@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mystery Box</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            color: #333;
+        }
+        .box-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin: 20px 0;
+        }
+        .box {
+            border: 2px solid #ccc;
+            border-radius: 10px;
+            padding: 15px;
+            margin: 10px;
+            width: 200px;
+            background-color: white;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .box img {
+            max-width: 100%;
+            border-radius: 10px;
+        }
+        .btn {
+            display: block;
+            margin: 10px auto;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <h1>🎁 Mystery Box</h1>
+    <div class="box-container">
+        <div class="box">
+            <img src="https://i.imgur.com/9oQeLwG.png" alt="Bronze Box">
+            <h3>Bronze Box</h3>
+            <p>Price: 1 TON</p>
+            <button class="btn" onclick="buyBox('bronze')">Buy Now</button>
+        </div>
+        <div class="box">
+            <img src="https://i.imgur.com/X92JqL0.png" alt="Silver Box">
+            <h3>Silver Box</h3>
+            <p>Price: 2 TON</p>
+            <button class="btn" onclick="buyBox('silver')">Buy Now</button>
+        </div>
+        <div class="box">
+            <img src="https://i.imgur.com/LM50kTo.png" alt="Gold Box">
+            <h3>Gold Box</h3>
+            <p>Price: 3 TON</p>
+            <button class="btn" onclick="buyBox('gold')">Buy Now</button>
+        </div>
+        <div class="box">
+            <img src="https://i.imgur.com/U7hlpzA.png" alt="Diamond Box">
+            <h3>Diamond Box</h3>
+            <p>Price: 5 TON</p>
+            <button class="btn" onclick="buyBox('diamond')">Buy Now</button>
+        </div>
+    </div>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script>
+        // Initialize Telegram WebApp
+        const tg = window.Telegram.WebApp;
+        tg.ready();
+
+        function buyBox(boxType) {
+            // Gửi dữ liệu về bot
+            tg.sendData(JSON.stringify({ action: 'buy_box', type: boxType }));
+        }
+
+        // Xử lý sự kiện khi bot gửi dữ liệu về WebApp (nếu cần)
+        tg.onEvent('mainButtonClicked', function() {
+            // Thực hiện một hành động nào đó
+        });
+
+        tg.onEvent('data', function(data) {
+            console.log('Received data:', data);
+        });
+    </script>
+</body>
+</html>
