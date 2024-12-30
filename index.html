@@ -1,37 +1,940 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mini App</title>
+    <title>Rise Of The Heroes - Hero Box Pre-Sale</title>
+    <!-- Meta Tags cho SEO -->
+    <meta name="description" content="Mở Hero Boxes để nhận các anh hùng với độ hiếm khác nhau trong Rise Of The Heroes. Thu thập và sở hữu anh hùng của bạn!">
+    <meta name="keywords" content="Rise Of The Heroes, Pre-Sale, Mua Hero Box, Độ Hiếm Anh Hùng, Telegram Mini App, Trò Chơi Mining, Toncoin">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&family=Montserrat:wght@600&display=swap" rel="stylesheet">
     <style>
+        /* Reset và Các Kiểu Cơ Bản */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
         body {
-            font-family: Arial, sans-serif;
+            font-family: 'Roboto', sans-serif;
+            background-color: #1a1a1a;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            padding: 20px;
+        }
+
+        header {
+            position: relative;
             text-align: center;
+            padding: 60px 20px;
+            background-image: url('https://i.imgur.com/W4dX31m.jpeg'); /* Hình nền chính */
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            color: #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            margin-bottom: 40px;
+        }
+
+        /* Overlay để cải thiện độ rõ của văn bản */
+        header::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6);
+            border-radius: 20px;
+            z-index: 1;
+        }
+
+        header h1 {
+            position: relative;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 3.5em;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 3px 3px #000;
+            z-index: 2;
+        }
+
+        header p {
+            position: relative;
+            font-size: 1.3em;
+            margin-bottom: 25px;
+            z-index: 2;
+        }
+
+        /* Nút Buy và Chọn Số Lượng ở giữa */
+        .buy-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+            z-index: 2;
+        }
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .quantity-selector button {
+            background-color: #ff9800;
+            color: #fff;
+            border: none;
+            padding: 12px 20px;
+            font-size: 1.2em;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: background-color 0.3s, transform 0.3s;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .quantity-selector button:hover {
+            background-color: #fb8c00;
+            transform: scale(1.05);
+        }
+
+        .quantity-selector span {
+            margin: 0 20px;
+            font-size: 1.8em;
+            min-width: 40px;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .buy-btn {
+            background-color: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 15px 50px;
+            font-size: 1.6em;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Montserrat', sans-serif;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .buy-btn:hover {
+            background-color: #43a047;
+            transform: scale(1.05);
+        }
+
+        /* Hiển thị Tổng Giá */
+        .price-display {
+            margin-top: 15px;
+            font-size: 1.4em;
+            color: #ffeb3b;
+            z-index: 2;
+            text-align: center;
+            font-weight: 700;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Ghi chú - Đã bị loại bỏ */
+        /* .notes {
+            margin-top: 10px;
+            font-size: 0.8em;
+            color: #ffeb3b;
+            z-index: 2;
+            text-align: center;
+        } */
+
+        /* Đếm ngược */
+        .countdown {
+            margin-top: 25px;
+            font-size: 1.6em;
+            color: #ffffff;
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+        }
+
+        main {
             margin-top: 50px;
         }
-        button {
-            font-size: 20px;
-            padding: 10px 20px;
-            background-color: #007BFF;
-            color: white;
+
+        /* Phần Hiển thị Anh Hùng Đã Thu Thập */
+        .acquired-heroes-section {
+            margin-top: 60px;
+            padding: 25px;
+            background-color: #2a2a2a;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+        }
+
+        .acquired-heroes-section h2 {
+            text-align: center;
+            margin-bottom: 35px;
+            color: #4caf50;
+            font-size: 2.5em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+            text-shadow: 2px 2px #000;
+        }
+
+        .heroes-gallery {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .hero-card {
+            background-color: #1e1e1e;
+            border: 3px solid #4caf50;
+            border-radius: 12px;
+            width: 180px;
+            margin: 20px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.6);
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            opacity: 0;
+            transform: scale(0.8);
+            animation: fadeInScale 0.5s forwards;
+        }
+
+        @keyframes fadeInScale {
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .hero-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.8);
+            border-color: #81c784;
+        }
+
+        .hero-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 8px;
+        }
+
+        .hero-card h4 {
+            margin: 12px 0 6px 0;
+            color: #4caf50;
+            font-size: 1.1em;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
+            text-shadow: 1px 1px #000;
+        }
+
+        .hero-card span {
+            display: inline-block;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 1em;
+            color: #fff;
+            margin-bottom: 6px;
+            font-weight: 700;
+        }
+
+        /* Màu sắc Độ Hiếm */
+        .rarity-common { background-color: #9e9e9e; }
+        .rarity-rare { background-color: #2196f3; }
+        .rarity-epic { background-color: #9c27b0; }
+        .rarity-legendary { background-color: #ff9800; }
+        .rarity-mythic { background-color: #f44336; }
+
+        /* Danh sách Thống kê với Biểu tượng */
+        .hero-card ul {
+            list-style: none;
+            padding: 0;
+            margin-top: 12px;
+            text-align: left;
+            font-size: 0.95em;
+            color: #ccc;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .hero-card ul li {
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-card ul li svg {
+            width: 18px;
+            height: 18px;
+            margin-right: 10px;
+            fill: #fff;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 70px;
+            color: #777;
+            font-size: 1em;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        /* Thiết kế Responsive */
+        @media (max-width: 768px) {
+            .buy-btn {
+                width: 85%;
+            }
+
+            .price-display {
+                font-size: 1.2em;
+            }
+
+            .hero-card {
+                width: 140px;
+                margin: 15px;
+                padding: 12px;
+            }
+
+            .hero-card h4 {
+                font-size: 1em;
+            }
+
+            .hero-card ul li svg {
+                width: 16px;
+                height: 16px;
+                margin-right: 8px;
+            }
+        }
+
+        /* Styles Thông báo */
+        .notification {
+            position: fixed;
+            top: 25px;
+            right: 25px;
+            background-color: #333;
+            color: #fff;
+            padding: 18px 25px;
+            border-radius: 8px;
+            display: none;
+            z-index: 1000;
+            opacity: 0.95;
+            font-size: 1.1em;
+            animation: fadeInOut 3s forwards;
+            font-family: 'Roboto', sans-serif;
+        }
+
+        .notification.success {
+            background-color: #4caf50;
+        }
+
+        .notification.error {
+            background-color: #f44336;
+        }
+
+        @keyframes fadeInOut {
+            0% { opacity: 0; transform: translateY(-20px); }
+            10% { opacity: 0.95; transform: translateY(0); }
+            90% { opacity: 0.95; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+
+        /* Styles Modal */
+        .modal {
+            display: none; /* Ẩn mặc định */
+            position: fixed; /* Giữ ở vị trí */
+            z-index: 1001; /* Đặt lên trên */
+            left: 0;
+            top: 0;
+            width: 100%; /* Chiều rộng đầy đủ */
+            height: 100%; /* Chiều cao đầy đủ */
+            overflow: auto; /* Cho phép cuộn nếu cần */
+            background-color: rgba(0,0,0,0.7); /* Màu nền đen với độ mờ */
+            animation: fadeInModal 0.5s forwards;
+        }
+
+        @keyframes fadeInModal {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background-color: #2a2a2a;
+            margin: 12% auto; /* 12% từ trên và canh giữa */
+            padding: 25px;
+            border: 1px solid #888;
+            width: 80%; /* Có thể điều chỉnh tùy theo kích thước màn hình */
+            max-width: 550px;
+            border-radius: 12px;
+            color: #fff;
+            text-align: center;
+            position: relative;
+            animation: slideInModal 0.5s forwards;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.6);
+            font-family: 'Roboto', sans-serif;
+        }
+
+        @keyframes slideInModal {
+            from { transform: translateY(-50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .modal-content h3 {
+            margin-bottom: 25px;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 700;
+        }
+
+        .modal-content button {
+            background-color: #4caf50;
+            color: #fff;
             border: none;
-            border-radius: 5px;
+            padding: 12px 25px;
+            margin: 12px;
+            font-size: 1em;
+            border-radius: 6px;
             cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            font-family: 'Montserrat', sans-serif;
+            font-weight: 600;
         }
-        button:hover {
-            background-color: #0056b3;
+
+        .modal-content button:hover {
+            background-color: #43a047;
+            transform: scale(1.05);
         }
+
+        .modal-content .cancel-btn {
+            background-color: #f44336;
+        }
+
+        .modal-content .cancel-btn:hover {
+            background-color: #e53935;
+        }
+
+        /* Styles Logo Toncoin */
+        .toncoin-logo {
+            width: 22px;
+            vertical-align: middle;
+            margin-right: 6px;
+        }
+
+        /* Styles Loading Screen */
+        .loading-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('https://i.imgur.com/JLBcJgV.jpeg'); /* Hình ảnh phụ được đặt làm nền */
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            flex-direction: column;
+            color: #fff;
+            animation: fadeOutLoading 1.5s forwards;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        @keyframes fadeOutLoading {
+            to { opacity: 0; visibility: hidden; }
+        }
+
+        .progress-bar-container {
+            width: 70%;
+            background-color: rgba(85, 85, 85, 0.8);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-top: 25px;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 22px;
+            background-color: #ff9800;
+            transition: width 1.5s linear;
+        }
+
+        /* Overlay hiệu ứng khi mở box */
+        .box-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.85);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1500;
+            animation: fadeInOverlay 0.5s forwards;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        @keyframes fadeInOverlay {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .box-overlay-content {
+            background-color: rgba(255,255,255,0.1);
+            padding: 40px;
+            border-radius: 15px;
+            text-align: center;
+            animation: popIn 0.5s forwards;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.7);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .box-overlay-content img {
+            width: 120px;
+            margin-bottom: 25px;
+            animation: rotateImage 2s linear infinite;
+        }
+
+        @keyframes rotateImage {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
     </style>
 </head>
 <body>
-    <h1>Welcome to My Mini App!</h1>
-    <button onclick="play()">Play</button>
+    <!-- Màn hình Loading -->
+    <div class="loading-screen" id="loading-screen">
+        <h2>Loading Game...</h2>
+        <div class="progress-bar-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+        <!-- Hình ảnh phụ đã được đặt làm nền, không cần thêm img tag nữa -->
+    </div>
 
+    <!-- Overlay khi mở Hero Box -->
+    <div class="box-overlay" id="box-overlay">
+        <div class="box-overlay-content">
+            <img src="https://i.imgur.com/W4dX31m.jpeg" alt="Box Opening">
+            <h3>Mở Hero Box...</h3>
+        </div>
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Rise Of The Heroes</h1>
+            <p>Pre-Sale đang diễn ra! Thời gian còn lại: <span id="countdown">00d 00h 00m 00s</span></p>
+            <div class="countdown" id="countdown-timer"></div>
+            <!-- Nút Buy và Chọn Số Lượng ở giữa -->
+            <div class="buy-section">
+                <div class="quantity-selector">
+                    <button id="decrease-btn">-</button>
+                    <span id="quantity">1</span>
+                    <button id="increase-btn">+</button>
+                </div>
+                <button class="buy-btn" id="buy-button">
+                    <img src="https://i.imgur.com/W4dX31m.jpeg" alt="Toncoin Logo" class="toncoin-logo">
+                    Buy (<span id="price-per-box">1.5</span> TON)
+                </button>
+            </div>
+            <!-- Hiển thị Tổng Giá -->
+            <div class="price-display" id="price-display">
+                Tổng: 1.5 TON
+            </div>
+            <!-- Đã loại bỏ ghi chú -->
+        </header>
+
+        <main>
+            <!-- Phần Hiển thị Anh Hùng Đã Thu Thập -->
+            <section class="acquired-heroes-section">
+                <h2>Your Acquired Heroes</h2>
+                <div class="heroes-gallery" id="heroes-gallery">
+                    <!-- Các Hero Card sẽ được thêm động ở đây -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Rise Of The Heroes. All rights reserved.</p>
+        </footer>
+    </div>
+
+    <!-- Thông báo -->
+    <div class="notification" id="notification"></div>
+
+    <!-- Modal Xác nhận Mua -->
+    <div id="confirmation-modal" class="modal">
+        <div class="modal-content">
+            <h3>Xác nhận Mua</h3>
+            <p>
+                Bạn có chắc chắn muốn mua 
+                <span id="confirm-quantity">1</span> Hero Box(es) với 
+                <img src="https://i.imgur.com/W4dX31m.jpeg" alt="Toncoin Logo" class="toncoin-logo"> 
+                <span id="total-cost">1.5 TON</span>?
+            </p>
+            <button id="confirm-purchase-btn">Đồng ý</button>
+            <button class="cancel-btn" id="cancel-purchase-btn">Hủy bỏ</button>
+        </div>
+    </div>
+
+    <!-- Telegram Web Apps SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script>
-        function play() {
-            alert("Play button clicked!");
+        // Khởi tạo Telegram Web Apps
+        window.Telegram.WebApp.ready();
+
+        // Điều chỉnh chiều cao viewport để phù hợp với Telegram
+        Telegram.WebApp.expand();
+
+        // Phát hiện Theme của Telegram và điều chỉnh màu sắc tương ứng
+        const theme = Telegram.WebApp.themeParams;
+
+        // Áp dụng màu nền và màu chữ từ Telegram nếu có
+        document.body.style.backgroundColor = theme.background_color || '#1a1a1a';
+        document.body.style.color = theme.text_color || '#ffffff';
+
+        // Hàm Hiển thị Thông báo
+        function showNotification(message, type) {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+
+            // Remove the notification after animation completes (3s)
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
         }
+
+        // Độ Hiếm của Hero với Xác Suất và Hệ Số Nhân
+        const heroRarities = [
+            { rarity: 'Common', probability: 60, colorClass: 'rarity-common', multiplier: 1 },
+            { rarity: 'Rare', probability: 25, colorClass: 'rarity-rare', multiplier: 2 },
+            { rarity: 'Epic', probability: 10, colorClass: 'rarity-epic', multiplier: 3 },
+            { rarity: 'Legendary', probability: 4, colorClass: 'rarity-legendary', multiplier: 4 },
+            { rarity: 'Mythic', probability: 1, colorClass: 'rarity-mythic', multiplier: 5 }
+        ];
+
+        // Các Hero mẫu cho mỗi độ hiếm với URL hình ảnh đã cung cấp
+        const heroesData = {
+            'Common': [
+                { name: 'Common Hero 1', img: 'https://i.imgur.com/e5tWjLW.jpeg' },
+                { name: 'Common Hero 2', img: 'https://i.imgur.com/ycG0sxa.jpeg' },
+                { name: 'Common Hero 3', img: 'https://i.imgur.com/pgaRmhh.jpeg' }
+            ],
+            'Rare': [
+                { name: 'Rare Hero 1', img: 'https://i.imgur.com/sllmEWW.jpeg' },
+                { name: 'Rare Hero 2', img: 'https://i.imgur.com/O6pknVh.jpeg' },
+                { name: 'Rare Hero 3', img: 'https://i.imgur.com/7mmrnnx.jpeg' } <!-- Đảm bảo URL chính xác -->
+            ],
+            'Epic': [
+                { name: 'Epic Hero 1', img: 'https://i.imgur.com/zHrATE5.jpeg' },
+                { name: 'Epic Hero 2', img: 'https://i.imgur.com/RV5qBBY.jpeg' },
+                { name: 'Epic Hero 3', img: 'https://i.imgur.com/stV94tn.jpeg' }
+            ],
+            'Legendary': [
+                { name: 'Legendary Hero 1', img: 'https://i.imgur.com/7mmrnnx.jpeg' },
+                { name: 'Legendary Hero 2', img: 'https://i.imgur.com/CRHRSWc.jpeg' },
+                { name: 'Legendary Hero 3', img: 'https://i.imgur.com/JLBcJgV.jpeg' } <!-- Sửa URL hình ảnh -->
+            ],
+            'Mythic': [
+                { name: 'Mythic Hero 1', img: 'https://i.imgur.com/6cvC8nK.jpeg' },
+                { name: 'Mythic Hero 2', img: 'https://i.imgur.com/HZhIjEo.jpeg' },
+                { name: 'Mythic Hero 3', img: 'https://i.imgur.com/S6Lkf4s.jpeg' }
+            ]
+        };
+
+        // Hàm Tải các Hero đã thu thập (Đã loại bỏ chức năng lưu trữ cho mục đích thử nghiệm)
+        function loadAcquiredHeroes() {
+            const gallery = document.getElementById('heroes-gallery');
+            gallery.innerHTML = ''; // Xóa các Hero hiện có
+
+            // Để đơn giản, không thêm Hero nào khi tải trang
+        }
+
+        // Hàm Tạo Thống Kê Ngẫu Nhiên cho Hero
+        function generateRandomStats(multiplier) {
+            // Base stats for Common Hero (multiplier = 1)
+            const baseStats = {
+                Strength: getRandomInt(10, 20),
+                Agility: getRandomInt(10, 20),
+                Intelligence: getRandomInt(10, 20),
+                HP: getRandomInt(100, 200),
+                Attack: getRandomInt(20, 40)
+            };
+
+            // Tăng chỉ số theo hệ số nhân
+            const scaledStats = {};
+            for (const [stat, value] of Object.entries(baseStats)) {
+                scaledStats[stat] = value * multiplier;
+            }
+
+            return scaledStats;
+        }
+
+        // Hàm Tạo Số Ngẫu Nhiên trong Khoảng min đến max (Bao Gồm max)
+        function getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        // Hàm Lấy Hero Ngẫu Nhiên Dựa trên Độ Hiếm
+        function getRandomHero() {
+            const rand = Math.random() * 100;
+            let cumulative = 0;
+            let selectedRarity = 'Common'; // Mặc định
+            let selectedMultiplier = 1;
+
+            for (let rarityObj of heroRarities) {
+                cumulative += rarityObj.probability;
+                if (rand <= cumulative) {
+                    selectedRarity = rarityObj.rarity;
+                    selectedMultiplier = rarityObj.multiplier;
+                    break;
+                }
+            }
+
+            // Chọn một hero ngẫu nhiên từ độ hiếm đã chọn
+            const heroesList = heroesData[selectedRarity];
+            const randomIndex = Math.floor(Math.random() * heroesList.length);
+            const selectedHero = heroesList[randomIndex];
+
+            return {
+                name: selectedHero.name,
+                img: selectedHero.img,
+                rarity: selectedRarity,
+                colorClass: heroRarities.find(r => r.rarity === selectedRarity).colorClass,
+                stats: generateRandomStats(selectedMultiplier)
+            };
+        }
+
+        // Hàm Mở một Hero Box với hiệu ứng hồi hộp
+        function openHeroBox() {
+            const hero = getRandomHero();
+
+            // Hiển thị overlay hiệu ứng mở box
+            const boxOverlay = document.getElementById('box-overlay');
+            boxOverlay.style.display = 'flex';
+
+            // Tạm dừng một thời gian trước khi hiển thị Hero Card
+            setTimeout(() => {
+                boxOverlay.style.display = 'none';
+                showNotification(`Bạn đã nhận được một anh hùng ${hero.rarity}: ${hero.name}!`, 'success');
+
+                // Hiển thị hero trong gallery với hiệu ứng fadeInScale
+                const gallery = document.getElementById('heroes-gallery');
+                const heroCard = document.createElement('div');
+                heroCard.classList.add('hero-card');
+
+                const heroImg = document.createElement('img');
+                heroImg.src = hero.img;
+                heroImg.alt = hero.name;
+
+                const heroName = document.createElement('h4');
+                heroName.textContent = hero.name;
+
+                const heroRarity = document.createElement('span');
+                heroRarity.textContent = hero.rarity;
+                heroRarity.classList.add(hero.colorClass);
+
+                // Tạo danh sách thống kê với Biểu tượng
+                const statsList = document.createElement('ul');
+                for (const [stat, value] of Object.entries(hero.stats)) {
+                    const statItem = document.createElement('li');
+                    statItem.innerHTML = `${getStatIcon(stat)} ${stat}: ${value}`;
+                    statsList.appendChild(statItem);
+                }
+
+                heroCard.appendChild(heroImg);
+                heroCard.appendChild(heroName);
+                heroCard.appendChild(heroRarity);
+                heroCard.appendChild(statsList);
+
+                gallery.appendChild(heroCard);
+            }, 2000); // 2 giây để tạo cảm giác hồi hộp
+        }
+
+        // Hàm Trả về Biểu tượng SVG cho từng Stat
+        function getStatIcon(stat) {
+            switch(stat) {
+                case 'Strength':
+                    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 2C10.343 2 9 3.343 9 5V7H7C5.343 7 4 8.343 4 10V14C4 15.657 5.343 17 7 17H9V19C9 20.657 10.343 22 12 22C13.657 22 15 20.657 15 19V17H17C18.657 17 20 15.657 20 14V10C20 8.343 18.657 7 17 7H15V5C15 3.343 13.657 2 12 2Z"/>
+                            </svg>`;
+                case 'Agility':
+                    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 0L15.09 7.26L23.18 8.27L17 13.97L18.18 22.02L12 18.27L5.82 22.02L7 13.97L0.82 8.27L8.91 7.26L12 0Z"/>
+                            </svg>`;
+                case 'Intelligence':
+                    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 21C16.97 21 21 16.97 21 12C21 7.03 16.97 3 12 3C7.03 3 3 7.03 3 12C3 16.97 7.03 21 12 21ZM13 17H11V15H13V17ZM13 13H11V7H13V13Z"/>
+                            </svg>`;
+                case 'HP':
+                    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M12 21C16.97 21 21 16.97 21 12C21 7.03 16.97 3 12 3C7.03 3 3 7.03 3 12C3 16.97 7.03 21 12 21ZM11 17H13V15H11V17ZM11 13H13V7H11V13Z"/>
+                            </svg>`;
+                case 'Attack':
+                    return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                                <path d="M21 2L9 14H5V20H11L21 10V2ZM10 16H6V12H10V16ZM10 10H6V6H10V10Z"/>
+                            </svg>`;
+                default:
+                    return '';
+            }
+        }
+
+        // Hàm Giảm Số Lượng
+        function decreaseQuantity() {
+            const qtyElement = document.getElementById('quantity');
+            let qty = parseInt(qtyElement.textContent);
+            if (qty > 1) {
+                qtyElement.textContent = qty - 1;
+                updateTotalCost();
+            }
+        }
+
+        // Hàm Tăng Số Lượng
+        function increaseQuantity() {
+            const qtyElement = document.getElementById('quantity');
+            let qty = parseInt(qtyElement.textContent);
+            if (qty < 10) { // Tối đa 10 boxes mỗi lần mua
+                qtyElement.textContent = qty + 1;
+                updateTotalCost();
+            }
+        }
+
+        // Hàm Cập Nhật Tổng Chi Phí
+        function updateTotalCost() {
+            const quantity = parseInt(document.getElementById('quantity').textContent);
+            const pricePerBox = 1.5; // Giá mỗi Hero Box
+            const totalCost = (quantity * pricePerBox).toFixed(2); // Tổng chi phí
+
+            // Cập nhật giá trên nút Buy
+            document.getElementById('price-per-box').textContent = pricePerBox;
+
+            // Cập nhật hiển thị tổng chi phí
+            document.getElementById('price-display').textContent = `Tổng: ${totalCost} TON`;
+        }
+
+        // Hàm Xác nhận Mua
+        function confirmPurchase() {
+            const quantity = parseInt(document.getElementById('quantity').textContent);
+            const pricePerBox = 1.5; // Giá mỗi Hero Box
+            const totalCost = (quantity * pricePerBox).toFixed(2); // Tổng chi phí
+
+            // Cập nhật nội dung trong modal
+            document.getElementById('confirm-quantity').textContent = quantity;
+            document.getElementById('total-cost').textContent = `${totalCost} TON`;
+
+            // Hiển thị modal
+            document.getElementById('confirmation-modal').style.display = 'block';
+        }
+
+        // Hàm Thực hiện Mua
+        function executePurchase() {
+            const quantity = parseInt(document.getElementById('confirm-quantity').textContent);
+            const pricePerBox = 1.5;
+            const totalCost = quantity * pricePerBox;
+
+            // Giả định rằng người dùng có đủ TON để mua (dùng để thử nghiệm)
+            // Trong thực tế, bạn cần tích hợp với ví TON hoặc cổng thanh toán
+
+            for (let i = 0; i < quantity; i++) {
+                openHeroBox();
+            }
+            closeModal();
+            showNotification(`Bạn đã mua thành công ${quantity} Hero Box(es) với tổng cộng ${totalCost.toFixed(2)} TON!`, 'success');
+        }
+
+        // Hàm Đóng Modal
+        function closeModal() {
+            document.getElementById('confirmation-modal').style.display = 'none';
+        }
+
+        // Đóng Modal khi nhấn ngoài nội dung modal
+        window.onclick = function(event) {
+            const modal = document.getElementById('confirmation-modal');
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        // Hàm Đếm ngược thời gian Pre-Sale
+        function startCountdown(endTime) {
+            const countdownElement = document.getElementById('countdown-timer');
+
+            const timer = setInterval(() => {
+                const now = new Date().getTime();
+                const distance = endTime - now;
+
+                if (distance < 0) {
+                    clearInterval(timer);
+                    countdownElement.innerHTML = "Pre-Sale đã kết thúc!";
+                    // Vô hiệu hóa nút Buy
+                    const buyButton = document.getElementById('buy-button');
+                    buyButton.disabled = true;
+                    buyButton.style.backgroundColor = '#555';
+                    buyButton.style.cursor = 'not-allowed';
+                    buyButton.innerHTML = 'Pre-Sale Đã Kết Thúc';
+                    return;
+                }
+
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                countdownElement.innerHTML = `${days}d ${hours}h ${minutes}m ${seconds}s`;
+            }, 1000);
+        }
+
+        // Hàm Hiển thị Màn hình Loading
+        function showLoadingScreen() {
+            const loadingScreen = document.getElementById('loading-screen');
+            const progressBar = document.getElementById('progress-bar');
+
+            // Hiển thị màn hình loading
+            loadingScreen.style.display = 'flex';
+            // Bắt đầu tiến trình thanh
+            setTimeout(() => {
+                progressBar.style.width = '100%';
+            }, 100); // Đợi 100ms trước khi bắt đầu
+
+            // 1.5 giây sau, ẩn màn hình loading và hiển thị nội dung chính
+            setTimeout(() => {
+                loadingScreen.style.display = 'none';
+            }, 1600); // 1500ms + 100ms
+        }
+
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', () => {
+            loadAcquiredHeroes();
+            updateTotalCost();
+
+            // Thiết lập thời gian kết thúc Pre-Sale (ví dụ: 7 ngày từ bây giờ)
+            const preSaleEndTime = new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
+            startCountdown(preSaleEndTime);
+
+            // Hiển thị màn hình loading khi vào game
+            showLoadingScreen();
+        });
+
+        document.getElementById('decrease-btn').addEventListener('click', decreaseQuantity);
+        document.getElementById('increase-btn').addEventListener('click', increaseQuantity);
+        document.getElementById('buy-button').addEventListener('click', confirmPurchase);
+        document.getElementById('confirm-purchase-btn').addEventListener('click', executePurchase);
+        document.getElementById('cancel-purchase-btn').addEventListener('click', closeModal);
     </script>
 </body>
 </html>
