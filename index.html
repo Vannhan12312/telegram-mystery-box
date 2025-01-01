@@ -2,17 +2,13 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>P2E MiniApp + PreSale + Box + Play (In-Bot Button)</title>
+  <title>My P2E MiniApp - PreSale + Telegram + Box</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
     /* RESET & BASE */
     * { margin:0; padding:0; box-sizing:border-box; }
-    html,body {
-      width:100%; height:100%;
-      background:#222; color:#fff;
-      font-family:sans-serif; overflow:hidden;
-    }
+    html,body { width:100%; height:100%; background:#222; color:#fff; font-family:sans-serif; overflow:hidden; }
 
     /* TOP BAR */
     #topBar {
@@ -27,22 +23,21 @@
       font-size:14px; font-weight:bold;
       transition:all 0.2s;
     }
-    .btn:hover {
-      background:#ff8c00; transform:translateY(-1px);
-    }
+    .btn:hover { background:#ff8c00; transform:translateY(-1px); }
 
     /* FOOTER TABS */
     #footerTabs {
-      position:absolute; bottom:0; left:0; width:100%; height:50px;
-      background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:space-around;
+      position:absolute; bottom:0; left:0;
+      width:100%; height:50px;
+      background:rgba(0,0,0,0.8);
+      display:flex; align-items:center; justify-content:space-around;
       z-index:10;
     }
     .tabItem {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      cursor:pointer; color:#fff; font-size:12px; font-weight:bold;
-      transition:transform 0.2s;
+      cursor:pointer; transition:transform 0.2s; color:#fff; font-size:12px; font-weight:bold;
     }
-    .tabItem img { width:32px; height:32px; margin-bottom:2px; }
+    .tabItem img { width:32px; height:32px; object-fit:contain; margin-bottom:2px; }
     .tabItem:hover { transform:scale(1.05); }
 
     /* CONTENT AREA */
@@ -53,7 +48,7 @@
     .tabPage { display:none; }
     .tabPage.show { display:block; }
 
-    /* HOME (Pre-Sale) */
+    /* HOME (PRE-SALE) */
     #homePreSaleContainer {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
       text-align:center; padding:10px; min-height:100%;
@@ -85,11 +80,9 @@
       background:#f57c00; color:#fff; border:none; border-radius:6px;
       cursor:pointer; transition:all 0.2s; text-shadow:1px 1px 2px #000;
     }
-    .btnCTA:hover {
-      background:#ff8c00; transform:translateY(-1px);
-    }
+    .btnCTA:hover { background:#ff8c00; transform:translateY(-1px); }
 
-    /* MISSION/HERO/HOUSE etc. */
+    /* QUEST / HERO / HOUSE / etc. */
     .missionCard, .heroCard, .houseCard {
       background:rgba(0,0,0,0.4); margin:5px; padding:5px; border-radius:8px; font-size:14px;
     }
@@ -102,12 +95,10 @@
 
     /* BOX FLIP (CLAIM BOX) */
     #flipInner {
-      width:100%; height:100%; position:absolute;
-      transform-style:preserve-3d; transition:transform 0.6s;
+      width:100%; height:100%; position:absolute; transform-style:preserve-3d; transition:transform 0.6s;
     }
-    #flipFront, #flipBack {
-      position:absolute; width:100%; height:100%;
-      border-radius:6px; backface-visibility:hidden;
+    #flipFront,#flipBack {
+      position:absolute; width:100%; height:100%; border-radius:6px; backface-visibility:hidden;
     }
     #flipFront { background:url('https://via.placeholder.com/80x80.png?text=Box') center/cover; }
     #flipBack  { transform:rotateY(180deg); background:url('https://via.placeholder.com/80x80.png?text=Opened') center/cover;}
@@ -128,15 +119,9 @@
       color:#fff; display:none; z-index:999999;
     }
 
-    /* PLAY BUTTON INSIDE BOT UI */
-    /* Giả sử ta cho nó nằm ở footer, bên phải, thay 1 tab “Play” */
-    #botPlayBtn {
-      background:#2181e2; color:#fff; border:none; border-radius:4px;
-      padding:4px 12px; font-size:14px; font-weight:bold;
-      text-shadow:1px 1px 2px #000; margin-left:8px;
-      cursor:pointer; transition:all 0.2s;
-    }
-    #botPlayBtn:hover { filter:brightness(1.1); transform:translateY(-1px); }
+    /* SCROLLBAR */
+    ::-webkit-scrollbar { width:6px; }
+    ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.3); border-radius:3px;}
   </style>
 </head>
 <body>
@@ -149,7 +134,6 @@
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div id="app" style="display:none;">
   <!-- TOP BAR -->
   <div id="topBar">
@@ -161,8 +145,6 @@
       <button class="btn" id="btnReferral">Referral</button>
       <button class="btn" id="btnWallet">TON Wallet</button>
       <button class="btn" id="btnSettings">Settings</button>
-      <!-- Nút PLAY đặt luôn trên topBar (mô phỏng “bên trong bot” logic) -->
-      <button id="botPlayBtn" onclick="onPlayClicked()">PLAY</button>
     </div>
   </div>
 
@@ -291,21 +273,12 @@
 <div id="claimBoxModal" class="modal">
   <h2>Open Box</h2>
   <div style="width:80px;height:80px;margin:0 auto;perspective:600px;position:relative;">
-    <div id="flipInner" style="
-      width:100%;height:100%;position:absolute;transform-style:preserve-3d;transition:transform 0.6s;">
-      <div id="flipFront" style="
-        position:absolute;width:100%;height:100%;border-radius:6px;backface-visibility:hidden;
-        background:url('https://via.placeholder.com/80x80.png?text=Box') center/cover;"></div>
-      <div id="flipBack" style="
-        position:absolute;width:100%;height:100%;border-radius:6px;backface-visibility:hidden;
-        transform:rotateY(180deg);
-        background:url('https://via.placeholder.com/80x80.png?text=Opened') center/cover;"></div>
+    <div id="flipInner" style="width:100%;height:100%;position:absolute;transform-style:preserve-3d;transition:transform 0.6s;">
+      <div id="flipFront" style="position:absolute;width:100%;height:100%;border-radius:6px;backface-visibility:hidden;background:url('https://via.placeholder.com/80x80.png?text=Box') center/cover;"></div>
+      <div id="flipBack" style="position:absolute;width:100%;height:100%;border-radius:6px;backface-visibility:hidden;transform:rotateY(180deg);background:url('https://via.placeholder.com/80x80.png?text=Opened') center/cover;"></div>
     </div>
   </div>
-  <div id="heroPreview" style="
-    width:80px;height:80px;margin:8px auto;border-radius:8px;
-    background-size:cover;background-position:center;">
-  </div>
+  <div id="heroPreview" style="width:80px;height:80px;margin:8px auto;border-radius:8px;background-size:cover;background-position:center;"></div>
   <p id="claimLabel" style="margin:6px 0;"></p>
   <p>Remaining: <span id="remainCount"></span></p>
   <button class="btn" id="claimNextBtn">Next Hero</button>
@@ -324,11 +297,12 @@
 
 <script>
 /***************************************************************
- * LOADING
+ * 1) LOADING
  ***************************************************************/
 let loadingProgress=0;
 let loadingInterval=setInterval(()=>{
-  loadingProgress+=5; if(loadingProgress>100) loadingProgress=100;
+  loadingProgress+=5;
+  if (loadingProgress>100) loadingProgress=100;
   document.getElementById('loadingBarInner').style.width=loadingProgress+'%';
 },100);
 
@@ -339,11 +313,11 @@ setTimeout(()=>{
 },2000);
 
 /***************************************************************
- * BASIC VARS
+ * 2) BASIC VARS
  ***************************************************************/
 let userBalance=100;
 document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
-document.getElementById('playerName').innerText="Player: BotPlay";
+document.getElementById('playerName').innerText="Player: PreSaleMaster";
 let isMusicOn=true, isSoundOn=true;
 
 /***************************************************************
@@ -359,25 +333,26 @@ document.body.addEventListener('click',function startBGM(){
 /***************************************************************
  * REFERRAL, WALLET, SETTINGS
  ***************************************************************/
-function closeReferral(){document.getElementById('referralModal').style.display='none';}
 document.getElementById('btnReferral').onclick=()=>{
   document.getElementById('referralModal').style.display='block';
-  document.getElementById('refLink').innerText="https://t.me/BotPlayMiniApp?start=888";
+  document.getElementById('refLink').innerText="https://t.me/MyPreSaleP2E?start=999";
 };
 document.getElementById('refCopyBtn').onclick=()=>{
-  let txt=document.getElementById('refLink').innerText;
-  navigator.clipboard.writeText(txt).then(()=>showNotification("Copied link!"));
+  let l=document.getElementById('refLink').innerText;
+  navigator.clipboard.writeText(l).then(()=>showNotification("Copied link!"));
 };
+function closeReferral(){ document.getElementById('referralModal').style.display='none'; }
 
-document.getElementById('btnWallet').onclick=()=>document.getElementById('walletModal').style.display='block';
-function closeWallet(){document.getElementById('walletModal').style.display='none';}
+document.getElementById('btnWallet').onclick=()=> document.getElementById('walletModal').style.display='block';
+function closeWallet(){ document.getElementById('walletModal').style.display='none'; }
+
 document.getElementById('walConnectBtn').onclick=()=>{
-  document.getElementById('walletAddr').innerText="EQ_bot_play...ton";
-  showNotification("Wallet connected!");
+  document.getElementById('walletAddr').innerText="EQ_miniapp...ton";
+  showNotification("TON wallet connected!");
 };
 document.getElementById('walDisconnectBtn').onclick=()=>{
   document.getElementById('walletAddr').innerText="-";
-  showNotification("Wallet disconnected!");
+  showNotification("TON wallet disconnected!");
 };
 document.getElementById('walWithdrawBtn').onclick=()=>{
   if(userBalance>=10){
@@ -398,7 +373,16 @@ document.getElementById('btnSettings').onclick=()=>{
   document.getElementById('chkMusic').checked=isMusicOn;
   document.getElementById('chkSound').checked=isSoundOn;
 };
-function closeSettings(){document.getElementById('settingsModal').style.display='none';}
+function closeSettings(){ document.getElementById('settingsModal').style.display='none'; }
+document.getElementById('chkMusic').onchange=(e)=>{
+  isMusicOn=e.target.checked;
+  if(isMusicOn) bgmAudio.play().catch(()=>{});
+  else bgmAudio.pause();
+};
+document.getElementById('chkSound').onchange=(e)=>{
+  isSoundOn=e.target.checked;
+};
+function closeHeroInfo(){ document.getElementById('heroInfoModal').style.display='none'; }
 
 /***************************************************************
  * FOOTER TABS
@@ -427,27 +411,28 @@ function showNotification(msg){
 /***************************************************************
  * PRE-SALE COUNTDOWN (7 days)
  ***************************************************************/
-let preSaleEndTime=Date.now()+(7*24*60*60*1000);
-const countdownEl=document.getElementById('countdownTimer');
+let preSaleEndTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
+let countdownEl = document.getElementById('countdownTimer');
+
 function updateCountdown(){
-  let now=Date.now();
-  let dist=preSaleEndTime-now;
-  if(dist<0){
-    countdownEl.textContent="TIME IS UP! (0d:0h:0m:0s)";
+  let now = Date.now();
+  let dist = preSaleEndTime - now;
+  if(dist < 0){
+    countdownEl.textContent = "TIME IS UP! (0d:0h:0m:0s)";
     return;
   }
-  let d=Math.floor(dist/(1000*60*60*24));
-  let h=Math.floor((dist%(1000*60*60*24))/(1000*60*60));
-  let m=Math.floor((dist%(1000*60*60))/(1000*60));
-  let s=Math.floor((dist%(1000*60))/1000);
+  let d = Math.floor(dist/(1000*60*60*24));
+  let h = Math.floor((dist%(1000*60*60*24))/(1000*60*60));
+  let m = Math.floor((dist%(1000*60*60))/(1000*60));
+  let s = Math.floor((dist%(1000*60))/1000);
 
-  countdownEl.textContent=`⏳ ${d}d: ${h}h: ${m}m: ${s}s`;
+  countdownEl.textContent = `⏳ ${d}d: ${h}h: ${m}m: ${s}s`;
 }
 setInterval(updateCountdown,1000);
 updateCountdown();
 
 function onPreSaleCTA(){
-  alert("You have chosen to ORDER NOW - enjoy the 30% discount!");
+  alert("You have chosen to ORDER NOW - enjoy 30% discount!");
 }
 
 /***************************************************************
@@ -455,7 +440,7 @@ function onPreSaleCTA(){
  ***************************************************************/
 let questData=[
   {id:1,name:"Defeat 5 monsters",reward:5,done:false},
-  {id:2,name:"Collect 10 coins",reward:8,done:false},
+  {id:2,name:"Invite 1 friend",reward:8,done:false},
 ];
 function renderQuest(){
   let qDiv=document.getElementById('questList');
@@ -465,10 +450,10 @@ function renderQuest(){
     c.classList.add('missionCard');
     let h3=document.createElement('h3'); h3.innerText=q.name; c.appendChild(h3);
     let p=document.createElement('p'); p.innerText=`Reward: ${q.reward} TON`; c.appendChild(p);
-
     let b=document.createElement('button'); b.classList.add('btn');
     if(q.done){
-      b.innerText="Claimed"; b.disabled=true;
+      b.innerText="Claimed";
+      b.disabled=true;
     } else {
       b.innerText="Complete";
       b.onclick=()=>{
@@ -502,18 +487,22 @@ function renderHouseList(){
     top.style.display='flex'; top.style.alignItems='center';
 
     let i=document.createElement('img');
-    i.src=h.img;
-    i.style.width="40px"; i.style.height="40px";
-    i.style.objectFit="cover"; i.style.borderRadius="4px"; i.style.marginRight="6px";
+    i.src=h.img; i.style.width="40px"; i.style.height="40px"; i.style.objectFit="cover"; i.style.borderRadius="4px"; i.style.marginRight="6px";
     top.appendChild(i);
 
     let n=document.createElement('div');
-    n.innerHTML=`<strong>${h.type} House</strong> <br>Level ${h.level}`;
+    n.innerHTML=`
+      <strong>${h.type} House</strong> 
+      <br>Level ${h.level}
+    `;
     top.appendChild(n);
     card.appendChild(top);
 
     let info=document.createElement('p');
-    info.innerHTML=`Cost: ${h.cost} TON<br>Daily Rent: ${h.rent} TON`;
+    info.innerHTML=`
+      Cost: ${h.cost} TON <br>
+      Daily Rent: ${h.rent} TON
+    `;
     card.appendChild(info);
 
     let btnGroup=document.createElement('div');
@@ -544,10 +533,11 @@ function renderHouseList(){
     bUpgrade.onclick=()=>{
       let upCost=Math.floor(h.cost/2)*(h.level+1);
       if(userBalance>=upCost){
-        userBalance-=upCost; h.level++;
+        userBalance-=upCost;
+        h.level++;
         h.rent+=Math.floor(h.rent/2);
         document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
-        showNotification(`${h.type} => Lv ${h.level}, rent => ${h.rent}`);
+        showNotification(`${h.type} House => Lv ${h.level}, rent => ${h.rent}`);
         renderHouseList();
       } else {
         showNotification(`Need ${upCost} TON to upgrade!`);
@@ -561,9 +551,9 @@ function renderHouseList(){
       if(userBalance>=pCost){
         userBalance-=pCost;
         document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
-        showNotification(`Party at ${h.type} House cost ${pCost} TON`);
+        showNotification(`Party at ${h.type} cost ${pCost} TON, morale++`);
       } else {
-        showNotification("Not enough TON to party!");
+        showNotification("Not enough TON for party!");
       }
     };
 
@@ -578,39 +568,90 @@ function renderHouseList(){
 }
 
 /***************************************************************
- * 50 HERO (COMMON->MYTHIC), random ratio 40/30/15/10/5
+ * HERO (50 heroes) + RANDOM (40-30-15-10-5)
  ***************************************************************/
 const heroData={
-  // (Giống code cũ – cắt ngắn để ví dụ)
-  Common:[ /*...10 common...*/ ],
-  Rare:[ /*...10 rare...*/ ],
-  Epic:[ /*...10 epic...*/ ],
-  Legendary:[ /*...10 legendary...*/ ],
-  Mythic:[ /*...10 mythic...*/ ]
+  Common:[
+    {name:"SlimeKid",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",stats:[3,1,10],element:"🌱"},
+    {name:"ShellFish",rarity:"Common",img:"https://i.imgur.com/Iy1X8r1.png",stats:[2,2,9],element:"💧"},
+    {name:"GreenFish",rarity:"Common",img:"https://i.imgur.com/zaWeuIb.png",stats:[3,1,8],element:"💧"},
+    {name:"MudCrab",rarity:"Common",img:"https://i.imgur.com/p08Obdb.png",stats:[2,3,7],element:"🌱"},
+    {name:"RockyShell",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",stats:[3,2,9],element:"🌱"},
+    {name:"JellyMold",rarity:"Common",img:"https://i.imgur.com/7tfCqWd.png",stats:[2,2,8],element:"💧"},
+    {name:"TinyCrab",rarity:"Common",img:"https://i.imgur.com/pHyAG2b.png",stats:[2,3,7],element:"🌱"},
+    {name:"BluishCrab",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",stats:[3,2,9],element:"💧"},
+    {name:"PearlCrab",rarity:"Common",img:"https://i.imgur.com/tq1KRm5.png",stats:[2,2,8],element:"🌱"},
+    {name:"SlimyJr",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",stats:[3,1,10],element:"💧"},
+  ],
+  Rare:[
+    {name:"FireCrab",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png",stats:[5,3,15],element:"🔥"},
+    {name:"TurtleWar",rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png",stats:[4,4,14],element:"💧"},
+    {name:"SeaKnight",rarity:"Rare",img:"https://i.imgur.com/QRJyOyp.png",stats:[5,3,15],element:"💧"},
+    {name:"DarkFrog",rarity:"Rare",img:"https://i.imgur.com/NK8EQm1.png",stats:[5,3,14],element:"🌑"},
+    {name:"CrabLord",rarity:"Rare",img:"https://i.imgur.com/Aa396uh.png",stats:[6,3,15],element:"🌱"},
+    {name:"ScorpionKid",rarity:"Rare",img:"https://i.imgur.com/aUTGKeg.png",stats:[5,3,14],element:"🌱"},
+    {name:"AquaShield",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png",stats:[4,4,15],element:"💧"},
+    {name:"CoralWar",rarity:"Rare",img:"https://i.imgur.com/TcSRW3O.png",stats:[5,3,15],element:"💧"},
+    {name:"ClamGuard",rarity:"Rare",img:"https://i.imgur.com/Juwfrcz.png",stats:[4,4,14],element:"💧"},
+    {name:"AngryFish",rarity:"Rare",img:"https://i.imgur.com/8rZaJYc.png",stats:[5,3,13],element:"💧"},
+  ],
+  Epic:[
+    {name:"SharkWar",rarity:"Epic",img:"https://i.imgur.com/02jTwGp.png",stats:[8,5,25],element:"💧"},
+    {name:"PearlMage",rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png",stats:[7,6,24],element:"🌟"},
+    {name:"EpicFrog",rarity:"Epic",img:"https://i.imgur.com/wr71ePx.png",stats:[8,4,26],element:"🌑"},
+    {name:"DeepCrab",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",stats:[7,5,25],element:"🌊"},
+    {name:"ShellBuster",rarity:"Epic",img:"https://i.imgur.com/PqCgXay.png",stats:[9,4,24],element:"🔥"},
+    {name:"OceanLancer",rarity:"Epic",img:"https://i.imgur.com/wxAAFkK.png",stats:[8,5,24],element:"💧"},
+    {name:"ReefDragon",rarity:"Epic",img:"https://i.imgur.com/EB7WHnW.png",stats:[7,6,25],element:"🌱"},
+    {name:"StormFish",rarity:"Epic",img:"https://i.imgur.com/EmWFXPq.png",stats:[7,6,24],element:"🌩"},
+    {name:"KrakenKid",rarity:"Epic",img:"https://i.imgur.com/mnMCDvt.png",stats:[8,5,24],element:"🌊"},
+    {name:"AbyssCrab",rarity:"Epic",img:"https://i.imgur.com/QkkGPnK.png",stats:[9,5,22],element:"🌱"},
+  ],
+  Legendary:[
+    {name:"InfernoCrab",rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png",stats:[12,7,40],element:"🔥"},
+    {name:"AbyssDragon",rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png",stats:[11,8,38],element:"🌑"},
+    {name:"MegaShark",rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png",stats:[12,6,39],element:"💧"},
+    {name:"PearlDragon",rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png",stats:[11,7,40],element:"💧"},
+    {name:"LavaClam",rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png",stats:[12,7,38],element:"🔥"},
+    {name:"CoralKnight",rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png",stats:[13,6,37],element:"💧"},
+    {name:"StoneWar",rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png",stats:[12,8,36],element:"🌱"},
+    {name:"MudGolem",rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png",stats:[11,8,38],element:"🌱"},
+    {name:"AngelCrab",rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png",stats:[13,7,36],element:"🌟"},
+    {name:"AquaDino",rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png",stats:[12,8,37],element:"💧"},
+  ],
+  Mythic:[
+    {name:"ElderDragon",rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png",stats:[18,10,60],element:"🌟"},
+    {name:"AquaGod",rarity:"Mythic",img:"https://i.imgur.com/ujlhSVK.png",stats:[17,12,58],element:"💧"},
+    {name:"ArcAngel",rarity:"Mythic",img:"https://i.imgur.com/1K8xEcc.png",stats:[18,9,59],element:"🌟"},
+    {name:"CyberDino",rarity:"Mythic",img:"https://i.imgur.com/EokU1JU.png",stats:[17,11,60],element:"🌑"},
+    {name:"PhoenixKing",rarity:"Mythic",img:"https://i.imgur.com/Qg9MLyO.png",stats:[19,10,58],element:"🔥"},
+    {name:"TimeSerpent",rarity:"Mythic",img:"https://i.imgur.com/Xsqp1Zl.png",stats:[18,12,56],element:"⏳"},
+    {name:"GalaxyWolf",rarity:"Mythic",img:"https://i.imgur.com/YeDYlBO.png",stats:[17,12,58],element:"🌌"},
+    {name:"AuraKnight",rarity:"Mythic",img:"https://i.imgur.com/h8LyWQG.png",stats:[18,11,59],element:"🌟"},
+    {name:"BlazeGod",rarity:"Mythic",img:"https://i.imgur.com/u2hcKvV.png",stats:[19,10,57],element:"🔥"},
+    {name:"AncientGolem",rarity:"Mythic",img:"https://i.imgur.com/WWF50XS.png",stats:[18,12,57],element:"⛰"},
+  ]
 };
 
-/* Sửa lại 1-2 hero ví dụ: (hoặc đầy đủ) */
-heroData.Common=[
-  {name:"SlimeKid",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",stats:[3,1,10],element:"🌱"},
-  // v.v...
-];
-
-/* Random ratio hero */
 function randomHero(){
   let roll=Math.random()*100;
   let rar;
-  if(roll<40) rar="Common";
-  else if(roll<70) rar="Rare";
-  else if(roll<85) rar="Epic";
-  else if(roll<95) rar="Legendary";
-  else rar="Mythic";
+  if(roll<40) rar="Common"; //40%
+  else if(roll<70) rar="Rare"; //30%
+  else if(roll<85) rar="Epic"; //15%
+  else if(roll<95) rar="Legendary"; //10%
+  else rar="Mythic"; //5%
 
   let pool=heroData[rar];
   let idx=Math.floor(Math.random()*pool.length);
   return {...pool[idx]};
 }
 
+/***************************************************************
+ * HERO LIST
+ ***************************************************************/
 let heroList=[];
+
 function renderHeroList(){
   let d=document.getElementById('heroListDiv');
   d.innerHTML="";
@@ -621,6 +662,7 @@ function renderHeroList(){
   heroList.forEach(h=>{
     let row=document.createElement('div');
     row.classList.add('heroCard');
+
     let im=document.createElement('img');
     im.src=h.img;
     row.appendChild(im);
@@ -637,30 +679,17 @@ function renderHeroList(){
       <br>⚔${h.stats[0]} 🏃${h.stats[1]} ❤${h.stats[2]} | ${h.element||""}
     `;
     row.appendChild(sp);
+
     row.onclick=()=>openHeroInfo(h);
     d.appendChild(row);
   });
-}
-function openHeroInfo(h){
-  document.getElementById('heroInfoModal').style.display='block';
-  document.getElementById('heroInfoImg').src=h.img;
-
-  let color="#fff";
-  if(h.rarity==="Rare") color="#0ff";
-  if(h.rarity==="Epic") color="#ffd700";
-  if(h.rarity==="Legendary") color="#ff4444";
-  if(h.rarity==="Mythic") color="#ff00ff";
-
-  document.getElementById('heroInfoName').innerText=h.name;
-  document.getElementById('heroInfoRarity').innerHTML=`<span style="color:${color}">[${h.rarity}]</span>`;
-  document.getElementById('heroInfoStats').innerText=`⚔${h.stats[0]} 🏃${h.stats[1]} ❤${h.stats[2]}`;
-  document.getElementById('heroInfoElement').innerText=`Element: ${h.element||""}`;
 }
 
 /***************************************************************
  * BOX FLOW
  ***************************************************************/
 let purchasedBoxCount=0, openedBoxIndex=0, lastHero=null;
+
 document.getElementById('confirmBoxYes').onclick=()=>{
   let cost=purchasedBoxCount*2;
   if(userBalance<cost){
@@ -683,9 +712,10 @@ document.getElementById('claimNextBtn').onclick=()=>{
   document.getElementById('flipInner').style.transform="";
   openedBoxIndex++;
   if(openedBoxIndex>=purchasedBoxCount){
-    showNotification(`Opened all ${purchasedBoxCount} box(es)!`);
+    showNotification("Opened all "+purchasedBoxCount+" box(es)!");
     document.getElementById('claimBoxModal').style.display='none';
-    purchasedBoxCount=0; openedBoxIndex=0;
+    purchasedBoxCount=0;
+    openedBoxIndex=0;
   } else {
     setTimeout(()=>openBoxHero(),600);
   }
@@ -711,20 +741,20 @@ function openBoxHero(){
   heroList.push(newH);
   renderHeroList();
 
+  // Use "⏳" in the claim label
   document.getElementById('flipInner').style.transform="rotateY(180deg)";
   document.getElementById('claimLabel').textContent=`⏳ Got: ${newH.name} [${newH.rarity}]`;
   document.getElementById('heroPreview').style.backgroundImage=`url('${newH.img}')`;
+
   let remain=purchasedBoxCount-(openedBoxIndex+1);
   document.getElementById('remainCount').innerText=remain;
 }
 
 /***************************************************************
- * PLAY BUTTON INSIDE BOT
+ * CTA for PreSale
  ***************************************************************/
-function onPlayClicked(){
-  // Tại đây bạn có thể gắn logic Bot Telegram,
-  // ví dụ gửi callback, hiển thị 1 minigame scene,...
-  showNotification("PLAY clicked! Integrate your bot logic here.");
+function onPreSaleCTA(){
+  alert("You have chosen to PLACE ORDER NOW - enjoy the 30% discount!");
 }
 </script>
 </body>
