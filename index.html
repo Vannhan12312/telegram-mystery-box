@@ -2,87 +2,76 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>My P2E MiniApp - PreSale + Telegram + Box</title>
+  <title>MyP2E - Telegram MiniApp + TON + House</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <style>
     /* RESET & BASE */
     * { margin:0; padding:0; box-sizing:border-box; }
-    html,body { width:100%; height:100%; background:#222; color:#fff; font-family:sans-serif; overflow:hidden; }
+    html,body { width:100%; height:100%; font-family:sans-serif; background:#333; color:#fff; overflow:hidden; user-select:none; }
+    
+    /* LOADING SCREEN */
+    #loadingScreen {
+      position:fixed; top:0; left:0; width:100%; height:100%;
+      background:#212121; z-index:99999;
+      display:flex; flex-direction:column; align-items:center; justify-content:center;
+    }
+    #loadingScreen img {
+      width:80px; height:80px; object-fit:contain; border-radius:10px;
+    }
+    #loadingBarOuter {
+      width:300px; height:10px; background:#333; margin-top:20px; border-radius:5px; overflow:hidden;
+    }
+    #loadingBarInner {
+      width:0%; height:100%; background:#4caf50; transition:width 0.1s;
+    }
+
+    /* MAIN APP */
+    #app {
+      position:relative; width:100%; height:100%; display:none;
+      background:url('https://i.imgur.com/mSrbALs.jpg') center/cover no-repeat; /* Demo BG */
+    }
 
     /* TOP BAR */
     #topBar {
-      position:absolute; top:0; left:0;
-      width:100%; height:50px;
-      background:rgba(0,0,0,0.7);
-      display:flex; align-items:center; justify-content:space-between;
+      position:absolute; top:0; left:0; 
+      width:100%; height:50px; background:rgba(0,0,0,0.7);
+      display:flex; align-items:center; justify-content:space-between; 
       padding:0 10px; z-index:10;
     }
     .btn {
-      background:#F57C00; color:#fff; padding:4px 12px; border:none; border-radius:4px; cursor:pointer;
-      font-size:14px; font-weight:bold;
-      transition:all 0.2s;
+      background:#F57C00; color:#fff; padding:4px 12px; border:none; border-radius:4px; cursor:pointer; 
+      font-size:14px; font-weight:bold; transition:all 0.2s;
     }
     .btn:hover { background:#ff8c00; transform:translateY(-1px); }
 
     /* FOOTER TABS */
     #footerTabs {
-      position:absolute; bottom:0; left:0;
-      width:100%; height:50px;
-      background:rgba(0,0,0,0.8);
-      display:flex; align-items:center; justify-content:space-around;
-      z-index:10;
+      position:absolute; bottom:0; left:0; width:100%; height:50px;
+      background:rgba(0,0,0,0.8); display:flex; align-items:center; justify-content:space-around; z-index:10;
     }
     .tabItem {
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      cursor:pointer; transition:transform 0.2s; color:#fff; font-size:12px; font-weight:bold;
+      cursor:pointer; transition:transform 0.2s;
     }
-    .tabItem img { width:32px; height:32px; object-fit:contain; margin-bottom:2px; }
+    .tabItem img {
+      width:32px; height:32px; object-fit:contain; margin-bottom:2px;
+    }
+    .tabItem span {
+      font-size:12px; font-weight:bold; color:#fff;
+    }
     .tabItem:hover { transform:scale(1.05); }
 
     /* CONTENT AREA */
     #contentArea {
-      position:absolute; top:50px; left:0; width:100%; height:calc(100% - 100px);
-      background:rgba(0,0,0,0.5); overflow:auto; padding:8px;
+      position:absolute; top:50px; left:0; 
+      width:100%; height:calc(100% - 100px);
+      background:rgba(0,0,0,0.5); 
+      overflow:auto; padding:8px;
     }
     .tabPage { display:none; }
     .tabPage.show { display:block; }
 
-    /* HOME (PRE-SALE) */
-    #homePreSaleContainer {
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      text-align:center; padding:10px; min-height:100%;
-    }
-    .fancyTitle {
-      font-size:32px; font-weight:bold; color:#ff5050; margin-bottom:6px;
-      text-shadow:2px 2px 4px #000;
-    }
-    .fancyTitle span {
-      background: linear-gradient(90deg, #ff5050, #ffa500, #ff5050);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      display: inline-block;
-    }
-    #homePreSaleContainer h1 {
-      font-size:24px; color:#ffcc00; margin-bottom:8px; text-shadow:1px 1px 2px #000;
-    }
-    .desc {
-      font-size:14px; color:#ddd; margin-bottom:12px;
-    }
-    .specialIcons {
-      font-size:16px; color:#0ff; margin-bottom:10px; text-shadow:1px 1px 2px #000;
-    }
-    #countdownTimer {
-      font-size:16px; font-weight:bold; color:#ffcc00; margin-bottom:14px; text-shadow:1px 1px 2px #000;
-    }
-    .btnCTA {
-      font-size:14px; font-weight:bold; padding:8px 16px;
-      background:#f57c00; color:#fff; border:none; border-radius:6px;
-      cursor:pointer; transition:all 0.2s; text-shadow:1px 1px 2px #000;
-    }
-    .btnCTA:hover { background:#ff8c00; transform:translateY(-1px); }
-
-    /* QUEST / HERO / HOUSE / etc. */
+    /* MISSION/HERO/HOUSE etc. */
     .missionCard, .heroCard, .houseCard {
       background:rgba(0,0,0,0.4); margin:5px; padding:5px; border-radius:8px; font-size:14px;
     }
@@ -93,21 +82,27 @@
       width:40px; height:40px; object-fit:cover; border-radius:4px; margin-right:6px;
     }
 
-    /* BOX FLIP (CLAIM BOX) */
+    /* BOX FLIP */
     #flipInner {
-      width:100%; height:100%; position:absolute; transform-style:preserve-3d; transition:transform 0.6s;
+      width:100%; height:100%;
+      position:absolute; transform-style:preserve-3d; transition:transform 0.6s;
     }
     #flipFront,#flipBack {
-      position:absolute; width:100%; height:100%; border-radius:6px; backface-visibility:hidden;
+      position:absolute; width:100%; height:100%;
+      border-radius:6px; backface-visibility:hidden;
     }
     #flipFront { background:url('https://via.placeholder.com/80x80.png?text=Box') center/cover; }
-    #flipBack  { transform:rotateY(180deg); background:url('https://via.placeholder.com/80x80.png?text=Opened') center/cover;}
+    #flipBack {
+      transform:rotateY(180deg);
+      background:url('https://via.placeholder.com/80x80.png?text=Opened') center/cover;
+    }
 
     /* MODAL */
     .modal {
       position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
       background:rgba(0,0,0,0.9); width:300px; padding:10px;
-      border-radius:8px; border:2px solid #fff; display:none; z-index:99999; text-align:center;
+      border-radius:8px; border:2px solid #fff;
+      display:none; z-index:99999; text-align:center;
     }
     .modal h2 { margin-bottom:5px; font-size:16px; }
     .modal p { font-size:14px; }
@@ -121,20 +116,18 @@
 
     /* SCROLLBAR */
     ::-webkit-scrollbar { width:6px; }
-    ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.3); border-radius:3px;}
+    ::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.3); border-radius:3px; }
   </style>
 </head>
 <body>
 
-<!-- LOADING SCREEN -->
+<!-- LOADING -->
 <div id="loadingScreen">
-  <img src="https://i.imgur.com/8qQC6N5.png" alt="LoadingLogo" style="width:80px;height:80px;">
-  <div id="loadingBarOuter" style="width:300px;height:10px;background:#333;margin-top:20px;border-radius:5px;overflow:hidden;">
-    <div id="loadingBarInner" style="width:0%;height:100%;background:#4caf50;transition:width 0.1s;"></div>
-  </div>
+  <img src="https://i.imgur.com/8qQC6N5.png" alt="Loading">
+  <div id="loadingBarOuter"><div id="loadingBarInner"></div></div>
 </div>
 
-<div id="app" style="display:none;">
+<div id="app">
   <!-- TOP BAR -->
   <div id="topBar">
     <div>
@@ -148,22 +141,12 @@
     </div>
   </div>
 
-  <!-- CONTENT AREA -->
+  <!-- CONTENT -->
   <div id="contentArea">
-    <!-- HOME (Pre-Sale) -->
+    <!-- HOME -->
     <div id="tabHome" class="tabPage show">
-      <div id="homePreSaleContainer">
-        <div class="fancyTitle"><span>★ PRE-SALE ★</span></div>
-        <h1>30% OFF ALL ITEMS</h1>
-        <div class="desc">
-          Enjoy a special 7-day early-bird discount before our official launch!
-        </div>
-        <div class="specialIcons">
-          ☞☞☞ Only 7 days left! ☜☜☜
-        </div>
-        <div id="countdownTimer">⏳ 7d: 00h: 00m: 00s</div>
-        <button class="btnCTA" onclick="onPreSaleCTA()">PLACE ORDER NOW</button>
-      </div>
+      <h3>Home - My P2E Telegram MiniApp</h3>
+      <p>Welcome! Use footer to navigate.</p>
     </div>
 
     <!-- QUEST -->
@@ -174,7 +157,7 @@
 
     <!-- HOUSE -->
     <div id="tabHouse" class="tabPage">
-      <h4>House</h4>
+      <h4>Your Houses</h4>
       <div id="houseList"></div>
     </div>
 
@@ -191,7 +174,7 @@
       <input type="number" id="boxQty" value="1" min="1" style="width:60px;text-align:center;">
       <button class="btn" onclick="confirmBuyBox()">Buy Box</button>
       <hr>
-      <p>Open box => random hero (50 total) with ratio 40-30-15-10-5</p>
+      <p>Open box => random among 50 heroes (10 each rarity). <br> Ratio 40%-30%-15%-10%-5%.</p>
     </div>
   </div>
 
@@ -220,11 +203,11 @@
   </div>
 </div>
 
-<!-- NOTIFICATION POPUP -->
+<!-- NOTIFICATION -->
 <div id="notification"></div>
 
 <!-- MODALS -->
-<!-- REFERRAL MODAL -->
+<!-- REFERRAL -->
 <div id="referralModal" class="modal">
   <h2>Referral</h2>
   <p id="refLink"></p>
@@ -232,7 +215,7 @@
   <button class="btn" onclick="closeReferral()">Close</button>
 </div>
 
-<!-- WALLET MODAL -->
+<!-- WALLET -->
 <div id="walletModal" class="modal">
   <h2>TON Wallet</h2>
   <p>Address: <span id="walletAddr">-</span></p>
@@ -244,7 +227,7 @@
   <button class="btn" onclick="closeWallet()">Close</button>
 </div>
 
-<!-- SETTINGS MODAL -->
+<!-- SETTINGS -->
 <div id="settingsModal" class="modal">
   <h2>Settings</h2>
   <div style="margin-bottom:4px;">
@@ -259,7 +242,7 @@
   <button class="btn" onclick="closeSettings()">Close</button>
 </div>
 
-<!-- CONFIRM BUY BOX MODAL -->
+<!-- CONFIRM BUY BOX -->
 <div id="confirmBoxModal" class="modal">
   <h2>Confirm Purchase</h2>
   <p id="confirmBoxText"></p>
@@ -269,7 +252,7 @@
   </div>
 </div>
 
-<!-- CLAIM BOX MODAL -->
+<!-- CLAIM BOX -->
 <div id="claimBoxModal" class="modal">
   <h2>Open Box</h2>
   <div style="width:80px;height:80px;margin:0 auto;perspective:600px;position:relative;">
@@ -284,7 +267,7 @@
   <button class="btn" id="claimNextBtn">Next Hero</button>
 </div>
 
-<!-- HERO INFO MODAL -->
+<!-- HERO INFO -->
 <div id="heroInfoModal" class="modal">
   <h2>Hero Info</h2>
   <img id="heroInfoImg" src="" alt="Hero" style="width:80px;height:80px;object-fit:cover;border-radius:4px;margin-bottom:8px;">
@@ -297,15 +280,14 @@
 
 <script>
 /***************************************************************
- * 1) LOADING
+ * LOADING
  ***************************************************************/
 let loadingProgress=0;
 let loadingInterval=setInterval(()=>{
   loadingProgress+=5;
-  if (loadingProgress>100) loadingProgress=100;
+  if(loadingProgress>100) loadingProgress=100;
   document.getElementById('loadingBarInner').style.width=loadingProgress+'%';
 },100);
-
 setTimeout(()=>{
   clearInterval(loadingInterval);
   document.getElementById('loadingScreen').style.display='none';
@@ -313,16 +295,14 @@ setTimeout(()=>{
 },2000);
 
 /***************************************************************
- * 2) BASIC VARS
+ * BASIC
  ***************************************************************/
 let userBalance=100;
 document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
-document.getElementById('playerName').innerText="Player: PreSaleMaster";
-let isMusicOn=true, isSoundOn=true;
+document.getElementById('playerName').innerText="Player: HouseMaster";
 
-/***************************************************************
- * BGM
- ***************************************************************/
+/* BGM */
+let isMusicOn=true, isSoundOn=true;
 let bgmAudio=new Audio('https://assets.mixkit.co/music/preview/mixkit-little-team-378.mp3');
 bgmAudio.loop=true; bgmAudio.volume=0.2;
 document.body.addEventListener('click',function startBGM(){
@@ -333,21 +313,25 @@ document.body.addEventListener('click',function startBGM(){
 /***************************************************************
  * REFERRAL, WALLET, SETTINGS
  ***************************************************************/
+function closeReferral(){document.getElementById('referralModal').style.display='none';}
+function closeWallet(){document.getElementById('walletModal').style.display='none';}
+function closeSettings(){document.getElementById('settingsModal').style.display='none';}
+function closeHeroInfo(){document.getElementById('heroInfoModal').style.display='none';}
+
 document.getElementById('btnReferral').onclick=()=>{
   document.getElementById('referralModal').style.display='block';
-  document.getElementById('refLink').innerText="https://t.me/MyPreSaleP2E?start=999";
+  document.getElementById('refLink').innerText="https://t.me/MyP2EHouse?start=777";
 };
 document.getElementById('refCopyBtn').onclick=()=>{
-  let l=document.getElementById('refLink').innerText;
-  navigator.clipboard.writeText(l).then(()=>showNotification("Copied link!"));
+  let link=document.getElementById('refLink').innerText;
+  navigator.clipboard.writeText(link).then(()=>showNotification("Copied link!"));
 };
-function closeReferral(){ document.getElementById('referralModal').style.display='none'; }
 
-document.getElementById('btnWallet').onclick=()=> document.getElementById('walletModal').style.display='block';
-function closeWallet(){ document.getElementById('walletModal').style.display='none'; }
-
+document.getElementById('btnWallet').onclick=()=>{
+  document.getElementById('walletModal').style.display='block';
+};
 document.getElementById('walConnectBtn').onclick=()=>{
-  document.getElementById('walletAddr').innerText="EQ_miniapp...ton";
+  document.getElementById('walletAddr').innerText="EQ_house...ton";
   showNotification("TON wallet connected!");
 };
 document.getElementById('walDisconnectBtn').onclick=()=>{
@@ -367,22 +351,17 @@ document.getElementById('walWithdrawBtn').onclick=()=>{
     showNotification("Not enough TON!");
   }
 };
-
 document.getElementById('btnSettings').onclick=()=>{
   document.getElementById('settingsModal').style.display='block';
   document.getElementById('chkMusic').checked=isMusicOn;
   document.getElementById('chkSound').checked=isSoundOn;
 };
-function closeSettings(){ document.getElementById('settingsModal').style.display='none'; }
 document.getElementById('chkMusic').onchange=(e)=>{
   isMusicOn=e.target.checked;
   if(isMusicOn) bgmAudio.play().catch(()=>{});
   else bgmAudio.pause();
 };
-document.getElementById('chkSound').onchange=(e)=>{
-  isSoundOn=e.target.checked;
-};
-function closeHeroInfo(){ document.getElementById('heroInfoModal').style.display='none'; }
+document.getElementById('chkSound').onchange=(e)=>{ isSoundOn=e.target.checked; };
 
 /***************************************************************
  * FOOTER TABS
@@ -409,38 +388,11 @@ function showNotification(msg){
 }
 
 /***************************************************************
- * PRE-SALE COUNTDOWN (7 days)
- ***************************************************************/
-let preSaleEndTime = Date.now() + (7 * 24 * 60 * 60 * 1000);
-let countdownEl = document.getElementById('countdownTimer');
-
-function updateCountdown(){
-  let now = Date.now();
-  let dist = preSaleEndTime - now;
-  if(dist < 0){
-    countdownEl.textContent = "TIME IS UP! (0d:0h:0m:0s)";
-    return;
-  }
-  let d = Math.floor(dist/(1000*60*60*24));
-  let h = Math.floor((dist%(1000*60*60*24))/(1000*60*60));
-  let m = Math.floor((dist%(1000*60*60))/(1000*60));
-  let s = Math.floor((dist%(1000*60))/1000);
-
-  countdownEl.textContent = `⏳ ${d}d: ${h}h: ${m}m: ${s}s`;
-}
-setInterval(updateCountdown,1000);
-updateCountdown();
-
-function onPreSaleCTA(){
-  alert("You have chosen to ORDER NOW - enjoy 30% discount!");
-}
-
-/***************************************************************
  * QUEST
  ***************************************************************/
 let questData=[
-  {id:1,name:"Defeat 5 monsters",reward:5,done:false},
-  {id:2,name:"Invite 1 friend",reward:8,done:false},
+  {id:1,name:"Collect 5 fish",reward:5,done:false},
+  {id:2,name:"Upgrade 1 house",reward:10,done:false},
 ];
 function renderQuest(){
   let qDiv=document.getElementById('questList');
@@ -448,9 +400,14 @@ function renderQuest(){
   questData.forEach(q=>{
     let c=document.createElement('div');
     c.classList.add('missionCard');
-    let h3=document.createElement('h3'); h3.innerText=q.name; c.appendChild(h3);
-    let p=document.createElement('p'); p.innerText=`Reward: ${q.reward} TON`; c.appendChild(p);
-    let b=document.createElement('button'); b.classList.add('btn');
+    let h3=document.createElement('h3');
+    h3.innerText=q.name; c.appendChild(h3);
+
+    let p=document.createElement('p');
+    p.innerText=`Reward: ${q.reward} TON`; c.appendChild(p);
+
+    let b=document.createElement('button');
+    b.classList.add('btn');
     if(q.done){
       b.innerText="Claimed";
       b.disabled=true;
@@ -470,13 +427,14 @@ function renderQuest(){
 }
 
 /***************************************************************
- * HOUSE
+ * HOUSE: 3 House + Functions
  ***************************************************************/
 let houseData=[
   {type:"Tiny",cost:20,img:"https://i.imgur.com/lT8vtE6.png",rent:2,level:1},
   {type:"Pen", cost:50,img:"https://i.imgur.com/NEhWHbW.png",rent:5,level:1},
   {type:"Villa", cost:100,img:"https://i.imgur.com/lLJ7gXk.png",rent:10,level:1},
 ];
+
 function renderHouseList(){
   let hDiv=document.getElementById('houseList');
   hDiv.innerHTML='';
@@ -496,6 +454,7 @@ function renderHouseList(){
       <br>Level ${h.level}
     `;
     top.appendChild(n);
+
     card.appendChild(top);
 
     let info=document.createElement('p');
@@ -507,6 +466,232 @@ function renderHouseList(){
 
     let btnGroup=document.createElement('div');
     btnGroup.style.display='flex'; btnGroup.style.gap='6px';
+    let bBuy=document.createElement('button');
+    bBuy.classList.add('btn'); bBuy.innerText="Buy/Own?";
+    let bRent=document.createElement('button');
+    bRent.classList.add('btn'); bRent.innerText="Collect Rent";
+    let bUpgrade=document.createElement('button');
+    bUpgrade.classList.add('btn'); bUpgrade.innerText="Upgrade";
+    let bParty=document.createElement('button');
+    bParty.classList.add('btn'); bParty.innerText="Party!";
+
+    bBuy.onclick=()=>{
+      if(userBalance>=h.cost){
+        userBalance-=h.cost;
+        document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
+        showNotification(`Bought ${h.type} House!`);
+      } else {
+        showNotification("Not enough TON!");
+      }
+    };
+    bRent.onclick=()=>{
+      userBalance+=h.rent;
+      document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
+      showNotification(`Collected ${h.rent} TON from ${h.type}`);
+    };
+    bUpgrade.onclick=()=>{
+      let upgradeCost=Math.floor(h.cost/2)*(h.level+1);
+      if(userBalance>=upgradeCost){
+        userBalance-=upgradeCost;
+        h.level++;
+        h.rent+=Math.floor(h.rent/2);
+        document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
+        showNotification(`Upgraded ${h.type} to level ${h.level}, rent => ${h.rent}`);
+        renderHouseList(); // refresh
+        // Quest #2 "Upgrade 1 house"?
+        let quest=questData.find(x=>x.id===2);
+        if(quest && !quest.done){
+          quest.done=true;
+          userBalance+=quest.reward;
+          showNotification(`Quest upgrade done +${quest.reward} TON`);
+        }
+      } else {
+        showNotification(`Need ${upgradeCost} TON to upgrade!`);
+      }
+    };
+    bParty.onclick=()=>{
+      let costParty=5*h.level;
+      if(userBalance>=costParty){
+        userBalance-=costParty;
+        document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
+        showNotification(`${h.type} House Party! -${costParty} TON, everyone's morale boosted!`);
+      } else {
+        showNotification("Not enough TON to party!");
+      }
+    };
+    btnGroup.appendChild(bBuy);
+    btnGroup.appendChild(bRent);
+    btnGroup.appendChild(bUpgrade);
+    btnGroup.appendChild(bParty);
+
+    card.appendChild(btnGroup);
+    hDiv.appendChild(card);
+  });
+}
+
+/***************************************************************
+ * 50 HERO (Epic fixed)
+ ***************************************************************/
+const heroData={
+  Common:[ /* 10 Common (like above) */ 
+    {name:"SlimeKid",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",stats:[3,1,10],element:"🌱"},
+    {name:"ShellFish",rarity:"Common",img:"https://i.imgur.com/Iy1X8r1.png",stats:[2,2,9],element:"💧"},
+    {name:"GreenFish",rarity:"Common",img:"https://i.imgur.com/zaWeuIb.png",stats:[3,1,8],element:"💧"},
+    {name:"MudCrab",rarity:"Common",img:"https://i.imgur.com/p08Obdb.png",stats:[2,3,7],element:"🌱"},
+    {name:"RockyShell",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",stats:[3,2,9],element:"🌱"},
+    {name:"JellyMold",rarity:"Common",img:"https://i.imgur.com/7tfCqWd.png",stats:[2,2,8],element:"💧"},
+    {name:"TinyCrab",rarity:"Common",img:"https://i.imgur.com/pHyAG2b.png",stats:[2,3,7],element:"🌱"},
+    {name:"BluishCrab",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",stats:[3,2,9],element:"💧"},
+    {name:"PearlCrab",rarity:"Common",img:"https://i.imgur.com/tq1KRm5.png",stats:[2,2,8],element:"🌱"},
+    {name:"SlimyJr",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",stats:[3,1,10],element:"💧"},
+  ],
+  Rare:[ /* 10 Rare (like above) */ 
+    {name:"FireCrab",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png",stats:[5,3,15],element:"🔥"},
+    {name:"TurtleWar",rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png",stats:[4,4,14],element:"💧"},
+    {name:"SeaKnight",rarity:"Rare",img:"https://i.imgur.com/QRJyOyp.png",stats:[5,3,15],element:"💧"},
+    {name:"DarkFrog",rarity:"Rare",img:"https://i.imgur.com/NK8EQm1.png",stats:[5,3,14],element:"🌑"},
+    {name:"CrabLord",rarity:"Rare",img:"https://i.imgur.com/Aa396uh.png",stats:[6,3,15],element:"🌱"},
+    {name:"ScorpionKid",rarity:"Rare",img:"https://i.imgur.com/aUTGKeg.png",stats:[5,3,14],element:"🌱"},
+    {name:"AquaShield",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png",stats:[4,4,15],element:"💧"},
+    {name:"CoralWar",rarity:"Rare",img:"https://i.imgur.com/TcSRW3O.png",stats:[5,3,15],element:"💧"},
+    {name:"ClamGuard",rarity:"Rare",img:"https://i.imgur.com/Juwfrcz.png",stats:[4,4,14],element:"💧"},
+    {name:"AngryFish",rarity:"Rare",img:"https://i.imgur.com/8rZaJYc.png",stats:[5,3,13],element:"💧"},
+  ],
+  Epic:[ /* 10 Epic with corrected links */
+    {name:"SharkWar",rarity:"Epic",img:"https://i.imgur.com/02jTwGp.png",stats:[8,5,25],element:"💧"},
+    {name:"PearlMage",rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png",stats:[7,6,24],element:"🌟"},
+    {name:"EpicFrog",rarity:"Epic",img:"https://i.imgur.com/wr71ePx.png",stats:[8,4,26],element:"🌑"},
+    {name:"DeepCrab",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",stats:[7,5,25],element:"🌊"},
+    {name:"ShellBuster",rarity:"Epic",img:"https://i.imgur.com/PqCgXay.png",stats:[9,4,24],element:"🔥"},
+    {name:"OceanLancer",rarity:"Epic",img:"https://i.imgur.com/wxAAFkK.png",stats:[8,5,24],element:"💧"},
+    {name:"ReefDragon",rarity:"Epic",img:"https://i.imgur.com/EB7WHnW.png",stats:[7,6,25],element:"🌱"},
+    {name:"StormFish",rarity:"Epic",img:"https://i.imgur.com/EmWFXPq.png",stats:[7,6,24],element:"🌩"},
+    {name:"KrakenKid",rarity:"Epic",img:"https://i.imgur.com/mnMCDvt.png",stats:[8,5,24],element:"🌊"},
+    {name:"AbyssCrab",rarity:"Epic",img:"https://i.imgur.com/QkkGPnK.png",stats:[9,5,22],element:"🌱"},
+  ],
+  Legendary:[ /* 10 Legendary (like above) */ 
+    {name:"InfernoCrab",rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png",stats:[12,7,40],element:"🔥"},
+    {name:"AbyssDragon",rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png",stats:[11,8,38],element:"🌑"},
+    {name:"MegaShark",rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png",stats:[12,6,39],element:"💧"},
+    {name:"PearlDragon",rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png",stats:[11,7,40],element:"💧"},
+    {name:"LavaClam",rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png",stats:[12,7,38],element:"🔥"},
+    {name:"CoralKnight",rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png",stats:[13,6,37],element:"💧"},
+    {name:"StoneWar",rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png",stats:[12,8,36],element:"🌱"},
+    {name:"MudGolem",rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png",stats:[11,8,38],element:"🌱"},
+    {name:"AngelCrab",rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png",stats:[13,7,36],element:"🌟"},
+    {name:"AquaDino",rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png",stats:[12,8,37],element:"💧"},
+  ],
+  Mythic:[ /* 10 Mythic (like above) */
+    {name:"ElderDragon",rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png",stats:[18,10,60],element:"🌟"},
+    {name:"AquaGod",rarity:"Mythic",img:"https://i.imgur.com/ujlhSVK.png",stats:[17,12,58],element:"💧"},
+    {name:"ArcAngel",rarity:"Mythic",img:"https://i.imgur.com/1K8xEcc.png",stats:[18,9,59],element:"🌟"},
+    {name:"CyberDino",rarity:"Mythic",img:"https://i.imgur.com/EokU1JU.png",stats:[17,11,60],element:"🌑"},
+    {name:"PhoenixKing",rarity:"Mythic",img:"https://i.imgur.com/Qg9MLyO.png",stats:[19,10,58],element:"🔥"},
+    {name:"TimeSerpent",rarity:"Mythic",img:"https://i.imgur.com/Xsqp1Zl.png",stats:[18,12,56],element:"⏳"},
+    {name:"GalaxyWolf",rarity:"Mythic",img:"https://i.imgur.com/YeDYlBO.png",stats:[17,12,58],element:"🌌"},
+    {name:"AuraKnight",rarity:"Mythic",img:"https://i.imgur.com/h8LyWQG.png",stats:[18,11,59],element:"🌟"},
+    {name:"BlazeGod",rarity:"Mythic",img:"https://i.imgur.com/u2hcKvV.png",stats:[19,10,57],element:"🔥"},
+    {name:"AncientGolem",rarity:"Mythic",img:"https://i.imgur.com/WWF50XS.png",stats:[18,12,57],element:"⛰"},
+  ]
+};
+
+/***************************************************************
+ * RANDOM HERO
+ ***************************************************************/
+function randomHero(){
+  let roll=Math.random()*100; 
+  let rar;
+  if(roll<40) rar="Common";       // 40%
+  else if(roll<70) rar="Rare";    // 30%
+  else if(roll<85) rar="Epic";    // 15%
+  else if(roll<95) rar="Legendary"; // 10%
+  else rar="Mythic";              // 5%
+
+  let pool=heroData[rar];
+  let idx=Math.floor(Math.random()*pool.length);
+  return {...pool[idx]};
+}
+
+/***************************************************************
+ * HERO LIST
+ ***************************************************************/
+let heroList=[];
+
+function renderHeroList(){
+  let d=document.getElementById('heroListDiv');
+  d.innerHTML="";
+  if(heroList.length===0){
+    d.innerHTML="<p>No heroes yet. Buy boxes!</p>";
+    return;
+  }
+  heroList.forEach(h=>{
+    let row=document.createElement('div');
+    row.classList.add('heroCard');
+
+    let im=document.createElement('img');
+    im.src=h.img;
+    row.appendChild(im);
+
+    // Color for rarity
+    let color="#fff";
+    if(h.rarity==="Rare") color="#0ff";
+    if(h.rarity==="Epic") color="#ffd700";
+    if(h.rarity==="Legendary") color="#ff4444";
+    if(h.rarity==="Mythic") color="#ff00ff";
+
+    let sp=document.createElement('span');
+    sp.innerHTML=`
+      <strong style="color:${color}">${h.name}</strong> [${h.rarity}]
+      <br>⚔${h.stats[0]} 🏃${h.stats[1]} ❤${h.stats[2]} | ${h.element||""}
+    `;
+    row.appendChild(sp);
+
+    row.onclick=()=>openHeroInfo(h);
+    d.appendChild(row);
+  });
+}
+
+function openHeroInfo(h){
+  document.getElementById('heroInfoModal').style.display='block';
+  document.getElementById('heroInfoImg').src=h.img;
+  let color="#fff";
+  if(h.rarity==="Rare") color="#0ff";
+  if(h.rarity==="Epic") color="#ffd700";
+  if(h.rarity==="Legendary") color="#ff4444";
+  if(h.rarity==="Mythic") color="#ff00ff";
+
+  document.getElementById('heroInfoName').innerText=h.name;
+  document.getElementById('heroInfoRarity').innerHTML=`<span style="color:${color}">[${h.rarity}]</span>`;
+  document.getElementById('heroInfoStats').innerText=`⚔${h.stats[0]} 🏃${h.stats[1]} ❤${h.stats[2]}`;
+  document.getElementById('heroInfoElement').innerText=`Element: ${h.element||""}`;
+}
+
+/***************************************************************
+ * HOUSE TAB (already created data)
+ ***************************************************************/
+function renderHouseList(){
+  let container=document.getElementById('houseList');
+  container.innerHTML='';
+  houseData.forEach(h=>{
+    let c=document.createElement('div');
+    c.classList.add('houseCard');
+
+    let top=document.createElement('div');
+    top.style.display='flex'; top.style.alignItems='center';
+    let img=document.createElement('img');
+    img.src=h.img; img.style.width="40px"; img.style.height="40px"; img.style.objectFit="cover"; img.style.borderRadius="4px"; img.style.marginRight="6px";
+    top.appendChild(img);
+    let info=document.createElement('div');
+    info.innerHTML=`
+      <strong>${h.type} House</strong> (Lv ${h.level})
+      <br>Cost: ${h.cost} TON, Rent: ${h.rent} TON
+    `;
+    top.appendChild(info);
+    c.appendChild(top);
+
+    // Buttons
+    let btnGroup=document.createElement('div');
+    btnGroup.style.display='flex'; btnGroup.style.gap='6px'; btnGroup.style.marginTop='6px';
 
     let bBuy=document.createElement('button');
     bBuy.classList.add('btn'); bBuy.innerText="Buy";
@@ -537,8 +722,16 @@ function renderHouseList(){
         h.level++;
         h.rent+=Math.floor(h.rent/2);
         document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
-        showNotification(`${h.type} House => Lv ${h.level}, rent => ${h.rent}`);
+        showNotification(`${h.type} House upgraded to Lv ${h.level}, rent => ${h.rent}`);
         renderHouseList();
+        // Maybe quest check
+        let quest=questData.find(q=>q.id===2); // "Upgrade 1 house"
+        if(quest && !quest.done){
+          quest.done=true;
+          userBalance+=quest.reward;
+          document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
+          showNotification(`Quest upgrade done +${quest.reward} TON`);
+        }
       } else {
         showNotification(`Need ${upCost} TON to upgrade!`);
       }
@@ -551,9 +744,9 @@ function renderHouseList(){
       if(userBalance>=pCost){
         userBalance-=pCost;
         document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
-        showNotification(`Party at ${h.type} cost ${pCost} TON, morale++`);
+        showNotification(`Party at ${h.type} House cost ${pCost} TON, morale++`);
       } else {
-        showNotification("Not enough TON for party!");
+        showNotification("Not enough TON to party!");
       }
     };
 
@@ -562,131 +755,46 @@ function renderHouseList(){
     btnGroup.appendChild(bUpgrade);
     btnGroup.appendChild(bParty);
 
-    card.appendChild(btnGroup);
-    hDiv.appendChild(card);
+    c.appendChild(btnGroup);
+    container.appendChild(c);
   });
 }
 
 /***************************************************************
- * HERO (50 heroes) + RANDOM (40-30-15-10-5)
+ * QUEST
  ***************************************************************/
-const heroData={
-  Common:[
-    {name:"SlimeKid",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",stats:[3,1,10],element:"🌱"},
-    {name:"ShellFish",rarity:"Common",img:"https://i.imgur.com/Iy1X8r1.png",stats:[2,2,9],element:"💧"},
-    {name:"GreenFish",rarity:"Common",img:"https://i.imgur.com/zaWeuIb.png",stats:[3,1,8],element:"💧"},
-    {name:"MudCrab",rarity:"Common",img:"https://i.imgur.com/p08Obdb.png",stats:[2,3,7],element:"🌱"},
-    {name:"RockyShell",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",stats:[3,2,9],element:"🌱"},
-    {name:"JellyMold",rarity:"Common",img:"https://i.imgur.com/7tfCqWd.png",stats:[2,2,8],element:"💧"},
-    {name:"TinyCrab",rarity:"Common",img:"https://i.imgur.com/pHyAG2b.png",stats:[2,3,7],element:"🌱"},
-    {name:"BluishCrab",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",stats:[3,2,9],element:"💧"},
-    {name:"PearlCrab",rarity:"Common",img:"https://i.imgur.com/tq1KRm5.png",stats:[2,2,8],element:"🌱"},
-    {name:"SlimyJr",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",stats:[3,1,10],element:"💧"},
-  ],
-  Rare:[
-    {name:"FireCrab",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png",stats:[5,3,15],element:"🔥"},
-    {name:"TurtleWar",rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png",stats:[4,4,14],element:"💧"},
-    {name:"SeaKnight",rarity:"Rare",img:"https://i.imgur.com/QRJyOyp.png",stats:[5,3,15],element:"💧"},
-    {name:"DarkFrog",rarity:"Rare",img:"https://i.imgur.com/NK8EQm1.png",stats:[5,3,14],element:"🌑"},
-    {name:"CrabLord",rarity:"Rare",img:"https://i.imgur.com/Aa396uh.png",stats:[6,3,15],element:"🌱"},
-    {name:"ScorpionKid",rarity:"Rare",img:"https://i.imgur.com/aUTGKeg.png",stats:[5,3,14],element:"🌱"},
-    {name:"AquaShield",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png",stats:[4,4,15],element:"💧"},
-    {name:"CoralWar",rarity:"Rare",img:"https://i.imgur.com/TcSRW3O.png",stats:[5,3,15],element:"💧"},
-    {name:"ClamGuard",rarity:"Rare",img:"https://i.imgur.com/Juwfrcz.png",stats:[4,4,14],element:"💧"},
-    {name:"AngryFish",rarity:"Rare",img:"https://i.imgur.com/8rZaJYc.png",stats:[5,3,13],element:"💧"},
-  ],
-  Epic:[
-    {name:"SharkWar",rarity:"Epic",img:"https://i.imgur.com/02jTwGp.png",stats:[8,5,25],element:"💧"},
-    {name:"PearlMage",rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png",stats:[7,6,24],element:"🌟"},
-    {name:"EpicFrog",rarity:"Epic",img:"https://i.imgur.com/wr71ePx.png",stats:[8,4,26],element:"🌑"},
-    {name:"DeepCrab",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",stats:[7,5,25],element:"🌊"},
-    {name:"ShellBuster",rarity:"Epic",img:"https://i.imgur.com/PqCgXay.png",stats:[9,4,24],element:"🔥"},
-    {name:"OceanLancer",rarity:"Epic",img:"https://i.imgur.com/wxAAFkK.png",stats:[8,5,24],element:"💧"},
-    {name:"ReefDragon",rarity:"Epic",img:"https://i.imgur.com/EB7WHnW.png",stats:[7,6,25],element:"🌱"},
-    {name:"StormFish",rarity:"Epic",img:"https://i.imgur.com/EmWFXPq.png",stats:[7,6,24],element:"🌩"},
-    {name:"KrakenKid",rarity:"Epic",img:"https://i.imgur.com/mnMCDvt.png",stats:[8,5,24],element:"🌊"},
-    {name:"AbyssCrab",rarity:"Epic",img:"https://i.imgur.com/QkkGPnK.png",stats:[9,5,22],element:"🌱"},
-  ],
-  Legendary:[
-    {name:"InfernoCrab",rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png",stats:[12,7,40],element:"🔥"},
-    {name:"AbyssDragon",rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png",stats:[11,8,38],element:"🌑"},
-    {name:"MegaShark",rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png",stats:[12,6,39],element:"💧"},
-    {name:"PearlDragon",rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png",stats:[11,7,40],element:"💧"},
-    {name:"LavaClam",rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png",stats:[12,7,38],element:"🔥"},
-    {name:"CoralKnight",rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png",stats:[13,6,37],element:"💧"},
-    {name:"StoneWar",rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png",stats:[12,8,36],element:"🌱"},
-    {name:"MudGolem",rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png",stats:[11,8,38],element:"🌱"},
-    {name:"AngelCrab",rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png",stats:[13,7,36],element:"🌟"},
-    {name:"AquaDino",rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png",stats:[12,8,37],element:"💧"},
-  ],
-  Mythic:[
-    {name:"ElderDragon",rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png",stats:[18,10,60],element:"🌟"},
-    {name:"AquaGod",rarity:"Mythic",img:"https://i.imgur.com/ujlhSVK.png",stats:[17,12,58],element:"💧"},
-    {name:"ArcAngel",rarity:"Mythic",img:"https://i.imgur.com/1K8xEcc.png",stats:[18,9,59],element:"🌟"},
-    {name:"CyberDino",rarity:"Mythic",img:"https://i.imgur.com/EokU1JU.png",stats:[17,11,60],element:"🌑"},
-    {name:"PhoenixKing",rarity:"Mythic",img:"https://i.imgur.com/Qg9MLyO.png",stats:[19,10,58],element:"🔥"},
-    {name:"TimeSerpent",rarity:"Mythic",img:"https://i.imgur.com/Xsqp1Zl.png",stats:[18,12,56],element:"⏳"},
-    {name:"GalaxyWolf",rarity:"Mythic",img:"https://i.imgur.com/YeDYlBO.png",stats:[17,12,58],element:"🌌"},
-    {name:"AuraKnight",rarity:"Mythic",img:"https://i.imgur.com/h8LyWQG.png",stats:[18,11,59],element:"🌟"},
-    {name:"BlazeGod",rarity:"Mythic",img:"https://i.imgur.com/u2hcKvV.png",stats:[19,10,57],element:"🔥"},
-    {name:"AncientGolem",rarity:"Mythic",img:"https://i.imgur.com/WWF50XS.png",stats:[18,12,57],element:"⛰"},
-  ]
-};
-
-function randomHero(){
-  let roll=Math.random()*100;
-  let rar;
-  if(roll<40) rar="Common"; //40%
-  else if(roll<70) rar="Rare"; //30%
-  else if(roll<85) rar="Epic"; //15%
-  else if(roll<95) rar="Legendary"; //10%
-  else rar="Mythic"; //5%
-
-  let pool=heroData[rar];
-  let idx=Math.floor(Math.random()*pool.length);
-  return {...pool[idx]};
-}
-
-/***************************************************************
- * HERO LIST
- ***************************************************************/
-let heroList=[];
-
-function renderHeroList(){
-  let d=document.getElementById('heroListDiv');
-  d.innerHTML="";
-  if(heroList.length===0){
-    d.innerHTML="<p>No heroes yet. Buy boxes!</p>";
-    return;
-  }
-  heroList.forEach(h=>{
-    let row=document.createElement('div');
-    row.classList.add('heroCard');
-
-    let im=document.createElement('img');
-    im.src=h.img;
-    row.appendChild(im);
-
-    let color="#fff";
-    if(h.rarity==="Rare") color="#0ff";
-    if(h.rarity==="Epic") color="#ffd700";
-    if(h.rarity==="Legendary") color="#ff4444";
-    if(h.rarity==="Mythic") color="#ff00ff";
-
-    let sp=document.createElement('span');
-    sp.innerHTML=`
-      <strong style="color:${color}">${h.name}</strong> [${h.rarity}]
-      <br>⚔${h.stats[0]} 🏃${h.stats[1]} ❤${h.stats[2]} | ${h.element||""}
-    `;
-    row.appendChild(sp);
-
-    row.onclick=()=>openHeroInfo(h);
-    d.appendChild(row);
+function renderQuest(){
+  let qDiv=document.getElementById('questList');
+  qDiv.innerHTML='';
+  questData.forEach(q=>{
+    let card=document.createElement('div');
+    card.classList.add('missionCard');
+    let h3=document.createElement('h3');
+    h3.innerText=q.name; card.appendChild(h3);
+    let p=document.createElement('p');
+    p.innerText=`Reward: ${q.reward} TON`; card.appendChild(p);
+    let b=document.createElement('button');
+    b.classList.add('btn');
+    if(q.done){
+      b.innerText="Claimed";
+      b.disabled=true;
+    } else {
+      b.innerText="Complete";
+      b.onclick=()=>{
+        q.done=true;
+        userBalance+=q.reward;
+        document.getElementById('balanceLabel').innerText=userBalance.toFixed(2);
+        showNotification(`Quest done +${q.reward} TON`);
+        renderQuest();
+      };
+    }
+    card.appendChild(b);
+    qDiv.appendChild(card);
   });
 }
 
 /***************************************************************
- * BOX FLOW
+ * BUY BOX => OPEN
  ***************************************************************/
 let purchasedBoxCount=0, openedBoxIndex=0, lastHero=null;
 
@@ -712,7 +820,7 @@ document.getElementById('claimNextBtn').onclick=()=>{
   document.getElementById('flipInner').style.transform="";
   openedBoxIndex++;
   if(openedBoxIndex>=purchasedBoxCount){
-    showNotification("Opened all "+purchasedBoxCount+" box(es)!");
+    showNotification(`Opened all ${purchasedBoxCount} box(es)!`);
     document.getElementById('claimBoxModal').style.display='none';
     purchasedBoxCount=0;
     openedBoxIndex=0;
@@ -741,9 +849,8 @@ function openBoxHero(){
   heroList.push(newH);
   renderHeroList();
 
-  // Use "⏳" in the claim label
   document.getElementById('flipInner').style.transform="rotateY(180deg)";
-  document.getElementById('claimLabel').textContent=`⏳ Got: ${newH.name} [${newH.rarity}]`;
+  document.getElementById('claimLabel').innerText=`Got: ${newH.name} [${newH.rarity}]`;
   document.getElementById('heroPreview').style.backgroundImage=`url('${newH.img}')`;
 
   let remain=purchasedBoxCount-(openedBoxIndex+1);
@@ -751,11 +858,9 @@ function openBoxHero(){
 }
 
 /***************************************************************
- * CTA for PreSale
+ * Start Up
  ***************************************************************/
-function onPreSaleCTA(){
-  alert("You have chosen to PLACE ORDER NOW - enjoy the 30% discount!");
-}
 </script>
+
 </body>
 </html>
