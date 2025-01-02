@@ -1,366 +1,488 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
+  <title>Rost & Flame - TON Edition</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P2E Game - TON Blockchain</title>
   <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
+    /* RESET */
+    * { box-sizing:border-box; margin:0; padding:0; font-family: Arial, sans-serif; }
+    html,body {
+      background:#f5f5f5; 
+      color:#333; 
+      width:100%; 
+      height:100%; 
+      overflow:auto;
     }
-
-    body {
-      background: #f0f0f0;
-      color: #333;
-      font-size: 14px;
-      overflow: hidden;
-    }
-
     header {
-      text-align: center;
-      background: linear-gradient(135deg, #4a90e2, #50c878);
-      color: white;
-      padding: 15px;
+      text-align:center; 
+      background:#ff5733; 
+      color:#fff; 
+      padding:10px;
     }
-
     nav {
-      display: flex;
-      justify-content: space-around;
-      background: #efefef;
-      padding: 10px 0;
+      display:flex; 
+      justify-content:space-around;
+      background:#eee;
+      border-bottom:1px solid #ccc;
     }
-
     nav button {
-      flex: 1;
-      border: none;
-      background: white;
-      padding: 10px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s;
+      flex:1; 
+      border:none; 
+      background:#fff; 
+      padding:8px; 
+      cursor:pointer; 
+      font-weight:bold; 
+      transition:0.2s;
     }
+    nav .active-tab { background:#c3f0d1; }
+    main { padding:8px; display:none; }
+    main.active { display:block; }
 
-    nav button:hover {
-      background: #d4f4e7;
-    }
-
-    .active-tab {
-      background: #c3f0d1;
-    }
-
-    main {
-      display: none;
-      padding: 15px;
-      animation: fadeIn 0.5s;
-    }
-
-    main.active {
-      display: block;
-    }
-
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    .hero-container {
-      display: grid;
-      grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
-      justify-items: center;
-    }
-
-    .hero-card {
-      width: 70px;
-      height: 100px;
-      background: white;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-start;
-      cursor: pointer;
-      overflow: hidden;
-      padding: 5px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-    }
-
-    .hero-card:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    .hero-card img {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 50%;
-      margin-bottom: 5px;
-    }
-
-    .hero-card p {
-      font-size: 12px;
-      line-height: 1.2;
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
+    /* FOOTER */
     footer {
-      text-align: center;
-      padding: 15px;
-      background: #f4f4f4;
-      border-top: 1px solid #ddd;
+      text-align:center;
+      background:#eee;
+      padding:6px;
     }
 
+    /* HERO GRID */
+    .hero-container {
+      display:grid; 
+      grid-template-columns: repeat(5, 1fr); /* 5 hero/row */
+      gap:6px;
+      justify-items:center;
+    }
+    .hero-card {
+      width:60px; 
+      height:90px;
+      background:#fff;
+      border:1px solid #ddd;
+      border-radius:6px;
+      display:flex; 
+      flex-direction:column; 
+      align-items:center; 
+      justify-content:flex-start;
+      cursor:pointer;
+      padding:3px;
+      overflow:hidden;
+    }
+    .hero-card img {
+      width:40px; 
+      height:40px; 
+      object-fit:cover; 
+      border-radius:4px; 
+    }
+    .hero-card p {
+      font-size:10px; 
+      line-height:1.2; 
+      margin:2px 0; 
+      text-align:center;
+      overflow:hidden; 
+      white-space:nowrap; 
+      text-overflow:ellipsis; 
+      max-width:100%;
+    }
+
+    /* RARITY COLORS */
+    .color-common    { color:#999; }
+    .color-rare      { color:#54FFFE; }
+    .color-epic      { color:#C66CC5; }
+    .color-legendary { color:#FFA800; }
+    .color-mythic    { color:#FF0000; }
+
+    /* MODAL */
     #modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(0, 0, 0, 0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
+      position:fixed; top:0; left:0; right:0; bottom:0;
+      background:rgba(0,0,0,0.5);
+      display:none;
+      justify-content:center; 
+      align-items:center;
+      z-index:9999;
     }
-
     #modal-content {
-      background: white;
-      padding: 20px;
-      border-radius: 8px;
-      width: 300px;
-      text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      background:#fff; 
+      padding:10px; 
+      border-radius:6px; 
+      width:220px; 
+      position:relative; 
+      text-align:center;
     }
-
     #modal-close {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      background: #ddd;
-      border: none;
-      cursor: pointer;
-      border-radius: 4px;
-      padding: 5px 10px;
-      transition: background 0.3s;
+      position:absolute; top:5px; right:5px;
+      background:#ddd; border:none; border-radius:4px;
+      cursor:pointer; padding:2px 5px;
     }
-
-    #modal-close:hover {
-      background: #bbb;
-    }
-
-    #modal-hero-img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-bottom: 10px;
-    }
-
-    .color-common {
-      color: #999;
-    }
-
-    .color-rare {
-      color: #54FFFE;
-    }
-
-    .color-epic {
-      color: #C66CC5;
-    }
-
-    .color-legendary {
-      color: #FFA800;
-    }
-
-    .color-mythic {
-      color: #FF0000;
-    }
+    #modal-hero-img { width:60px; height:60px; object-fit:cover; border-radius:4px; margin-bottom:6px; }
   </style>
 </head>
 <body>
   <header>
-    <h1>P2E Game</h1>
-    <p>TON Blockchain Integration</p>
+    <h1>Rost & Flame (TON Edition)</h1>
+    <p>P2E Mini Game for Telegram</p>
   </header>
 
   <nav>
     <button class="active-tab" onclick="switchTab('home')">Home</button>
     <button onclick="switchTab('shop')">Shop</button>
-    <button onclick="switchTab('hero')">Heroes</button>
-    <button onclick="switchTab('quest')">Quests</button>
+    <button onclick="switchTab('hero')">Hero</button>
+    <button onclick="switchTab('quest')">Quest</button>
     <button onclick="switchTab('wallet')">Wallet</button>
   </nav>
 
+  <!-- HOME -->
   <main id="home" class="active">
-    <p>Welcome to the P2E Game powered by TON Blockchain!</p>
-    <div id="player-summary"></div>
-    <button onclick="addTokens(100)">Get +100 Tokens</button>
+    <p>Welcome to Rost & Flame - Earn with your Heroes!</p>
+    <p>Connected to TON blockchain (simulated)</p>
+    <div id="player-info"></div>
+    <button onclick="addTokens(50)" style="margin-top:8px;">Get +50 tokens</button>
   </main>
 
+  <!-- SHOP -->
   <main id="shop">
     <h3>Shop</h3>
-    <p>Buy chests and expand your hero collection:</p>
+    <p>Buy chest for 10 tokens each. Random hero from 50 heroes.</p>
     <button onclick="buyChest(1)">Buy 1 Chest</button>
-    <button onclick="buyChest(5)">Buy 5 Chests</button>
-    <button onclick="buyChest(10)">Buy 10 Chests</button>
-    <p id="shop-message"></p>
+    <button onclick="buyChest(5)">Buy 5 Chest</button>
+    <button onclick="buyChest(10)">Buy 10 Chest</button>
+    <p id="shop-message" style="color:#f33;font-size:13px;margin-top:6px;"></p>
   </main>
 
+  <!-- HERO -->
   <main id="hero">
     <h3>Your Heroes</h3>
     <div class="hero-container" id="hero-list"></div>
   </main>
 
+  <!-- QUEST -->
   <main id="quest">
     <h3>Quests</h3>
     <div id="quest-list"></div>
   </main>
 
+  <!-- WALLET -->
   <main id="wallet">
-    <h3>Wallet</h3>
-    <p>Token Balance: <span id="wallet-tokens"></span></p>
+    <h3>TON Wallet</h3>
+    <p>Address: <span id="wallet-address">-</span></p>
+    <p>Balance: <span id="wallet-balance">0</span> TON</p>
+    <button onclick="connectTON()">Connect TON</button>
+    <button onclick="disconnectTON()">Disconnect</button>
+    <hr>
+    <p>Tokens in game: <span id="game-tokens"></span></p>
+    <button onclick="withdrawTokens()">Withdraw to TON</button>
   </main>
 
+  <!-- MODAL -->
   <div id="modal-overlay">
     <div id="modal-content">
       <button id="modal-close" onclick="closeModal()">X</button>
-      <img id="modal-hero-img" src="" alt="Hero" />
+      <img id="modal-hero-img" src="" alt="Hero">
       <p id="modal-hero-name" style="font-weight:bold;"></p>
       <p id="modal-hero-rarity"></p>
       <p id="modal-hero-attr"></p>
       <p id="modal-hero-stats"></p>
       <p id="modal-hero-level"></p>
+      <p id="modal-hero-skill"></p>
     </div>
   </div>
 
   <footer>
-    &copy; 2023 P2E Game - Powered by TON Blockchain
+    &copy; 2023 Rost & Flame - Powered by TON
   </footer>
 
   <script>
-    // Core game logic and blockchain integration will go here
-
+    /********************************************************************
+     * 1. PLAYER + Quests
+     ********************************************************************/
     const player = {
-      tokens: 100,
+      tokens: 100,           // in-game tokens
       heroes: [],
       quests: [
-        { id: 1, name: 'Complete Tutorial', reward: 50, completed: false },
-        { id: 2, name: 'Win 3 Battles', reward: 100, completed: false },
-      ],
+        {id:1, name:"Reach 5 Heroes", completed:false, reward:20},
+        {id:2, name:"Merge 1 Hero to Lv2", completed:false, reward:30},
+      ]
     };
 
-    function switchTab(tabId) {
-      document.querySelectorAll('main').forEach(main => main.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-tab'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
+    /********************************************************************
+     * 2. TÍCH HỢP TON (MÔ PHỎNG)
+     ********************************************************************/
+    let tonAddress=null;
+    let tonBalance=5.0; // 5 TON (giả lập)
+    function connectTON(){
+      tonAddress="EQ_fake_TON_address_123";
+      alert("TON wallet connected!");
+      updateWallet();
     }
-
-    function addTokens(amount) {
-      player.tokens += amount;
-      document.getElementById('wallet-tokens').textContent = player.tokens;
-      alert(`You received ${amount} tokens!`);
+    function disconnectTON(){
+      tonAddress=null;
+      alert("Disconnected from TON");
+      updateWallet();
     }
-
-    function buyChest(count) {
-      const cost = count * 10;
-      if (player.tokens < cost) {
-        alert('Not enough tokens!');
+    function updateWallet(){
+      document.getElementById('wallet-address').textContent= tonAddress? tonAddress : "-";
+      document.getElementById('wallet-balance').textContent= tonBalance.toFixed(2);
+      document.getElementById('game-tokens').textContent= player.tokens;
+    }
+    function withdrawTokens(){
+      if(!tonAddress){
+        alert("No TON wallet connected!");
         return;
       }
-
-      player.tokens -= cost;
-      document.getElementById('wallet-tokens').textContent = player.tokens;
-
-      for (let i = 0; i < count; i++) {
-        const hero = {
-          name: `Hero ${Math.random().toString(36).substring(7)}`,
-          rarity: ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'][Math.floor(Math.random() * 5)],
-          attribute: ['Water', 'Fire', 'Earth', 'Air'][Math.floor(Math.random() * 4)],
-          damage: Math.floor(Math.random() * 50) + 10,
-          level: 1,
-        };
-        player.heroes.push(hero);
+      if(player.tokens<50){
+        alert("Need at least 50 tokens to withdraw! (demo rule)");
+        return;
       }
-
-      updateHeroList();
+      // Burn tokens in game => add TON? (demo)
+      player.tokens -= 50;
+      tonBalance += 1; // 50 in-game tokens => 1 TON (demo rate)
+      updateWallet();
+      updateHome();
+      alert("Withdrew 50 tokens => +1 TON (demo).");
     }
 
-    function updateHeroList() {
-      const heroContainer = document.getElementById('hero-list');
-      heroContainer.innerHTML = player.heroes
-        .map(
-          hero => `
-        <div class="hero-card" onclick="showHeroDetails('${hero.name}')">
-          <p class="color-${hero.rarity.toLowerCase()}">${hero.name}</p>
-          <p>${hero.attribute} | Lv ${hero.level}</p>
-        </div>`
-        )
-        .join('');
+    /********************************************************************
+     * 3. 50 HEROES + RARITY CHANCES (giống code cũ)
+     ********************************************************************/
+    const allHeroes = [
+      // 10 Common
+      {name:"SlimeKid",   rarity:"Common",    img:"https://i.imgur.com/wY0nzE9.png", attribute:"Water", symbol:"💧", damage:12, speed:4, skill:"Splash", level:1},
+      {name:"ShellFish",  rarity:"Common",    img:"https://i.imgur.com/Iy1X8r1.png", attribute:"Water", symbol:"💧", damage:14, speed:5, skill:"Shield", level:1},
+      {name:"GreenFish",  rarity:"Common",    img:"https://i.imgur.com/81Ypu1S.png", attribute:"Earth", symbol:"🌱", damage:10, speed:5, skill:"LeafCut", level:1},
+      {name:"MudCrab",    rarity:"Common",    img:"https://i.imgur.com/XMUx21e.png", attribute:"Earth", symbol:"🌱", damage:15, speed:3, skill:"MudThrow", level:1},
+      {name:"RockyShell", rarity:"Common",    img:"https://i.imgur.com/eVNSFSH.png", attribute:"Earth", symbol:"🌱", damage:16, speed:4, skill:"RockHit", level:1},
+      {name:"JellyMold",  rarity:"Common",    img:"https://i.imgur.com/hjZPOpf.png", attribute:"Water", symbol:"💧", damage:10, speed:6, skill:"JellyZap", level:1},
+      {name:"TinyCrab",   rarity:"Common",    img:"https://i.imgur.com/TvssIKL.png", attribute:"Water", symbol:"💧", damage:12, speed:5, skill:"CrabClaw", level:1},
+      {name:"BluishCrab", rarity:"Common",    img:"https://i.imgur.com/9soOAZz.png", attribute:"Water", symbol:"💧", damage:13, speed:4, skill:"Bubble",  level:1},
+      {name:"PearlCrab",  rarity:"Common",    img:"https://i.imgur.com/ZRG9eiQ.png", attribute:"Water", symbol:"💧", damage:11, speed:6, skill:"PearlShot",level:1},
+      {name:"SlimyJr",    rarity:"Common",    img:"https://i.imgur.com/aOV5P1e.png", attribute:"Water", symbol:"💧", damage:14, speed:4, skill:"SlimeGlue",level:1},
+      // 10 Rare
+      {name:"FireCrab",   rarity:"Rare",      img:"https://i.imgur.com/3l9MKIl.png", attribute:"Fire", symbol:"🔥", damage:22, speed:8, skill:"FireClaw", level:1},
+      {name:"TurtleWar",  rarity:"Rare",      img:"https://i.imgur.com/cSy6okk.png", attribute:"Water", symbol:"💧", damage:20, speed:9, skill:"ShellSpin",level:1},
+      {name:"SeaKnight",  rarity:"Rare",      img:"https://i.imgur.com/QRJyOyp.png", attribute:"Water", symbol:"💧", damage:25, speed:7, skill:"SeaSlash",level:1},
+      {name:"DarkFrog",   rarity:"Rare",      img:"https://i.imgur.com/NK8EQm1.png", attribute:"Dark", symbol:"🌑", damage:24, speed:8, skill:"ShadowSting",level:1},
+      {name:"CrabLord",   rarity:"Rare",      img:"https://i.imgur.com/Aa396uh.png", attribute:"Earth", symbol:"🌱", damage:28, speed:6, skill:"EarthSmash",level:1},
+      {name:"ScorpionKid",rarity:"Rare",      img:"https://i.imgur.com/aUTGKeg.png", attribute:"Earth", symbol:"🌱", damage:27, speed:8, skill:"PoisonStab",level:1},
+      {name:"AquaShield", rarity:"Rare",      img:"https://i.imgur.com/H65ycJW.png", attribute:"Water", symbol:"💧", damage:22, speed:9, skill:"BubbleWall",level:1},
+      {name:"CoralWar",   rarity:"Rare",      img:"https://i.imgur.com/TcSRW3O.png", attribute:"Water", symbol:"💧", damage:23, speed:8, skill:"CoralSpear",level:1},
+      {name:"ClamGuard",  rarity:"Rare",      img:"https://i.imgur.com/Juwfrcz.png", attribute:"Water", symbol:"💧", damage:20, speed:10,skill:"ClamShot",level:1},
+      {name:"AngryFish",  rarity:"Rare",      img:"https://i.imgur.com/8rZaJYc.png", attribute:"Water", symbol:"💧", damage:26, speed:7, skill:"FishFury", level:1},
+      // 10 Epic
+      {name:"SharkWar",   rarity:"Epic",      img:"https://i.imgur.com/02jTwGp.png", attribute:"Water", symbol:"💧", damage:35, speed:12,skill:"JawBreak",level:1},
+      {name:"PearlMage",  rarity:"Epic",      img:"https://i.imgur.com/JOCwUzy.png", attribute:"Earth", symbol:"🌱", damage:32, speed:12,skill:"GemPulse",level:1},
+      {name:"EpicFrog",   rarity:"Epic",      img:"https://i.imgur.com/wr71ePx.png", attribute:"Dark",  symbol:"🌑", damage:40, speed:10,skill:"FrogCurse",level:1},
+      {name:"DeepCrab",   rarity:"Epic",      img:"https://i.imgur.com/OXjxfTK.png", attribute:"Water", symbol:"💧", damage:36, speed:11,skill:"DeepStab",level:1},
+      {name:"ShellBuster",rarity:"Epic",      img:"https://i.imgur.com/PqCgXay.png", attribute:"Fire",  symbol:"🔥", damage:42, speed:9, skill:"FlameBust",level:1},
+      {name:"OceanLancer",rarity:"Epic",      img:"https://i.imgur.com/wxAAFkK.png", attribute:"Water", symbol:"💧", damage:39, speed:10,skill:"LanceShot",level:1},
+      {name:"ReefDragon", rarity:"Epic",      img:"https://i.imgur.com/EB7WHnW.png", attribute:"Earth", symbol:"🌱", damage:37, speed:12,skill:"ReefRoar", level:1},
+      {name:"StormFish",  rarity:"Epic",      img:"https://i.imgur.com/EmWFXPq.png", attribute:"Lightning",symbol:"⚡",damage:38, speed:13,skill:"SparkFin",level:1},
+      {name:"KrakenKid",  rarity:"Epic",      img:"https://i.imgur.com/mnMCDvt.png", attribute:"Water", symbol:"💧", damage:41, speed:11,skill:"Tentacle", level:1},
+      {name:"AbyssCrab",  rarity:"Epic",      img:"https://i.imgur.com/QkkGPnK.png", attribute:"Dark",  symbol:"🌑", damage:43, speed:9, skill:"AbyssGaze",level:1},
+      // 10 Legendary
+      {name:"InfernoCrab", rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png", attribute:"Fire", symbol:"🔥", damage:52, speed:15,skill:"InfernoClaw",level:1},
+      {name:"AbyssDragon", rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png", attribute:"Dark", symbol:"🌑", damage:55, speed:16,skill:"DarkRoar",   level:1},
+      {name:"MegaShark",   rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png", attribute:"Water",symbol:"💧",damage:58, speed:14,skill:"MegaBite",   level:1},
+      {name:"PearlDragon", rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png", attribute:"Water",symbol:"💧",damage:54, speed:16,skill:"PearlRoar",  level:1},
+      {name:"LavaClam",    rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png", attribute:"Fire", symbol:"🔥",damage:57, speed:15,skill:"LavaShell",  level:1},
+      {name:"CoralKnight", rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png", attribute:"Water",symbol:"💧",damage:53, speed:17,skill:"CoralSlash", level:1},
+      {name:"StoneWar",    rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png", attribute:"Earth",symbol:"🌱",damage:56, speed:15,skill:"StoneClub",  level:1},
+      {name:"MudGolem",    rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png", attribute:"Earth",symbol:"🌱",damage:59, speed:14,skill:"MudPunch",   level:1},
+      {name:"AngelCrab",   rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png", attribute:"Light",symbol:"🌟",damage:60, speed:16,skill:"HolyPinch", level:1},
+      {name:"AquaDino",    rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png", attribute:"Water",symbol:"💧",damage:62, speed:15,skill:"AquaBlast",  level:1},
+      // 10 Mythic
+      {name:"ElderDragon", rarity:"Mythic",   img:"https://i.imgur.com/tFzK3iu.png", attribute:"Light",symbol:"🌟",damage:80, speed:20,skill:"ElderRoar",  level:1},
+      {name:"AquaGod",     rarity:"Mythic",   img:"https://i.imgur.com/ujlhSVK.png", attribute:"Water",symbol:"💧",damage:78, speed:22,skill:"Tsunami",    level:1},
+      {name:"ArcAngel",    rarity:"Mythic",   img:"https://i.imgur.com/1K8xEcc.png", attribute:"Light",symbol:"🌟",damage:85, speed:19,skill:"DivineBow", level:1},
+      {name:"CyberDino",   rarity:"Mythic",   img:"https://i.imgur.com/EokU1JU.png", attribute:"Dark", symbol:"🌑",damage:82, speed:21,skill:"CyberClaw", level:1},
+      {name:"PhoenixKing", rarity:"Mythic",   img:"https://i.imgur.com/Qg9MLyO.png", attribute:"Fire", symbol:"🔥",damage:88, speed:18,skill:"FlameWing", level:1},
+      {name:"TimeSerpent", rarity:"Mythic",   img:"https://i.imgur.com/Xsqp1Zl.png", attribute:"Time", symbol:"⏳",damage:90, speed:23,skill:"TimeCrash", level:1},
+      {name:"GalaxyWolf",  rarity:"Mythic",   img:"https://i.imgur.com/YeDYlBO.png", attribute:"Space",symbol:"🌌",damage:86, speed:22,skill:"GalaxyHowl",level:1},
+      {name:"AuraKnight",  rarity:"Mythic",   img:"https://i.imgur.com/h8LyWQG.png", attribute:"Light",symbol:"🌟",damage:84, speed:20,skill:"AuraSlash", level:1},
+      {name:"BlazeGod",    rarity:"Mythic",   img:"https://i.imgur.com/u2hcKvV.png", attribute:"Fire", symbol:"🔥",damage:89, speed:19,skill:"BlazeSpin", level:1},
+      {name:"AncientGolem",rarity:"Mythic",   img:"https://i.imgur.com/WWF50XS.png", attribute:"Earth",symbol:"🌱",damage:92, speed:18,skill:"GolemFist", level:1},
+    ];
+    const rarityChances = [
+      { rarity: "Common",    chance: 40 },
+      { rarity: "Rare",      chance: 30 },
+      { rarity: "Epic",      chance: 15 },
+      { rarity: "Legendary", chance: 10 },
+      { rarity: "Mythic",    chance: 5  },
+    ];
+
+    /********************************************************************
+     * 4. SWITCH TAB
+     ********************************************************************/
+    function switchTab(tabId){
+      document.querySelectorAll('main').forEach(m=>m.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active-tab'));
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
+      if(tabId==='home') updateHome();
+      if(tabId==='hero') renderHeroes();
+      if(tabId==='quest') updateQuest();
+      if(tabId==='wallet') updateWallet();
     }
 
-    function showHeroDetails(name) {
-      const hero = player.heroes.find(h => h.name === name);
-      if (!hero) return;
-
-      document.getElementById('modal-hero-name').textContent = hero.name;
-      document.getElementById('modal-hero-rarity').textContent = hero.rarity;
-      document.getElementById('modal-hero-attr').textContent = hero.attribute;
-      document.getElementById('modal-hero-stats').textContent = `Damage: ${hero.damage}`;
-      document.getElementById('modal-hero-level').textContent = `Level: ${hero.level}`;
-
-      document.getElementById('modal-overlay').style.display = 'flex';
+    /********************************************************************
+     * 5. HOME
+     ********************************************************************/
+    function updateHome(){
+      document.getElementById('player-info').textContent=`Tokens: ${player.tokens}`;
+      document.getElementById('game-tokens').textContent= player.tokens;
+    }
+    function addTokens(n){
+      player.tokens+=n;
+      updateHome();
+      alert(`+${n} tokens!`);
     }
 
-    function closeModal() {
-      document.getElementById('modal-overlay').style.display = 'none';
+    /********************************************************************
+     * 6. SHOP: BUY CHEST => random hero => autoMerge => update
+     ********************************************************************/
+    function buyChest(count){
+      const cost = count*10;
+      if(player.tokens<cost){
+        document.getElementById('shop-message').textContent="Not enough tokens!";
+        return;
+      }
+      player.tokens-=cost;
+      for(let i=0;i<count;i++){
+        const rar = getRandomRarity();
+        const pool= allHeroes.filter(h=>h.rarity===rar);
+        if(pool.length>0){
+          let rnd=Math.floor(Math.random()*pool.length);
+          let newHero={...pool[rnd]};
+          player.heroes.push(newHero);
+        }
+      }
+      autoMerge();
+      updateHome();
+      renderHeroes();
+      document.getElementById('shop-message').textContent=`Bought ${count} chest(s). Merged if duplicates.`;
+    }
+    function getRandomRarity(){
+      let roll=Math.random()*100, accum=0;
+      for(let rc of rarityChances){
+        accum+=rc.chance;
+        if(roll<accum) return rc.rarity;
+      }
+      return "Common";
     }
 
-    function updateQuestList() {
-      const questContainer = document.getElementById('quest-list');
-      questContainer.innerHTML = player.quests
-        .map(
-          quest => `
-        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px; border-radius: 4px;">
-          <p><strong>${quest.name}</strong></p>
-          <p>Reward: ${quest.reward} tokens</p>
-          <p>Status: ${quest.completed ? 'Completed' : 'Incomplete'}</p>
-          ${
-            !quest.completed
-              ? `<button onclick="completeQuest(${quest.id})">Complete Quest</button>`
-              : ''
+    /********************************************************************
+     * 7. AUTO MERGE
+     * Mỗi cặp hero giống name + rarity + level => gộp => level+1, damage x1.5
+     * Tối đa level 5 => nếu lv5 ko merge nữa => logic "không lạm phát" (?) 
+     ********************************************************************/
+    function autoMerge(){
+      let groupMap={};
+      player.heroes.forEach((h,idx)=>{
+        let key=`${h.name}__${h.rarity}__Lv${h.level}`;
+        if(!groupMap[key]) groupMap[key]=[];
+        groupMap[key].push(idx);
+      });
+      // Mỗi group: while length>=2 => merge => push hero level+1 => remove old
+      for(let key in groupMap){
+        let arr=groupMap[key];
+        while(arr.length>=2){
+          let i1=arr.pop(); 
+          let i2=arr.pop();
+          let big=Math.max(i1,i2);
+          let sm =Math.min(i1,i2);
+          let h1=player.heroes[sm];
+          let h2=player.heroes[big];
+          // remove 2
+          player.heroes.splice(big,1);
+          player.heroes.splice(sm,1);
+          // create merged
+          let merged={...h1};
+          if(merged.level<5){
+            merged.level++;
+            merged.damage=Math.floor(merged.damage*1.5);
           }
-        </div>`
-        )
-        .join('');
+          // speed logic => or skip => or speed= speed+1 ...
+          // skill logic => optional => skill upgrade...
+          
+          player.heroes.push(merged);
+        }
+      }
+      // Check quest e.g. if we have hero lv2 => quest #2
+      let haveLv2=player.heroes.some(h=>h.level>=2);
+      if(haveLv2){
+        let q2=player.quests.find(q=>q.id===2);
+        if(q2 && !q2.completed){
+          q2.completed=true;
+          player.tokens+=q2.reward;
+          updateHome();
+          alert(`Quest done: Merge hero to Lv2 => +${q2.reward} tokens!`);
+        }
+      }
     }
 
-    function completeQuest(id) {
-      const quest = player.quests.find(q => q.id === id);
-      if (!quest || quest.completed) return;
-
-      quest.completed = true;
-      addTokens(quest.reward);
-      updateQuestList();
+    /********************************************************************
+     * 8. HERO
+     ********************************************************************/
+    function renderHeroes(){
+      // Check quest #1: if heroes>=5 => quest done
+      if(player.heroes.length>=5){
+        let q1=player.quests.find(x=>x.id===1);
+        if(q1 && !q1.completed){
+          q1.completed=true;
+          player.tokens+=q1.reward;
+          updateHome();
+          alert(`Quest done: Have 5 heroes => +${q1.reward} tokens!`);
+        }
+      }
+      const c=document.getElementById('hero-list');
+      c.innerHTML=player.heroes.map((h,idx)=>{
+        let rarClass=`color-${h.rarity.toLowerCase()}`;
+        return `
+          <div class="hero-card" onclick="showHeroModal(${idx})">
+            <img src="${h.img}" alt="${h.name}">
+            <p class="${rarClass}">${h.name}</p>
+            <p>Lv${h.level}</p>
+          </div>
+        `;
+      }).join('');
+    }
+    function showHeroModal(idx){
+      let h=player.heroes[idx];
+      document.getElementById('modal-hero-img').src=h.img;
+      document.getElementById('modal-hero-name').textContent=h.name;
+      document.getElementById('modal-hero-rarity').innerHTML=`<span class="color-${h.rarity.toLowerCase()}">${h.rarity}</span>`;
+      document.getElementById('modal-hero-attr').textContent=`${h.symbol} ${h.attribute}`;
+      document.getElementById('modal-hero-stats').textContent=`⚔${h.damage} ⚡${h.speed}`;
+      document.getElementById('modal-hero-level').textContent=`Level: ${h.level}`;
+      document.getElementById('modal-hero-skill').textContent=`Skill: ${h.skill}`;
+      document.getElementById('modal-overlay').style.display='flex';
+    }
+    function closeModal(){
+      document.getElementById('modal-overlay').style.display='none';
     }
 
-    document.addEventListener('DOMContentLoaded', () => {
-      document.getElementById('wallet-tokens').textContent = player.tokens;
-      updateHeroList();
-      updateQuestList();
+    /********************************************************************
+     * 9. QUEST
+     ********************************************************************/
+    function updateQuest(){
+      let qDiv=document.getElementById('quest-list');
+      qDiv.innerHTML=player.quests.map(q=>{
+        return `
+          <div style="border:1px solid #ccc; margin:4px; padding:4px;">
+            <strong>${q.name}</strong>
+            <p>Reward: ${q.reward}</p>
+            <p>Status: ${q.completed? 'Done':'Ongoing'}</p>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /********************************************************************
+     * INIT
+     ********************************************************************/
+    document.addEventListener('DOMContentLoaded',()=>{
+      updateHome();
+      updateWallet();
+      renderHeroes();
+      updateQuest();
     });
   </script>
 </body>
