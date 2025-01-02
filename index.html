@@ -2,114 +2,101 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Rost & Flame - Mini Game</title>
+  <title>Rost & Flame - Telegram Mini Game</title>
   <style>
-    /* Reset & base style */
     * {
       box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
       font-family: sans-serif;
     }
     body {
+      margin: 0; 
+      padding: 0;
       background: #fafafa;
     }
-    /* Header nhỏ hơn */
+    header, nav, main, footer {
+      padding: 10px; 
+      margin: 10px;
+    }
     header {
       background: #f55742; 
       color: #fff;
       text-align: center;
-      padding: 8px;
-      margin: 5px;
       border-radius: 5px;
     }
-    header h1 {
-      font-size: 18px;
-      margin-bottom: 4px;
-    }
-    header p {
-      font-size: 12px;
-    }
-
-    /* Nav gọn */
     nav {
-      display: flex;
-      justify-content: center;
-      gap: 5px;
-      margin: 5px;
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 10px;
     }
     nav button {
-      padding: 6px 10px;
+      margin: 5px;
+      padding: 8px 12px;
+      cursor: pointer;
       border-radius: 5px;
       border: none;
       background: #efefef;
-      font-size: 12px;
-      cursor: pointer;
+      font-weight: bold;
     }
     .active-tab {
       background: #c3f0d1;
-    }
-
-    /* Main containers */
-    main {
-      margin: 5px;
-      padding: 5px;
     }
     .hidden {
       display: none;
     }
 
-    /******************************************************
-     * Hero Layout: 5 heroes/dòng, nhỏ gọn
-     ******************************************************/
+    /***********************************************
+     * Hero Layout: 5 heroes mỗi dòng, gọn hơn
+     ***********************************************/
     .hero-container {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
       gap: 5px;
-      max-width: 400px; /* Rộng tối đa */
-      margin: 0 auto;   /* canh giữa */
+      margin: 0 auto;
+      /* Giới hạn chiều rộng để không vỡ layout mini app */
+      max-width: 370px; 
     }
     .hero-card {
       border: 1px solid #ccc;
-      border-radius: 4px;
+      border-radius: 5px;
       text-align: center;
       background: #fff;
       padding: 3px;
-      cursor: pointer;
-      font-size: 11px; 
-      min-height: 100px;
+      cursor: pointer; 
       position: relative;
+      min-height: 110px;
     }
     .hero-card img {
-      max-width: 45px;
-      max-height: 45px;
+      max-width: 50px;
+      max-height: 50px;
+      border-radius: 5px;
       margin: 0 auto;
       display: block;
-      border-radius: 4px;
     }
     .hero-rarity {
       font-weight: bold;
-      font-size: 10px;
-      margin-top: 2px;
+      font-size: 11px;
+      margin-bottom: 2px;
     }
     .hero-name {
-      font-weight: bold;
       font-size: 11px;
-      margin-top: 2px;
+      font-weight: bold;
+      margin: 2px 0;
     }
     .btn-row {
       display: flex; 
       justify-content: center; 
-      gap: 2px; 
-      margin-top: 2px;
+      gap: 3px; 
+      margin-top: 3px;
     }
     .move-btn, .disassemble-btn {
-      border: 1px solid #ddd;
-      background: #ffefef;
-      font-size: 9px;
+      display: inline-block;
       padding: 2px 4px;
-      border-radius: 3px;
+      background: #ffefef;
+      border: 1px solid #ddd;
+      color: #333;
       cursor: pointer;
+      border-radius: 3px;
+      font-size: 10px;
     }
     .move-btn:hover {
       background: #e0f6ff;
@@ -120,68 +107,76 @@
       border-color: #ff8888;
     }
 
-    /******************************************************
+    /***********************************************
      * Rarity colors
-     ******************************************************/
+     ***********************************************/
     .color-common    { color: #AAAAAA; }
     .color-rare      { color: #54FFFE; }
     .color-epic      { color: #C66CC5; }
     .color-legendary { color: #FFA800; }
     .color-mythic    { color: #FF0000; }
 
-    /******************************************************
-     * Home / Shop / Quest / Wallet layout
-     ******************************************************/
+    /***********************************************
+     * Home, Shop, Quest, Wallet Layout
+     ***********************************************/
     #home .summary {
+      margin-top: 15px;
+      font-size: 16px;
       background: #fff;
       border: 1px solid #ddd;
+      padding: 10px;
       border-radius: 5px;
-      padding: 8px;
-      font-size: 12px;
-      margin-bottom: 5px;
     }
     #shop .shop-items button {
       margin: 5px; 
-      padding: 6px 10px; 
+      padding: 8px 12px; 
       border-radius: 5px; 
       border: none;
       cursor: pointer;
-      font-size: 12px;
       background: #eee;
     }
+    #quest button {
+      margin: 3px;
+      cursor: pointer;
+    }
+    #wallet button {
+      margin: 5px;
+      cursor: pointer;
+    }
 
-    /******************************************************
+    /***********************************************
      * Boat layout
-     ******************************************************/
+     ***********************************************/
     #boat-content {
-      background: #fff;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      padding: 8px;
+      border: 1px solid #ccc; 
+      background: #fff; 
+      border-radius: 5px; 
+      padding: 10px;
     }
     .boat-header {
       display: flex; 
       justify-content: space-between; 
       align-items: center;
-      margin-bottom: 5px;
-      font-size: 14px;
+      margin-bottom: 10px;
+    }
+    .boat-title {
+      font-size: 16px; 
       font-weight: bold;
     }
     .quick-convert-btn {
-      padding: 4px 8px; 
+      padding: 5px 10px; 
       border: none; 
       cursor: pointer;
       border-radius: 5px;
       background: #ffdada;
-      font-size: 12px;
     }
     .quick-convert-btn:hover {
       background: #ffbbbb;
     }
 
-    /******************************************************
-     * Modal popup hero detail
-     ******************************************************/
+    /***********************************************
+     * Modal popup để xem Hero detail
+     ***********************************************/
     #modal-overlay {
       position: fixed;
       inset: 0;
@@ -193,46 +188,40 @@
     }
     #modal-content {
       background: #fff;
-      padding: 15px;
+      padding: 20px;
       border-radius: 5px;
-      width: 220px;
+      width: 250px;
       text-align: center;
-      font-size: 12px; 
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-    }
-    #modal-hero-img {
-      max-width: 50px;
-      display: block;
-      margin: 0 auto 8px;
-      border-radius: 4px;
     }
     #modal-close {
       margin-top: 10px;
-      padding: 4px 8px;
-      font-size: 12px;
+      padding: 5px 10px;
       cursor: pointer;
       border: none;
       border-radius: 5px;
       background: #ddd;
     }
+    #modal-hero-img {
+      max-width: 60px;
+      display: block;
+      margin: 0 auto 10px;
+      border-radius: 5px;
+    }
 
     footer {
       text-align: center;
-      font-size: 10px;
+      font-size: 12px;
       color: #999;
-      margin: 10px 0;
     }
   </style>
 </head>
 <body>
-
-  <!-- HEADER -->
   <header>
     <h1>Rost & Flame</h1>
     <p>The Ultimate Telegram Mini Game</p>
   </header>
 
-  <!-- NAV -->
   <nav>
     <button id="btn-home" class="active-tab">Home</button>
     <button id="btn-shop">Shop</button>
@@ -248,28 +237,28 @@
       <p id="player-info"></p>
       <p id="player-heroes"></p>
     </div>
-    <!-- Canvas placeholder (boat) -->
+    <!-- Canvas placeholder -->
     <div style="
       width: 100%; 
-      height: 100px; 
+      height: 150px; 
       background: url('https://i.imgur.com/f4bELuK.png') center/cover no-repeat;
-      border-radius: 5px;">
+      border-radius: 5px;
+      margin-top: 15px;">
+      <!-- Boat placeholder -->
     </div>
   </main>
 
   <!-- SHOP -->
   <main id="shop" class="hidden">
-    <h3>Shop - Buy Chests</h3>
-    <p style="font-size:12px;">
-      Exchange your RFM tokens for chests. Each chest gives a random Hero with certain rarity.
-    </p>
+    <h2>Shop - Buy Chests</h2>
+    <p>Exchange your RFM tokens for chests. Each chest grants a random Hero with certain rarity.</p>
     <div class="shop-items">
       <button onclick="buyChests(10)">Buy 10 Chests</button>
       <button onclick="buyChests(20)">Buy 20 Chests</button>
       <button onclick="buyChests(100)">Buy 100 Chests</button>
       <button onclick="buyChests(200)">Buy 200 Chests</button>
     </div>
-    <p id="shop-msg" style="margin-top:5px; font-weight:bold; font-size:12px;"></p>
+    <p id="shop-msg" style="margin-top:10px; font-weight:bold;"></p>
   </main>
 
   <!-- BOAT -->
@@ -277,15 +266,15 @@
     <div id="boat-content">
       <div>
         <div class="boat-header">
-          <span>Your Equipment</span>
-          <span>Max 20 heroes</span>
+          <div class="boat-title">Your Equipment</div>
+          <div>Max 20 heroes</div>
         </div>
         <div id="boat-active-heroes" class="hero-container"></div>
       </div>
       <hr />
       <div>
         <div class="boat-header">
-          <span>Your Warehouse</span>
+          <div class="boat-title">Your Warehouse</div>
           <button class="quick-convert-btn" onclick="quickConvert()">Quick convert</button>
         </div>
         <div id="boat-warehouse-heroes" class="hero-container"></div>
@@ -295,29 +284,23 @@
 
   <!-- QUEST -->
   <main id="quest" class="hidden">
-    <h3>Daily Quests & Referrals</h3>
-    <div id="quest-list" style="font-size:12px; margin-bottom:8px;"></div>
+    <h2>Daily Quests & Referrals</h2>
+    <div id="quest-list"></div>
     <hr/>
-    <p style="font-size:12px;"><strong>Referrals:</strong></p>
-    <p style="font-size:12px;">
-      You have <span id="referral-pending"></span> RFM pending from referrals.
-    </p>
-    <button onclick="withdrawReferral()" style="font-size:12px;">Withdraw Referral Reward</button>
+    <p><strong>Referrals:</strong></p>
+    <p>You have <span id="referral-pending"></span> RFM pending from referrals.</p>
+    <button onclick="withdrawReferral()">Withdraw Referral Reward</button>
   </main>
 
   <!-- WALLET -->
   <main id="wallet" class="hidden">
-    <h3>Wallet</h3>
-    <p style="font-size:12px;">
-      Manage your RFM balance and integrate with TON coin payment.
-    </p>
-    <p style="font-size:12px;">
-      RFM Balance: <span id="wallet-balance"></span>
-    </p>
-    <button onclick="connectTON()" style="font-size:12px;">Connect TON Wallet (Mock)</button>
-    <button onclick="withdrawRFM()" style="font-size:12px;">Withdraw (to TON) - Mock</button>
-    <button onclick="swapRFM()" style="font-size:12px;">Swap RFM -> TON (Mock)</button>
-    <p style="margin-top: 8px; font-size:10px;">
+    <h2>Wallet</h2>
+    <p>Manage your RFM balance and integrate with TON coin payment.</p>
+    <p>RFM Balance: <span id="wallet-balance"></span></p>
+    <button onclick="connectTON()">Connect TON Wallet (Mock)</button>
+    <button onclick="withdrawRFM()">Withdraw (to TON) - Mock</button>
+    <button onclick="swapRFM()">Swap RFM -> TON (Mock)</button>
+    <p style="margin-top: 10px;">
       <em>Note: Real TON integration requires TON Connect or custom API.</em>
     </p>
   </main>
@@ -326,14 +309,14 @@
   <div id="modal-overlay">
     <div id="modal-content">
       <img id="modal-hero-img" src="" alt="Hero" 
-           onerror="this.src='https://via.placeholder.com/50/ddd/000?text=No+Img';" />
-      <p id="modal-hero-name" style="font-weight:bold; margin-bottom:4px;"></p>
-      <p id="modal-hero-rarity" style="margin-bottom:4px;"></p>
-      <p id="modal-hero-skill" style="margin-bottom:4px;"></p>
-      <p id="modal-hero-damage" style="margin-bottom:4px;"></p>
-      <p id="modal-hero-speed" style="margin-bottom:4px;"></p>
-      <p id="modal-hero-pin" style="margin-bottom:4px;"></p>
-      <p id="modal-hero-attr" style="margin-bottom:8px;"></p>
+           onerror="this.src='https://via.placeholder.com/60/ddd/000?text=Image+not+found';" />
+      <p id="modal-hero-name" style="font-weight:bold; font-size:14px;"></p>
+      <p id="modal-hero-rarity" style="margin:4px 0;"></p>
+      <p id="modal-hero-skill" style="margin:2px 0;"></p>
+      <p id="modal-hero-damage" style="margin:2px 0;"></p>
+      <p id="modal-hero-speed" style="margin:2px 0;"></p>
+      <p id="modal-hero-pin" style="margin:2px 0;"></p>
+      <p id="modal-hero-attr" style="margin:2px 0;"></p>
       <button id="modal-close" onclick="closeModal()">Close</button>
     </div>
   </div>
@@ -344,8 +327,9 @@
 
   <script>
   /************************************************************
-   *  ALL GAME LOGIC IN ONE HTML FILE
+   * ALL GAME LOGIC IN ONE HTML FILE
    ************************************************************/
+
   // Hardcode user ID for local test
   const LOCAL_USER_ID = 'demoUser_123'; 
   const LOCAL_USER_NAME = 'DemoPlayer';
@@ -363,6 +347,7 @@
     }
   };
 
+  // Global user object
   let currentUser = null;
 
   // Probability for rarities
@@ -391,7 +376,7 @@
     Fire: "🔥",
     Water: "💧",
     Wind: "🍃",
-    Earth: "🌎",  // đổi 🪨 -> 🌎
+    Earth: "🌎", 
     Electric: "⚡"
   };
   const attributeList = ["Fire","Water","Wind","Earth","Electric"];
@@ -407,13 +392,10 @@
     "🎯 Tsunami Wave"
   ];
 
-  /********************************************************
-   *  NÂNG CẤP HERO KHI TRÙNG: level, baseDamage
-   *  actualDamage = baseDamage + (level-1)*5
-   ********************************************************/
-  // Hero = { id, name, image, rarity, skill, baseDamage, level, speed, pin, attribute }
-  // Lần đầu => level=1
-  // Mở hero trùng (same name + same attribute) => hero cũ level++ => discard hero mới
+  // Function to pick random from array
+  function pickRandom(arr) {
+    return arr[Math.floor(Math.random() * arr.length)];
+  }
 
   // Hero data
   const allHeroesList = {
@@ -479,7 +461,98 @@
     ]
   };
 
-  // Save/Load
+  // Create hero with random stats + level=1
+  function createRandomHero() {
+    const rarity = getRandomRarity();
+    const baseList = allHeroesList[rarity];
+    const base = pickRandom(baseList);
+
+    // random skill
+    const skill = pickRandom(skillList);
+    // random damage
+    const dmg = Math.floor(Math.random()*91)+10; 
+    // random speed
+    const spd = Math.floor(Math.random()*20)+1;
+    // random pin
+    const pinVal = Math.floor(Math.random()*151)+50;
+    // random attribute
+    const att = pickRandom(attributeList);
+
+    return {
+      id: 'hero_' + Math.random().toString(36).substring(2),
+      name: base.name,
+      image: base.image,
+      rarity,
+      level: 1,
+      skill,
+      damage: dmg,
+      speed: spd,
+      pin: pinVal,
+      attribute: att
+    };
+  }
+  function getRandomRarity() {
+    let roll = Math.random() * 100;
+    let sum = 0;
+    for (let r of rarityRates) {
+      sum += r.rate;
+      if (roll < sum) return r.rarity;
+    }
+    return 'Common';
+  }
+  function createRandomHeroes(count) {
+    let arr = [];
+    for(let i=0; i<count; i++){
+      arr.push(createRandomHero());
+    }
+    return arr;
+  }
+
+  // AUTO UPGRADE: 
+  // Tìm 2 hero "cùng tên" & "cùng level" => merge => level+1 => stats +50%
+  // Lặp lại đến khi không merge được nữa
+  function autoUpgrade(arrayHeroes) {
+    let changed = true;
+    while(changed) {
+      changed = false;
+      // Tạo map: key = name + '#' + level, value = list index
+      let countMap = {};
+      for(let i=0; i<arrayHeroes.length; i++){
+        let h = arrayHeroes[i];
+        let key = h.name + '#' + h.level;
+        if(!countMap[key]) countMap[key] = [];
+        countMap[key].push(i);
+      }
+      // Tìm key có >= 2 hero => merge
+      for(let key in countMap) {
+        let idxList = countMap[key];
+        while(idxList.length >= 2) {
+          // Lấy 2 hero => merge
+          let i1 = idxList.pop();
+          let i2 = idxList.pop();
+          if(i1 < i2) { // swap để i2 < i1
+            let tmp = i1; i1 = i2; i2 = tmp;
+          }
+          let h1 = arrayHeroes[i1];
+          let h2 = arrayHeroes[i2];
+          // Merge => h1 là hero mới (level+1, stats*1.5)
+          h1.level += 1;
+          h1.damage = Math.floor(h1.damage * 1.5);
+          h1.speed = Math.floor(h1.speed * 1.5);
+          h1.pin = Math.floor(h1.pin * 1.5);
+          // remove h2
+          arrayHeroes.splice(i2,1);
+          // remove h1 from array => reinsert => to keep indexes consistent
+          arrayHeroes.splice(i1,1, h1);
+          changed = true;
+          break; // break while => need to rebuild countMap
+        }
+        if(changed) break;
+      }
+    }
+  }
+
+  // Data & UI
   function saveUserData() {
     localStorage.setItem('RostFlameUser', JSON.stringify(currentUser));
   }
@@ -489,277 +562,210 @@
     return null;
   }
 
-  // Mô phỏng damage = baseDamage + (level-1)*5
-  function getActualDamage(hero) {
-    return hero.baseDamage + (hero.level-1)*5;
-  }
-
-  // Tạo hero
-  function createRandomHero() {
-    const rarity = getRandomRarity();
-    const arr = allHeroesList[rarity];
-    const base = arr[Math.floor(Math.random() * arr.length)];
-
-    // skill
-    const skill = skillList[Math.floor(Math.random()*skillList.length)];
-    // baseDamage
-    const bDmg = Math.floor(Math.random()*91)+10; 
-    // speed
-    const spd = Math.floor(Math.random()*20)+1;
-    // pin
-    const pinVal = Math.floor(Math.random()*151)+50;
-    // attribute
-    const att = attributeList[Math.floor(Math.random()*attributeList.length)];
-
-    return {
-      id: 'hero_' + Math.random().toString(36).slice(2),
-      name: base.name,
-      image: base.image,
-      rarity,
-      skill,
-      baseDamage: bDmg,
-      level: 1,
-      speed: spd,
-      pin: pinVal,
-      attribute: att
-    };
-  }
-
-  // Tạo N hero
-  function createRandomHeroes(count) {
-    let out = [];
-    for(let i=0; i<count; i++){
-      out.push(createRandomHero());
-    }
-    return out;
-  }
-
-  // Tìm hero trùng (same name + same attribute)
-  // => nâng cấp hero cũ (level++), discard hero mới
-  function tryMergeDuplicate(newHero) {
-    // Kiểm tra trong Equipment
-    let exist = currentUser.heroesEquipment.find(h => 
-      h.name===newHero.name && h.attribute===newHero.attribute
-    );
-    if(exist) {
-      exist.level++;
-      return true; // merged
-    }
-    // Nếu ko thấy => kiểm tra Warehouse
-    let exist2 = currentUser.heroesWarehouse.find(h => 
-      h.name===newHero.name && h.attribute===newHero.attribute
-    );
-    if(exist2) {
-      exist2.level++;
-      return true; // merged
-    }
-    return false;
-  }
-
-  // Tabs
+  // ========== TABS ==========
   const tabs = ['home','shop','boat','quest','wallet'];
-  function showTab(tid) {
+  function showTab(tabId) {
     tabs.forEach(t => {
       document.getElementById(t).classList.add('hidden');
       document.getElementById('btn-'+t).classList.remove('active-tab');
     });
-    document.getElementById(tid).classList.remove('hidden');
-    document.getElementById('btn-'+tid).classList.add('active-tab');
-
-    if(tid==='home') refreshHome();
-    if(tid==='shop') refreshShop();
-    if(tid==='boat') refreshBoat();
-    if(tid==='quest') refreshQuest();
-    if(tid==='wallet') refreshWallet();
+    document.getElementById(tabId).classList.remove('hidden');
+    document.getElementById('btn-'+tabId).classList.add('active-tab');
+    if(tabId === 'home') refreshHome();
+    if(tabId === 'shop') refreshShop();
+    if(tabId === 'boat') refreshBoat();
+    if(tabId === 'quest') refreshQuest();
+    if(tabId === 'wallet') refreshWallet();
   }
 
-  // HOME
+  // ========== HOME ==========
   function refreshHome() {
-    document.getElementById('player-welcome').innerHTML =
+    document.getElementById('player-welcome').innerHTML = 
       `Welcome <strong>${currentUser.userName}</strong>!`;
-    document.getElementById('player-info').innerHTML =
+    document.getElementById('player-info').innerHTML = 
       `You have <strong>${currentUser.rfmTokens}</strong> RFM tokens.`;
-    let totalH = currentUser.heroesEquipment.length + currentUser.heroesWarehouse.length;
+    const totalHeroes = currentUser.heroesEquipment.length + currentUser.heroesWarehouse.length;
     document.getElementById('player-heroes').innerHTML =
-      `You currently own <strong>${totalH}</strong> heroes.`;
+      `You currently own <strong>${totalHeroes}</strong> heroes.`;
   }
 
-  // SHOP
+  // ========== SHOP ==========
   function refreshShop() {
     document.getElementById('shop-msg').innerHTML = '';
   }
-  function buyChests(num) {
-    let cost = num*2;
+  function buyChests(count) {
+    const cost = count * 2; // each chest = 2 RFM
     if(currentUser.rfmTokens < cost) {
-      document.getElementById('shop-msg').innerHTML =
+      document.getElementById('shop-msg').innerHTML = 
         `Not enough RFM. Need ${cost}, you have ${currentUser.rfmTokens}.`;
       return;
     }
     currentUser.rfmTokens -= cost;
-    let newHeroes = createRandomHeroes(num);
-
-    newHeroes.forEach(h=>{
-      // Thử merge hero trùng
-      let merged = tryMergeDuplicate(h);
-      if(!merged) {
-        // nếu ko trùng => add hero mới
-        if(currentUser.heroesEquipment.length<20) {
-          currentUser.heroesEquipment.push(h);
-        } else {
-          currentUser.heroesWarehouse.push(h);
-        }
+    const newHeroes = createRandomHeroes(count);
+    // Add each hero => if equipment <20 => go equip, else warehouse
+    for(let h of newHeroes) {
+      if(currentUser.heroesEquipment.length < 20) {
+        currentUser.heroesEquipment.push(h);
+      } else {
+        currentUser.heroesWarehouse.push(h);
       }
-    });
+    }
+    // AUTO-UPGRADE: check equip + warehouse
+    autoUpgrade(currentUser.heroesEquipment);
+    autoUpgrade(currentUser.heroesWarehouse);
 
     saveUserData();
-    document.getElementById('shop-msg').innerHTML =
-      `You bought ${num} chests for ${cost} RFM.<br/>
-       Gained ${num} heroes (some may have merged).<br/>
+    document.getElementById('shop-msg').innerHTML = 
+      `You bought ${count} chests for ${cost} RFM.<br/>
+       Gained ${count} heroes (auto-upgrade applied if duplicates).<br/>
        Remaining RFM: ${currentUser.rfmTokens}.`;
   }
 
-  // BOAT
+  // ========== BOAT ==========
   function refreshBoat() {
-    let eqDiv = document.getElementById('boat-active-heroes');
-    let whDiv = document.getElementById('boat-warehouse-heroes');
-
-    if(currentUser.heroesEquipment.length===0) {
-      eqDiv.innerHTML = `<p style="font-size:12px;">No heroes in equipment.</p>`;
+    const equipDiv = document.getElementById('boat-active-heroes');
+    const whDiv = document.getElementById('boat-warehouse-heroes');
+    if(currentUser.heroesEquipment.length === 0) {
+      equipDiv.innerHTML = '<p>No heroes in equipment.</p>';
     } else {
-      eqDiv.innerHTML = currentUser.heroesEquipment.map(h=>heroCardHTML(h,'equipment')).join('');
+      equipDiv.innerHTML = currentUser.heroesEquipment
+        .map(h=>heroCardHTML(h, 'equipment')).join('');
     }
-    if(currentUser.heroesWarehouse.length===0) {
-      whDiv.innerHTML = `<p style="font-size:12px;">Warehouse is empty.</p>`;
+    if(currentUser.heroesWarehouse.length === 0) {
+      whDiv.innerHTML = '<p>Warehouse is empty.</p>';
     } else {
-      whDiv.innerHTML = currentUser.heroesWarehouse.map(h=>heroCardHTML(h,'warehouse')).join('');
+      whDiv.innerHTML = currentUser.heroesWarehouse
+        .map(h=>heroCardHTML(h, 'warehouse')).join('');
     }
   }
-  // Card
-  function heroCardHTML(h, loc) {
-    let rclass = getRarityClass(h.rarity);
-    let actBtn = '';
-    if(loc==='equipment'){
-      actBtn = `<div class="move-btn" onclick="confirmUnequip('${h.id}');event.stopPropagation();">Unequip</div>`;
+
+  function heroCardHTML(hero, location) {
+    const rc = getRarityClass(hero.rarity);
+    let actionBtn = '';
+    if(location === 'equipment') {
+      actionBtn = `<div class="move-btn" onclick="confirmUnequip('${hero.id}'); event.stopPropagation();">Unequip</div>`;
     } else {
-      actBtn = `<div class="move-btn" onclick="confirmEquip('${h.id}');event.stopPropagation();">Equip</div>`;
+      actionBtn = `<div class="move-btn" onclick="confirmEquip('${hero.id}'); event.stopPropagation();">Equip</div>`;
     }
-    let convBtn = `<div class="disassemble-btn" onclick="confirmConvert('${h.id}');event.stopPropagation();">Convert</div>`;
-
-    // Hiển thị level?
-    // Gợi ý: "Lv2" => user biết hero đang level mấy
-    let levelTag = (h.level>1) ? ` (Lv${h.level})` : '';
-
+    const disBtn = `<div class="disassemble-btn" onclick="confirmConvert('${hero.id}'); event.stopPropagation();">Convert</div>`;
+    // hiển thị level: "LvX"
     return `
-    <div class="hero-card" onclick="showHeroDetail('${h.id}')">
-      <img src="${h.image}" 
-           onerror="this.src='https://via.placeholder.com/45/ddd/000?text=No+Img';" />
-      <div class="hero-rarity ${rclass}">${h.rarity}${levelTag}</div>
-      <div class="hero-name">${h.name}</div>
+    <div class="hero-card" onclick="showHeroDetail('${hero.id}')">
+      <img src="${hero.image}" alt="${hero.name}" 
+           onerror="this.src='https://via.placeholder.com/50/ddd/000?text=Image+not+found';"/>
+      <div class="hero-rarity ${rc}">${hero.rarity} Lv${hero.level}</div>
+      <div class="hero-name">${hero.name}</div>
       <div class="btn-row">
-        ${actBtn}
-        ${convBtn}
+        ${actionBtn}
+        ${disBtn}
       </div>
     </div>
     `;
   }
-  function confirmUnequip(hid) {
-    if(!confirm("Unequip this hero?")) return;
-    moveHeroToWarehouse(hid);
+
+  function confirmUnequip(heroId) {
+    if(!confirm("Are you sure you want to unequip this hero?")) return;
+    moveHeroToWarehouse(heroId);
   }
-  function confirmEquip(hid) {
-    if(!confirm("Equip this hero?")) return;
-    moveHeroToEquipment(hid);
+  function confirmEquip(heroId) {
+    if(!confirm("Equip this hero to your Equipment?")) return;
+    moveHeroToEquipment(heroId);
   }
-  function confirmConvert(hid) {
-    if(!confirm("Convert this hero into RFM?")) return;
-    disassembleHero(hid);
+  function confirmConvert(heroId) {
+    if(!confirm("Are you sure to convert this hero into RFM?")) return;
+    disassembleHero(heroId);
   }
 
-  // Move
   function moveHeroToWarehouse(heroId) {
-    let idx = currentUser.heroesEquipment.findIndex(x=>x.id===heroId);
+    const idx = currentUser.heroesEquipment.findIndex(h=>h.id===heroId);
     if(idx<0) return;
     let hero = currentUser.heroesEquipment[idx];
     currentUser.heroesEquipment.splice(idx,1);
     currentUser.heroesWarehouse.push(hero);
+    // autoUpgrade each side
+    autoUpgrade(currentUser.heroesEquipment);
+    autoUpgrade(currentUser.heroesWarehouse);
     saveUserData();
     refreshBoat();
   }
   function moveHeroToEquipment(heroId) {
-    if(currentUser.heroesEquipment.length>=20) {
+    if(currentUser.heroesEquipment.length >= 20) {
       alert('Your Equipment is full (20/20).');
       return;
     }
-    let idx = currentUser.heroesWarehouse.findIndex(x=>x.id===heroId);
+    const idx = currentUser.heroesWarehouse.findIndex(h=>h.id===heroId);
     if(idx<0) return;
     let hero = currentUser.heroesWarehouse[idx];
     currentUser.heroesWarehouse.splice(idx,1);
     currentUser.heroesEquipment.push(hero);
+    // autoUpgrade
+    autoUpgrade(currentUser.heroesEquipment);
+    autoUpgrade(currentUser.heroesWarehouse);
     saveUserData();
     refreshBoat();
   }
 
-  // Convert
   function disassembleHero(heroId) {
     let found = null;
-    let i1 = currentUser.heroesEquipment.findIndex(x=>x.id===heroId);
-    if(i1>=0) {
-      found = currentUser.heroesEquipment[i1];
-      currentUser.heroesEquipment.splice(i1,1);
+    let idx = currentUser.heroesEquipment.findIndex(x=>x.id===heroId);
+    if(idx>=0) {
+      found = currentUser.heroesEquipment[idx];
+      currentUser.heroesEquipment.splice(idx,1);
     } else {
-      let i2 = currentUser.heroesWarehouse.findIndex(x=>x.id===heroId);
-      if(i2>=0) {
-        found = currentUser.heroesWarehouse[i2];
-        currentUser.heroesWarehouse.splice(i2,1);
+      let idx2 = currentUser.heroesWarehouse.findIndex(x=>x.id===heroId);
+      if(idx2>=0) {
+        found = currentUser.heroesWarehouse[idx2];
+        currentUser.heroesWarehouse.splice(idx2,1);
       }
     }
     if(!found) {
       alert('Hero not found');
       return;
     }
-    let dmg = getActualDamage(found); // baseDamage + (level-1)*5
-    let reward = Math.floor(dmg / 2);
+    let reward = Math.floor(found.damage / 2);
     currentUser.rfmTokens += reward;
     saveUserData();
     alert(`Converted "${found.name}" => +${reward} RFM.`);
     refreshBoat();
   }
+
   function quickConvert() {
     if(currentUser.heroesWarehouse.length===0) {
       alert('No heroes in warehouse to convert.');
       return;
     }
-    if(!confirm("Convert ALL heroes in warehouse to RFM?")) return;
-    let total = 0;
-    currentUser.heroesWarehouse.forEach(h=>{
-      let dmg = getActualDamage(h);
-      total += Math.floor(dmg/2);
+    if(!confirm('Are you sure you want to convert ALL heroes in the warehouse?')) return;
+    let totalReward = 0;
+    currentUser.heroesWarehouse.forEach(hero=>{
+      totalReward += Math.floor(hero.damage/2);
     });
     currentUser.heroesWarehouse = [];
-    currentUser.rfmTokens += total;
+    currentUser.rfmTokens += totalReward;
     saveUserData();
-    alert(`All warehouse heroes converted => +${total} RFM!`);
+    alert(`All warehouse heroes converted => +${totalReward} RFM!`);
     refreshBoat();
   }
 
-  // Modal (detail)
-  function showHeroDetail(hid) {
-    let hero = findHeroById(hid);
+  // ========== POPUP DETAIL ==========
+  function showHeroDetail(heroId) {
+    let hero = findHeroById(heroId);
     if(!hero) return;
-    document.getElementById('modal-hero-img').src = hero.image || 'https://via.placeholder.com/50/ddd/000?text=No+Img';
+    document.getElementById('modal-hero-img').src = hero.image || 'https://via.placeholder.com/60/ddd/000?text=Image+not+found';
     document.getElementById('modal-hero-name').innerText = hero.name;
-    document.getElementById('modal-hero-rarity').innerHTML =
-      `<span class="${getRarityClass(hero.rarity)}">${hero.rarity} Lv${hero.level}</span>`;
-    document.getElementById('modal-hero-skill').innerHTML = hero.skill ? hero.skill : '🎯 ???';
-
-    // Tính damage thực
-    let actualDmg = getActualDamage(hero);
-    document.getElementById('modal-hero-damage').innerHTML = `🗡: ${actualDmg}`;
-    document.getElementById('modal-hero-speed').innerHTML = `💨: ${hero.speed ?? '??'}`;
-    document.getElementById('modal-hero-pin').innerHTML = `📌: ${hero.pin ?? '??'}`;
-    let symbol = attributeSymbols[hero.attribute] || '';
-    document.getElementById('modal-hero-attr').innerHTML = 
-      `Attribute: ${symbol} ${hero.attribute || '???'}`;
+    let rc = getRarityClass(hero.rarity);
+    document.getElementById('modal-hero-rarity').innerHTML = 
+      `<span class="${rc}">${hero.rarity} Lv${hero.level}</span>`;
+    // skill
+    document.getElementById('modal-hero-skill').innerText = hero.skill || '🎯 ???';
+    // damage
+    document.getElementById('modal-hero-damage').innerText = `⚔: ${hero.damage||'??'}`;
+    // speed
+    document.getElementById('modal-hero-speed').innerText = `💨: ${hero.speed||'??'}`;
+    // pin
+    document.getElementById('modal-hero-pin').innerText = `📌: ${hero.pin||'??'}`;
+    // attribute
+    let attSym = attributeSymbols[hero.attribute] || '';
+    document.getElementById('modal-hero-attr').innerText = `Attribute: ${attSym} ${hero.attribute||'???'}`;
 
     document.getElementById('modal-overlay').style.display = 'flex';
   }
@@ -772,33 +778,34 @@
     return currentUser.heroesWarehouse.find(x=>x.id===id);
   }
 
-  // QUEST
+  // ========== QUEST ==========
   function refreshQuest() {
-    let dailyQuests = [
-      { id:'follow_group', desc:'Follow Rost & Flame Group', reward:10 },
-      { id:'vote_like', desc:'Give us a Like', reward:5 },
-      { id:'connect_wallet', desc:'Connect your TON Wallet', reward:15 }
+    const dailyQuests = [
+      { id: 'follow_group',   desc: 'Follow Rost & Flame Group',   reward: 10 },
+      { id: 'vote_like',      desc: 'Give us a Like',              reward: 5  },
+      { id: 'connect_wallet', desc: 'Connect your TON Wallet',     reward: 15 }
     ];
-    let qList = document.getElementById('quest-list');
-    qList.innerHTML = '';
-    dailyQuests.forEach(q=>{
+    const questListEl = document.getElementById('quest-list');
+    questListEl.innerHTML = '';
+
+    dailyQuests.forEach(q => {
       let done = currentUser.questsCompleted.includes(q.id);
-      let btnTxt = done ? 'Completed' : `Claim +${q.reward} RFM`;
-      let dis = done ? 'disabled' : '';
-      qList.innerHTML += `
+      let btnLabel = done ? 'Completed' : `Claim +${q.reward} RFM`;
+      let disabled = done ? 'disabled' : '';
+      questListEl.innerHTML += `
         <p>
           <strong>${q.desc}</strong><br/>
-          <button onclick="finishQuest('${q.id}')" ${dis} style="font-size:12px;">${btnTxt}</button>
+          <button onclick="finishQuest('${q.id}')" ${disabled}>${btnLabel}</button>
         </p>
       `;
     });
     document.getElementById('referral-pending').innerText = currentUser.referrals.pendingReward;
   }
   function finishQuest(qid) {
-    let questRewards = {
-      'follow_group':10, 
-      'vote_like':5, 
-      'connect_wallet':15
+    const questRewards = {
+      'follow_group': 10,
+      'vote_like': 5,
+      'connect_wallet': 15
     };
     if(!questRewards[qid]) {
       alert('Quest not found');
@@ -815,55 +822,59 @@
     refreshQuest();
   }
   function withdrawReferral() {
-    let amt = currentUser.referrals.pendingReward;
-    if(amt<=0) {
-      alert('No referral reward.');
+    const amt = currentUser.referrals.pendingReward;
+    if(amt <= 0) {
+      alert('No referral reward to withdraw.');
       return;
     }
     currentUser.rfmTokens += amt;
     currentUser.referrals.pendingReward = 0;
     saveUserData();
-    alert(`Withdrawn ${amt} RFM to your in-game balance!`);
+    alert(`Withdrawn ${amt} RFM to your balance.`);
     refreshQuest();
   }
 
-  // WALLET
+  // ========== WALLET ==========
   function refreshWallet() {
     document.getElementById('wallet-balance').innerText = currentUser.rfmTokens;
   }
   function connectTON() {
+    // TODO: integrate real TON
     alert('TON Wallet connected (mock).');
   }
   function withdrawRFM() {
-    if(currentUser.rfmTokens<1) {
-      alert('Not enough RFM.');
+    if(currentUser.rfmTokens < 1) {
+      alert('Not enough RFM to withdraw.');
       return;
     }
     let amt = currentUser.rfmTokens;
-    currentUser.rfmTokens=0;
+    currentUser.rfmTokens = 0;
     saveUserData();
     alert(`Withdrew ${amt} RFM to TON (mock).`);
     refreshWallet();
   }
   function swapRFM() {
-    if(currentUser.rfmTokens<1){
+    // Example: 1 RFM => 0.001 TON
+    if(currentUser.rfmTokens < 1) {
       alert('No RFM to swap.');
       return;
     }
     let amt = currentUser.rfmTokens;
-    currentUser.rfmTokens=0;
+    currentUser.rfmTokens = 0;
     saveUserData();
-    let ton = amt*0.001;
+    let ton = amt * 0.001;
     alert(`Swapped ${amt} RFM => ${ton} TON (mock).`);
     refreshWallet();
   }
 
-  // INIT
+  // ========== INIT ==========
   function init() {
-    let stored = loadUserData();
-    currentUser = stored || JSON.parse(JSON.stringify(defaultUserData));
-    saveUserData();
-
+    const stored = loadUserData();
+    if(stored) currentUser = stored;
+    else {
+      currentUser = JSON.parse(JSON.stringify(defaultUserData));
+      saveUserData();
+    }
     document.getElementById('btn-home').addEventListener('click', ()=>showTab('home'));
     document.getElementById('btn-shop').addEventListener('click', ()=>showTab('shop'));
     document.getElementById('btn-boat').addEventListener('click', ()=>showTab('boat'));
