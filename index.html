@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rost & Flame - Nested Buttons</title>
+    <title>Rost & Flame - Shop Feature</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -36,14 +36,14 @@
             height: auto;
             margin-top: 10px;
         }
-        .stats {
+        .stats, .wallet, .shop {
             margin-bottom: 20px;
             background: rgba(255, 255, 255, 0.2);
             padding: 15px;
             border-radius: 8px;
             box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
-        .stats p {
+        .stats p, .wallet p, .shop p {
             margin: 8px 0;
             font-size: 16px;
         }
@@ -66,31 +66,24 @@
         .button:hover {
             background: #1d3557;
         }
-        .dropdown {
-            display: none;
-            position: absolute;
-            top: 50px;
-            left: 0;
-            width: 100%;
+        .shop-item {
             background: #2a9d8f;
             padding: 10px;
+            margin: 10px 0;
             border-radius: 5px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+            color: #fff;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 16px;
         }
-        .dropdown button {
-            display: block;
-            margin: 5px 0;
-            background: #1d3557;
-            padding: 8px;
-            font-size: 14px;
+        .shop-item button {
+            background: #e63946;
+            padding: 5px 10px;
             color: #fff;
             border: none;
             border-radius: 5px;
             cursor: pointer;
-            width: 100%;
-        }
-        .dropdown button:hover {
-            background: #0d2538;
         }
     </style>
 </head>
@@ -103,65 +96,123 @@
             <p id="userInfo">Welcome, Ice Phoenix Keeper</p>
         </div>
 
+        <!-- Wallet Section -->
+        <div class="wallet">
+            <h3>🔗 Wallet</h3>
+            <p><strong>Address:</strong> <span id="walletAddress">Not Connected</span></p>
+            <p><strong>Balance:</strong> <span id="walletBalance">-- TON</span></p>
+            <button class="button wallet" onclick="connectWallet()">Connect Wallet</button>
+        </div>
+
         <!-- Stats Section -->
         <div class="stats">
-            <p><strong>💰 Balance:</strong> <span id="tonBalance">100 TON</span></p>
+            <p><strong>💰 Game Balance:</strong> <span id="tonBalance">100 TON</span></p>
+            <p><strong>🔥 Phoenixes Trained:</strong> <span id="trainCount">0/10</span></p>
+            <p><strong>⭐ VIP Phoenixes Served:</strong> <span id="vipCount">0/2</span></p>
         </div>
 
         <!-- Actions Section -->
         <div class="actions">
-            <div class="button" onclick="toggleDropdown(this)">
-                🐉 Train Phoenix
-                <div class="dropdown">
-                    <button onclick="trainQuick()">Quick Training</button>
-                    <button onclick="trainSpecial()">Special Training</button>
-                </div>
+            <button class="button" onclick="trainPhoenix()">❄️ Train Phoenix</button>
+            <button class="button" onclick="openShop()">🛒 Open Shop</button>
+        </div>
+
+        <!-- Shop Section -->
+        <div class="container shop" id="shopContainer" style="display: none;">
+            <h3>🛒 Shop</h3>
+            <div id="shopItems">
+                <!-- Items will be dynamically inserted here -->
             </div>
-            <div class="button" onclick="toggleDropdown(this)">
-                🌟 Special Actions
-                <div class="dropdown">
-                    <button onclick="serveVipPhoenix()">Serve VIP Phoenix</button>
-                    <button onclick="boostPhoenix()">Boost Phoenix Power</button>
-                </div>
-            </div>
+            <button class="button" onclick="closeShop()">Close Shop</button>
         </div>
     </div>
 
     <script>
         let user = {
             tonBalance: 100,
+            trainCount: 0,
+            vipCount: 0,
+            inventory: [],
         };
 
-        function toggleDropdown(button) {
-            const dropdown = button.querySelector('.dropdown');
-            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
+        let wallet = {
+            address: null,
+            balance: 0,
+        };
+
+        const shopItems = [
+            { name: "Ice Crystal", price: 10 },
+            { name: "Phoenix Feather", price: 15 },
+            { name: "Mystic Flame", price: 20 },
+        ];
+
+        function connectWallet() {
+            const mockAddress = "EQABC1234...XYZ";
+            const mockBalance = 200;
+            wallet.address = mockAddress;
+            wallet.balance = mockBalance;
+
+            alert("Wallet connected successfully!");
+            updateWalletStats();
         }
 
-        function trainQuick() {
-            alert("Quick training complete! You earned 0.5 TON.");
-            user.tonBalance += 0.5;
-            updateStats();
+        function trainPhoenix() {
+            if (user.trainCount < 10) {
+                user.trainCount++;
+                user.tonBalance += 0.5;
+                alert("Phoenix trained successfully! You earned 0.5 TON.");
+                updateStats();
+            } else {
+                alert("You have reached the daily training limit (10).");
+            }
         }
 
-        function trainSpecial() {
-            alert("Special training complete! You earned 1 TON.");
-            user.tonBalance += 1;
-            updateStats();
+        function openShop() {
+            const shopContainer = document.getElementById("shopContainer");
+            shopContainer.style.display = "block";
+            const shopItemsContainer = document.getElementById("shopItems");
+            shopItemsContainer.innerHTML = "";
+
+            shopItems.forEach(item => {
+                const div = document.createElement("div");
+                div.className = "shop-item";
+                div.innerHTML = `
+                    <span>${item.name} - ${item.price} TON</span>
+                    <button onclick="buyItem('${item.name}', ${item.price})">Buy</button>
+                `;
+                shopItemsContainer.appendChild(div);
+            });
         }
 
-        function serveVipPhoenix() {
-            alert("VIP Phoenix served! You earned 5 TON.");
-            user.tonBalance += 5;
-            updateStats();
+        function buyItem(itemName, price) {
+            if (user.tonBalance >= price) {
+                user.tonBalance -= price;
+                user.inventory.push(itemName);
+                alert(`You bought ${itemName}!`);
+                updateStats();
+            } else {
+                alert("Not enough TON to buy this item.");
+            }
         }
 
-        function boostPhoenix() {
-            alert("Phoenix power boosted! Special abilities unlocked.");
+        function closeShop() {
+            const shopContainer = document.getElementById("shopContainer");
+            shopContainer.style.display = "none";
+        }
+
+        function updateWalletStats() {
+            document.getElementById("walletAddress").textContent = wallet.address || "Not Connected";
+            document.getElementById("walletBalance").textContent = wallet.balance + " TON";
         }
 
         function updateStats() {
             document.getElementById("tonBalance").textContent = `${user.tonBalance.toFixed(1)} TON`;
+            document.getElementById("trainCount").textContent = `${user.trainCount}/10`;
+            document.getElementById("vipCount").textContent = `${user.vipCount}/2`;
         }
+
+        updateWalletStats();
+        updateStats();
     </script>
 </body>
 </html>
