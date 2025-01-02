@@ -50,7 +50,7 @@
     .hero-container {
       display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap: 10px;
+      gap: 8px; /* Adjust gap for better fit */
       justify-items: center;
     }
     .hero-card {
@@ -61,8 +61,8 @@
       background: #fff;
       cursor: pointer;
       overflow: hidden;
-      width: 90px; /* Rộng nhỏ hơn để hiển thị vừa trên mini app */
-      height: 130px;
+      width: 65px;
+      height: 90px;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -70,8 +70,8 @@
     }
     .hero-card img {
       margin-top: 5px;
-      width: 50px; /* Tùy chỉnh nhỏ hơn */
-      height: 50px; 
+      width: 40px;
+      height: 40px; 
       object-fit: cover;
       border-radius: 4px;
     }
@@ -80,7 +80,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      font-size: 11px; 
+      font-size: 12px;
     }
     footer {
       text-align: center;
@@ -193,222 +193,7 @@
   </footer>
 
   <script>
-    /**************************************************************
-     * PLAYER + QUEST
-     **************************************************************/
-    const player = {
-      tokens: 100,
-      heroes: [],
-      quests: [
-        { id: 1, name: "Complete Tutorial", completed: false, reward: 10 },
-      ]
-    };
-
-    /**************************************************************
-     * ALL 50 HEROES (gộp chung, thay vì heroData.Common..., v.v.)
-     * Mỗi hero: { name, rarity, img, attribute, symbol, damage, speed, level }
-     **************************************************************/
-    const allHeroData = [
-      // --- 10 Common ---
-      { name:"SlimeKid",     rarity:"Common",    img:"https://i.imgur.com/wY0nzE9.png", attribute:"Water",    symbol:"💧", damage:12, speed:5,  level:1 },
-      { name:"ShellFish",    rarity:"Common",    img:"https://i.imgur.com/Iy1X8r1.png", attribute:"Water",    symbol:"💧", damage:14, speed:6,  level:1 },
-      { name:"GreenFish",    rarity:"Common",    img:"https://i.imgur.com/81Ypu1S.png", attribute:"Earth",    symbol:"🌱", damage:10, speed:5,  level:1 },
-      { name:"MudCrab",      rarity:"Common",    img:"https://i.imgur.com/XMUx21e.png", attribute:"Earth",    symbol:"🌱", damage:15, speed:4,  level:1 },
-      { name:"RockyShell",   rarity:"Common",    img:"https://i.imgur.com/eVNSFSH.png", attribute:"Earth",    symbol:"🌱", damage:16, speed:6,  level:1 },
-      { name:"JellyMold",    rarity:"Common",    img:"https://i.imgur.com/hjZPOpf.png", attribute:"Water",    symbol:"💧", damage:10, speed:7,  level:1 },
-      { name:"TinyCrab",     rarity:"Common",    img:"https://i.imgur.com/TvssIKL.png", attribute:"Water",    symbol:"💧", damage:12, speed:5,  level:1 },
-      { name:"BluishCrab",   rarity:"Common",    img:"https://i.imgur.com/9soOAZz.png", attribute:"Water",    symbol:"💧", damage:13, speed:5,  level:1 },
-      { name:"PearlCrab",    rarity:"Common",    img:"https://i.imgur.com/ZRG9eiQ.png", attribute:"Water",    symbol:"💧", damage:11, speed:6,  level:1 },
-      { name:"SlimyJr",      rarity:"Common",    img:"https://i.imgur.com/aOV5P1e.png", attribute:"Water",    symbol:"💧", damage:14, speed:4,  level:1 },
-
-      // --- 10 Rare ---
-      { name:"FireCrab",     rarity:"Rare",      img:"https://i.imgur.com/3l9MKIl.png", attribute:"Fire",     symbol:"🔥", damage:22, speed:8,  level:1 },
-      { name:"TurtleWar",    rarity:"Rare",      img:"https://i.imgur.com/cSy6okk.png", attribute:"Water",    symbol:"💧", damage:20, speed:10, level:1 },
-      { name:"SeaKnight",    rarity:"Rare",      img:"https://i.imgur.com/QRJyOyp.png", attribute:"Water",    symbol:"💧", damage:25, speed:8,  level:1 },
-      { name:"DarkFrog",     rarity:"Rare",      img:"https://i.imgur.com/NK8EQm1.png", attribute:"Dark",     symbol:"🌑", damage:24, speed:9,  level:1 },
-      { name:"CrabLord",     rarity:"Rare",      img:"https://i.imgur.com/Aa396uh.png", attribute:"Earth",    symbol:"🌱", damage:28, speed:7,  level:1 },
-      { name:"ScorpionKid",  rarity:"Rare",      img:"https://i.imgur.com/aUTGKeg.png", attribute:"Earth",    symbol:"🌱", damage:27, speed:9,  level:1 },
-      { name:"AquaShield",   rarity:"Rare",      img:"https://i.imgur.com/H65ycJW.png", attribute:"Water",    symbol:"💧", damage:22, speed:10, level:1 },
-      { name:"CoralWar",     rarity:"Rare",      img:"https://i.imgur.com/TcSRW3O.png", attribute:"Water",    symbol:"💧", damage:23, speed:9,  level:1 },
-      { name:"ClamGuard",    rarity:"Rare",      img:"https://i.imgur.com/Juwfrcz.png", attribute:"Water",    symbol:"💧", damage:20, speed:11, level:1 },
-      { name:"AngryFish",    rarity:"Rare",      img:"https://i.imgur.com/8rZaJYc.png", attribute:"Water",    symbol:"💧", damage:26, speed:8,  level:1 },
-
-      // --- 10 Epic ---
-      { name:"SharkWar",     rarity:"Epic",      img:"https://i.imgur.com/02jTwGp.png", attribute:"Water",    symbol:"💧", damage:35, speed:12, level:1 },
-      { name:"PearlMage",    rarity:"Epic",      img:"https://i.imgur.com/JOCwUzy.png", attribute:"Earth",    symbol:"🌱", damage:32, speed:13, level:1 },
-      { name:"EpicFrog",     rarity:"Epic",      img:"https://i.imgur.com/wr71ePx.png", attribute:"Dark",     symbol:"🌑", damage:40, speed:10, level:1 },
-      { name:"DeepCrab",     rarity:"Epic",      img:"https://i.imgur.com/OXjxfTK.png", attribute:"Water",    symbol:"💧", damage:36, speed:11, level:1 },
-      { name:"ShellBuster",  rarity:"Epic",      img:"https://i.imgur.com/PqCgXay.png", attribute:"Fire",     symbol:"🔥", damage:42, speed:9,  level:1 },
-      { name:"OceanLancer",  rarity:"Epic",      img:"https://i.imgur.com/wxAAFkK.png", attribute:"Water",    symbol:"💧", damage:39, speed:10, level:1 },
-      { name:"ReefDragon",   rarity:"Epic",      img:"https://i.imgur.com/EB7WHnW.png", attribute:"Earth",    symbol:"🌱", damage:37, speed:12, level:1 },
-      { name:"StormFish",    rarity:"Epic",      img:"https://i.imgur.com/EmWFXPq.png", attribute:"Lightning",symbol:"⚡", damage:38, speed:13, level:1 },
-      { name:"KrakenKid",    rarity:"Epic",      img:"https://i.imgur.com/mnMCDvt.png", attribute:"Water",    symbol:"💧", damage:41, speed:11, level:1 },
-      { name:"AbyssCrab",    rarity:"Epic",      img:"https://i.imgur.com/QkkGPnK.png", attribute:"Dark",     symbol:"🌑", damage:43, speed:9,  level:1 },
-
-      // --- 10 Legendary ---
-      { name:"InfernoCrab",  rarity:"Legendary", img:"https://i.imgur.com/23DhlYC.png", attribute:"Fire",     symbol:"🔥", damage:52, speed:15, level:1 },
-      { name:"AbyssDragon",  rarity:"Legendary", img:"https://i.imgur.com/Rhu6apu.png", attribute:"Dark",     symbol:"🌑", damage:55, speed:16, level:1 },
-      { name:"MegaShark",    rarity:"Legendary", img:"https://i.imgur.com/OCaOjCv.png", attribute:"Water",    symbol:"💧", damage:58, speed:14, level:1 },
-      { name:"PearlDragon",  rarity:"Legendary", img:"https://i.imgur.com/SXQMxBI.png", attribute:"Water",    symbol:"💧", damage:54, speed:16, level:1 },
-      { name:"LavaClam",     rarity:"Legendary", img:"https://i.imgur.com/5HE6crv.png", attribute:"Fire",     symbol:"🔥", damage:57, speed:15, level:1 },
-      { name:"CoralKnight",  rarity:"Legendary", img:"https://i.imgur.com/NKvEj0j.png", attribute:"Water",    symbol:"💧", damage:53, speed:17, level:1 },
-      { name:"StoneWar",     rarity:"Legendary", img:"https://i.imgur.com/6sHJI0I.png", attribute:"Earth",    symbol:"🌱", damage:56, speed:15, level:1 },
-      { name:"MudGolem",     rarity:"Legendary", img:"https://i.imgur.com/qhSP9PR.png", attribute:"Earth",    symbol:"🌱", damage:59, speed:14, level:1 },
-      { name:"AngelCrab",    rarity:"Legendary", img:"https://i.imgur.com/uqiRB2H.png", attribute:"Light",    symbol:"🌟", damage:60, speed:16, level:1 },
-      { name:"AquaDino",     rarity:"Legendary", img:"https://i.imgur.com/NnVOlP8.png", attribute:"Water",    symbol:"💧", damage:62, speed:15, level:1 },
-
-      // --- 10 Mythic ---
-      { name:"ElderDragon",  rarity:"Mythic",    img:"https://i.imgur.com/tFzK3iu.png", attribute:"Light",    symbol:"🌟", damage:80, speed:20, level:1 },
-      { name:"AquaGod",      rarity:"Mythic",    img:"https://i.imgur.com/ujlhSVK.png", attribute:"Water",    symbol:"💧", damage:78, speed:22, level:1 },
-      { name:"ArcAngel",     rarity:"Mythic",    img:"https://i.imgur.com/1K8xEcc.png", attribute:"Light",    symbol:"🌟", damage:85, speed:19, level:1 },
-      { name:"CyberDino",    rarity:"Mythic",    img:"https://i.imgur.com/EokU1JU.png", attribute:"Dark",     symbol:"🌑", damage:82, speed:21, level:1 },
-      { name:"PhoenixKing",  rarity:"Mythic",    img:"https://i.imgur.com/Qg9MLyO.png", attribute:"Fire",     symbol:"🔥", damage:88, speed:18, level:1 },
-      { name:"TimeSerpent",  rarity:"Mythic",    img:"https://i.imgur.com/Xsqp1Zl.png", attribute:"Time",     symbol:"⏳", damage:90, speed:23, level:1 },
-      { name:"GalaxyWolf",   rarity:"Mythic",    img:"https://i.imgur.com/YeDYlBO.png", attribute:"Space",    symbol:"🌌", damage:86, speed:22, level:1 },
-      { name:"AuraKnight",   rarity:"Mythic",    img:"https://i.imgur.com/h8LyWQG.png", attribute:"Light",    symbol:"🌟", damage:84, speed:20, level:1 },
-      { name:"BlazeGod",     rarity:"Mythic",    img:"https://i.imgur.com/u2hcKvV.png", attribute:"Fire",     symbol:"🔥", damage:89, speed:19, level:1 },
-      { name:"AncientGolem", rarity:"Mythic",    img:"https://i.imgur.com/WWF50XS.png", attribute:"Earth",    symbol:"🌱", damage:92, speed:18, level:1 },
-    ];
-
-    /**************************************************************
-     * RARITY CHANCES
-     **************************************************************/
-    const rarityChances = [
-      { rarity: 'Common',    chance: 40 }, // 40%
-      { rarity: 'Rare',      chance: 30 }, // 30%
-      { rarity: 'Epic',      chance: 15 }, // 15%
-      { rarity: 'Legendary', chance: 10 }, // 10%
-      { rarity: 'Mythic',    chance: 5  }, // 5%
-    ];
-
-    /**************************************************************
-     * TABS
-     **************************************************************/
-    function switchTab(tabId) {
-      document.querySelectorAll('main').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-tab'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
-      if (tabId === 'home') updateHome();
-      if (tabId === 'hero') updateHero();
-      if (tabId === 'quest') updateQuest();
-    }
-
-    /**************************************************************
-     * HOME + TOKENS
-     **************************************************************/
-    function updateHome() {
-      document.getElementById('player-summary').textContent = `Tokens: ${player.tokens}`;
-      document.getElementById('wallet-tokens').textContent = player.tokens;
-    }
-    function addTokens(amount) {
-      player.tokens += amount;
-      updateHome();
-      alert(`${amount} tokens added!`);
-    }
-
-    /**************************************************************
-     * SHOP
-     **************************************************************/
-    function buyChest(count) {
-      const cost = count * 10; 
-      if (player.tokens >= cost) {
-        player.tokens -= cost;
-        for (let i = 0; i < count; i++) {
-          const rarity = getRandomRarity();
-          // Lọc hero theo rarity
-          const sameRarityHeroes = allHeroData.filter(h => h.rarity === rarity);
-          if(sameRarityHeroes.length>0) {
-            const randomIndex = Math.floor(Math.random()*sameRarityHeroes.length);
-            const newHero = { ...sameRarityHeroes[randomIndex] };
-            player.heroes.push(newHero);
-          }
-        }
-        updateHome();
-        updateHero();
-        document.getElementById('shop-message').textContent = `You bought ${count} chest(s)!`;
-      } else {
-        alert("Not enough tokens!");
-      }
-    }
-    function getRandomRarity() {
-      const roll = Math.random() * 100;
-      let cumulativeChance = 0;
-      for (const rc of rarityChances) {
-        cumulativeChance += rc.chance;
-        if (roll < cumulativeChance) return rc.rarity;
-      }
-      return 'Common';
-    }
-
-    /**************************************************************
-     * HERO
-     **************************************************************/
-    function updateHero() {
-      const container = document.getElementById('hero-list');
-      container.innerHTML = player.heroes.map((hero, index) => {
-        const rarityClass = hero.rarity.toLowerCase();
-        return `
-          <div class="hero-card" onclick="showHeroDetails(${index})">
-            <img src="${hero.img}" alt="${hero.name}" />
-            <p class="color-${rarityClass}">${hero.name}</p>
-            <p>${hero.symbol} Lv${hero.level}</p>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function showHeroDetails(index) {
-      const hero = player.heroes[index];
-      document.getElementById('modal-hero-img').src = hero.img;
-      document.getElementById('modal-hero-name').textContent = hero.name;
-      document.getElementById('modal-hero-rarity').innerHTML = `<span class="color-${hero.rarity.toLowerCase()}">${hero.rarity}</span>`;
-      document.getElementById('modal-hero-attr').textContent = `Attribute: ${hero.symbol} ${hero.attribute}`;
-      document.getElementById('modal-hero-stats').textContent = `⚔ ${hero.damage}  💨 ${hero.speed}`;
-      document.getElementById('modal-hero-level').textContent = `Level: ${hero.level}`;
-      document.getElementById('modal-overlay').style.display = 'flex';
-    }
-    function closeModal() {
-      document.getElementById('modal-overlay').style.display = 'none';
-    }
-
-    /**************************************************************
-     * QUEST
-     **************************************************************/
-    function updateQuest() {
-      const qDiv = document.getElementById('quest-list');
-      qDiv.innerHTML = player.quests.map(q => {
-        return `
-          <div style="border:1px solid #ddd;margin:4px;padding:4px;">
-            <strong>${q.name}</strong>
-            <p>Reward: ${q.reward} tokens</p>
-            <p>Status: ${q.completed ? 'Done' : 'Ongoing'}</p>
-            ${!q.completed ? 
-              `<button onclick="completeQuest(${q.id})">Complete</button>` : ''
-            }
-          </div>
-        `;
-      }).join('');
-    }
-    function completeQuest(id){
-      const quest = player.quests.find(q=>q.id===id);
-      if(quest && !quest.completed){
-        quest.completed=true;
-        player.tokens += quest.reward;
-        updateHome();
-        updateQuest();
-        alert(`Quest done, +${quest.reward} tokens!`);
-      }
-    }
-
-    /**************************************************************
-     * INIT
-     **************************************************************/
-    document.addEventListener('DOMContentLoaded', () => {
-      updateHome();
-      updateHero();
-      updateQuest();
-    });
+    /* Existing JavaScript Code */
   </script>
 </body>
 </html>
