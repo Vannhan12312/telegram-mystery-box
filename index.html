@@ -29,11 +29,6 @@
       margin-bottom: 15px;
     }
 
-    header h1 {
-      font-size: 24px;
-      margin-bottom: 5px;
-    }
-
     nav {
       display: flex;
       justify-content: space-around;
@@ -104,18 +99,6 @@
       font-size: 14px;
       margin: 5px 0;
     }
-
-    .hero-card .rarity {
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-
-    .rarity.common { color: #9e9e9e; }
-    .rarity.rare { color: #42a5f5; }
-    .rarity.epic { color: #ab47bc; }
-    .rarity.legendary { color: #ff7043; }
-    .rarity.mythic { color: #e53935; }
 
     .wallet-section {
       text-align: center;
@@ -235,60 +218,6 @@
       background: #e6b800;
     }
 
-    .settings-section {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .settings-section button {
-      background: #007bff;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .settings-section button:hover {
-      background: #0056b3;
-    }
-
-    .loading-screen {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      color: #fff;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-      font-size: 24px;
-      text-align: center;
-    }
-
-    .back-button {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      background: #292929;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-      transition: background 0.3s;
-    }
-
-    .back-button:hover {
-      background: #3e3e3e;
-    }
-
   </style>
 </head>
 <body>
@@ -327,7 +256,6 @@
 
   <main id="heroes">
     <h2>Your Heroes</h2>
-    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
     <div class="hero-container" id="hero-list"></div>
     <div class="farm-section" id="farm-section" style="display: none;">
       <h3>Farm TON Tokens</h3>
@@ -338,7 +266,6 @@
 
   <main id="wallet">
     <h2>Wallet</h2>
-    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
     <div class="wallet-section">
       <p>Connect your TON wallet to start earning and withdrawing rewards.</p>
       <button onclick="connectWallet()">Connect Wallet</button>
@@ -353,11 +280,8 @@
 
   <main id="settings">
     <h2>Settings</h2>
-    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
-    <div class="settings-section">
-      <button onclick="toggleSound()">Toggle Sound</button>
-      <button onclick="changeTheme()">Change Theme</button>
-    </div>
+    <button onclick="toggleSound()">Toggle Sound</button>
+    <button onclick="changeTheme()">Change Theme</button>
   </main>
 
   <div id="hero-modal">
@@ -368,10 +292,6 @@
       <p id="modal-hero-stats"></p>
       <button onclick="closeModal()">Close</button>
     </div>
-  </div>
-
-  <div class="loading-screen" id="loading-screen">
-    <p>Loading, please wait...</p>
   </div>
 
   <script>
@@ -473,56 +393,14 @@
 
     function copyReferralCode() {
       const referralCode = document.getElementById("referral-code");
-      navigator.clipboard.writeText(referral
-<script>
-  function copyReferralCode() {
-    const referralCode = document.getElementById("referral-code");
-    navigator.clipboard
-      .writeText(referralCode.value)
-      .then(() => alert("Referral code copied to clipboard!"))
-      .catch(() => alert("Failed to copy referral code."));
-  }
-
-  function shareOnTelegram() {
-    const referralLink = document.getElementById("referral-code").value;
-    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(
-      referralLink
-    )}&text=Join%20COST%20%26%20FLAME%20and%20earn%20TON%20rewards!`;
-    window.open(telegramUrl, "_blank");
-  }
-
-  function switchTab(tabId) {
-    document.querySelectorAll("main").forEach((tab) => tab.classList.remove("active"));
-    document.querySelector(`#${tabId}`).classList.add("active");
-  }
-
-  function connectWallet() {
-    player.walletConnected = true;
-    document.getElementById("wallet-status").textContent = "Status: Connected";
-    alert("Wallet connected successfully!");
-  }
-
-  function withdrawTON() {
-    if (!player.walletConnected) {
-      alert("Please connect your wallet first!");
-      return;
-    }
-    alert("TON withdrawal successful! Check your wallet.");
-  }
-
-  document.addEventListener("DOMContentLoaded", () => {
-    updateHeroList();
-  });
-</script>      referralCode.value)
-      .then(() => alert("Referral code copied to clipboard!"))
-      .catch(() => alert("Failed to copy referral code."));
+      navigator.clipboard.writeText(referralCode.value)
+        .then(() => alert("Referral code copied to clipboard!"))
+        .catch(() => alert("Failed to copy referral code."));
     }
 
     function shareOnTelegram() {
       const referralLink = document.getElementById("referral-code").value;
-      const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(
-        referralLink
-      )}&text=Join%20COST%20%26%20FLAME%20and%20earn%20TON%20rewards!`;
+      const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=Join%20COST%20%26%20FLAME%20and%20earn%20TON%20rewards!`;
       window.open(telegramUrl, "_blank");
     }
 
@@ -555,4 +433,3 @@
   </script>
 </body>
 </html>
-
