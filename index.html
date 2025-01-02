@@ -44,14 +44,15 @@
     .hero-card {
       border: 1px solid #ccc;
       border-radius: 5px;
-      width: 140px;
+      width: 120px;
       text-align: center;
       background: #fff;
       padding: 5px;
+      position: relative;
     }
     .hero-card img {
-      max-width: 120px;
-      max-height: 120px;
+      max-width: 100px;
+      max-height: 100px;
       border-radius: 5px;
       margin: 0 auto;
       display: block;
@@ -59,16 +60,29 @@
     .hero-card .rarity {
       font-weight: bold;
     }
-    .disassemble-btn {
+    .btn-row {
+      display: flex; 
+      justify-content: center; 
+      gap: 5px; 
+      margin-top: 5px;
+    }
+    .move-btn, .disassemble-btn {
       display: inline-block;
       padding: 3px 6px;
-      margin-top: 5px;
-      background: #ffcccc;
-      border: 1px solid #ff8888;
+      background: #ffefef;
+      border: 1px solid #ddd;
       color: #333;
       cursor: pointer;
       border-radius: 3px;
       font-size: 12px;
+    }
+    .move-btn:hover {
+      background: #e0f6ff;
+      border-color: #88ddff;
+    }
+    .disassemble-btn:hover {
+      background: #ffe0e0;
+      border-color: #ff8888;
     }
     .attribute {
       font-size: 12px; 
@@ -108,6 +122,33 @@
       font-size: 12px;
       color: #999;
     }
+    /* BOAT LAYOUT */
+    #boat-content {
+      border: 1px solid #ccc; 
+      background: #fff; 
+      border-radius: 5px; 
+      padding: 10px;
+    }
+    .boat-header {
+      display: flex; 
+      justify-content: space-between; 
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .boat-title {
+      font-size: 16px; 
+      font-weight: bold;
+    }
+    .quick-convert-btn {
+      padding: 5px 10px; 
+      border: none; 
+      cursor: pointer;
+      border-radius: 5px;
+      background: #ffdada;
+    }
+    .quick-convert-btn:hover {
+      background: #ffbbbb;
+    }
   </style>
 </head>
 <body>
@@ -138,7 +179,7 @@
       background: url('https://i.imgur.com/f4bELuK.png') center/cover no-repeat;
       border-radius: 5px;
       margin-top: 15px;">
-      <!-- This can be your boat placeholder. -->
+      <!-- Boat placeholder -->
     </div>
   </main>
 
@@ -157,15 +198,23 @@
 
   <!-- BOAT -->
   <main id="boat" class="hidden">
-    <h2>Your Boat</h2>
-    <p>Manage your active heroes and warehouse.</p>
-    
-    <h3>Active Heroes (max 20)</h3>
-    <div id="boat-active-heroes" class="hero-container"></div>
-    
-    <h3>Warehouse</h3>
-    <div id="boat-warehouse-heroes" class="hero-container"></div>
-
+    <div id="boat-content">
+      <div>
+        <div class="boat-header">
+          <div class="boat-title">Your Equipment</div>
+          <div>Max 20 heroes</div>
+        </div>
+        <div id="boat-active-heroes" class="hero-container"></div>
+      </div>
+      <hr />
+      <div>
+        <div class="boat-header">
+          <div class="boat-title">Your Warehouse</div>
+          <button class="quick-convert-btn" onclick="quickConvert()">Quick convert</button>
+        </div>
+        <div id="boat-warehouse-heroes" class="hero-container"></div>
+      </div>
+    </div>
   </main>
 
   <!-- QUEST -->
@@ -187,7 +236,6 @@
     <button onclick="withdrawRFM()">Withdraw (to TON) - Mock</button>
     <button onclick="swapRFM()">Swap RFM -> TON (Mock)</button>
     <p style="margin-top: 10px;">
-      <!-- We can show some placeholder info about TON -->
       <em>Note: Real TON integration requires TON Connect or custom API.</em>
     </p>
   </main>
@@ -200,19 +248,10 @@
   /************************************************************
    * ALL GAME LOGIC IN ONE HTML FILE
    ************************************************************/
-  // For a real Telegram Mini App, you can use
-  // const tg = window.Telegram.WebApp;
-  // tg.expand();
-  // Then handle data with tg.sendData(), etc.
-  // Here we just do a normal JavaScript + localStorage approach.
+  // For real Telegram Mini App, use window.Telegram.WebApp etc.
+  // Here we do basic localStorage usage.
 
-  // =============== Data & Structures ===============
-  // Keep user data in localStorage
-  // Format: { userId, userName, rfmTokens, heroesEquipment, heroesWarehouse, questsCompleted, referrals }
-
-  let currentUser = null;
-
-  // Hardcode random user ID for local test (in real Telegram, you get from ctx.from.id).
+  // Hardcode user ID for local testing
   const LOCAL_USER_ID = 'demoUser_123'; 
   const LOCAL_USER_NAME = 'DemoPlayer';
 
@@ -229,7 +268,10 @@
     }
   };
 
-  // Rarities & Probability
+  // Our global user object
+  let currentUser = null;
+
+  // Probability for each rarity
   const rarityRates = [
     { rarity: 'Common',    rate: 55 },
     { rarity: 'Rare',      rate: 25 },
@@ -238,7 +280,7 @@
     { rarity: 'Mythic',    rate: 2  },
   ];
 
-  // Rarity Color Class
+  // Rarity => CSS class
   function getRarityClass(rarity) {
     switch(rarity) {
       case 'Common':    return 'color-common';
@@ -250,7 +292,6 @@
     return '';
   }
 
-  // For each rarity, store an array of heroes (name, image)
   const allHeroesList = {
     'Common': [
       { name: 'Fisher Bob',   image: 'https://i.imgur.com/wY0nzE9.png' },
@@ -316,20 +357,17 @@
 
   const attributes = ['Fire','Water','Wind','Earth','Electric'];
 
-  // =============== Utility Functions ===============
+  // ========== Storage ========== 
   function saveUserData() {
     localStorage.setItem('RostFlameUser', JSON.stringify(currentUser));
   }
-
   function loadUserData() {
     const stored = localStorage.getItem('RostFlameUser');
-    if(stored) {
-      return JSON.parse(stored);
-    }
+    if(stored) return JSON.parse(stored);
     return null;
   }
 
-  // Generate a random hero
+  // ========== Hero Creation ========== 
   function getRandomRarity() {
     let roll = Math.random() * 100;
     let sum = 0;
@@ -339,15 +377,11 @@
     }
     return 'Common';
   }
-
   function createRandomHero() {
     const rarity = getRandomRarity();
-    const heroesOfThatRarity = allHeroesList[rarity];
-    const rndIndex = Math.floor(Math.random() * heroesOfThatRarity.length);
-    const base = heroesOfThatRarity[rndIndex];
-
-    // random damage 10-100
-    const dmg = Math.floor(Math.random() * 91) + 10; 
+    const list = allHeroesList[rarity];
+    const base = list[Math.floor(Math.random()*list.length)];
+    const dmg = Math.floor(Math.random()*91)+10; // 10..100
     const attr = attributes[Math.floor(Math.random()*attributes.length)];
 
     return {
@@ -359,32 +393,15 @@
       attribute: attr
     };
   }
-
   function createRandomHeroes(count) {
     let arr = [];
-    for (let i=0; i<count; i++) {
+    for(let i=0; i<count; i++){
       arr.push(createRandomHero());
     }
     return arr;
   }
 
-  // Format hero card HTML
-  function heroCardHTML(hero, location) {
-    // location = 'equipment' or 'warehouse'
-    const rClass = getRarityClass(hero.rarity);
-    return `
-      <div class="hero-card">
-        <img src="${hero.image}" alt="${hero.name}" />
-        <div class="rarity ${rClass}">${hero.rarity}</div>
-        <div style="font-weight:bold;">${hero.name}</div>
-        <div>DMG: ${hero.damage}</div>
-        <div class="attribute">Attribute: ${hero.attribute}</div>
-        <div class="disassemble-btn" onclick="disassembleHero('${hero.id}')">Disassemble</div>
-      </div>
-    `;
-  }
-
-  // =============== Main Tabs ===============
+  // ========== Tabs ========== 
   const tabs = ['home','shop','boat','quest','wallet'];
   function showTab(tabId) {
     tabs.forEach(t => {
@@ -400,103 +417,164 @@
     if(tabId === 'wallet') refreshWallet();
   }
 
-  // =============== Home Page ===============
+  // ========== HOME ========== 
   function refreshHome() {
-    const welcomeEl = document.getElementById('player-welcome');
-    const infoEl = document.getElementById('player-info');
-    const heroesEl = document.getElementById('player-heroes');
-
-    welcomeEl.innerHTML = `Welcome <strong>${currentUser.userName}</strong>!`;
-    infoEl.innerHTML = `You have <strong>${currentUser.rfmTokens}</strong> RFM tokens.`;
-
+    document.getElementById('player-welcome').innerHTML = 
+      `Welcome <strong>${currentUser.userName}</strong>!`;
+    document.getElementById('player-info').innerHTML = 
+      `You have <strong>${currentUser.rfmTokens}</strong> RFM tokens.`;
     const totalHeroes = currentUser.heroesEquipment.length + currentUser.heroesWarehouse.length;
-    heroesEl.innerHTML = `You currently own <strong>${totalHeroes}</strong> heroes.`;
+    document.getElementById('player-heroes').innerHTML =
+      `You currently own <strong>${totalHeroes}</strong> heroes.`;
   }
 
-  // =============== Shop Page ===============
+  // ========== SHOP ========== 
   function refreshShop() {
     document.getElementById('shop-msg').innerHTML = '';
   }
-  function buyChests(num) {
-    // Price example: 1 chest = 2 RFM => num * 2
-    // You can adjust cost as you like
-    const cost = num * 2;
+  function buyChests(count) {
+    // Example: each chest costs 2 RFM
+    const cost = count * 2;
     if(currentUser.rfmTokens < cost) {
-      document.getElementById('shop-msg').innerHTML = `Not enough RFM. You need ${cost}.`;
+      document.getElementById('shop-msg').innerHTML = 
+        `Not enough RFM. Need ${cost}, you have ${currentUser.rfmTokens}.`;
       return;
     }
     currentUser.rfmTokens -= cost;
-    // create heroes
-    const newHeroes = createRandomHeroes(num);
-    newHeroes.forEach(hero => {
+    const newHeroes = createRandomHeroes(count);
+    newHeroes.forEach(h=>{
       if(currentUser.heroesEquipment.length < 20) {
-        currentUser.heroesEquipment.push(hero);
+        currentUser.heroesEquipment.push(h);
       } else {
-        currentUser.heroesWarehouse.push(hero);
+        currentUser.heroesWarehouse.push(h);
       }
     });
     saveUserData();
     document.getElementById('shop-msg').innerHTML = 
-      `You bought ${num} chests for ${cost} RFM!<br/>
-       You obtained ${newHeroes.length} heroes.<br/>
-       Current RFM: ${currentUser.rfmTokens}`;
+      `You bought ${count} chests for ${cost} RFM.<br/>
+       Gained ${count} heroes.<br/>
+       Remaining RFM: ${currentUser.rfmTokens}.`;
   }
 
-  // =============== Boat Page ===============
+  // ========== BOAT ========== 
   function refreshBoat() {
-    // Active heroes
-    const activeDiv = document.getElementById('boat-active-heroes');
-    const whDiv = document.getElementById('boat-warehouse-heroes');
-
+    // Equipment
+    const equipDiv = document.getElementById('boat-active-heroes');
     if(currentUser.heroesEquipment.length === 0) {
-      activeDiv.innerHTML = `<p>No active heroes.</p>`;
+      equipDiv.innerHTML = '<p>No heroes in equipment.</p>';
     } else {
-      activeDiv.innerHTML = currentUser.heroesEquipment.map(h => heroCardHTML(h, 'equipment')).join('');
+      equipDiv.innerHTML = currentUser.heroesEquipment
+        .map(h=>heroCardHTML(h, 'equipment')).join('');
     }
-
+    // Warehouse
+    const whDiv = document.getElementById('boat-warehouse-heroes');
     if(currentUser.heroesWarehouse.length === 0) {
-      whDiv.innerHTML = `<p>Warehouse empty.</p>`;
+      whDiv.innerHTML = '<p>Warehouse is empty.</p>';
     } else {
-      whDiv.innerHTML = currentUser.heroesWarehouse.map(h => heroCardHTML(h, 'warehouse')).join('');
+      whDiv.innerHTML = currentUser.heroesWarehouse
+        .map(h=>heroCardHTML(h, 'warehouse')).join('');
     }
   }
-  // Disassemble hero => get reward
-  function disassembleHero(heroId) {
-    let found = null;
-    let from = null;
-    for(let i=0; i<currentUser.heroesEquipment.length; i++){
-      if(currentUser.heroesEquipment[i].id === heroId){
-        found = currentUser.heroesEquipment[i];
-        from = 'equipment';
-        currentUser.heroesEquipment.splice(i,1);
-        break;
-      }
+  // Tạo HTML cho 1 hero (card)
+  function heroCardHTML(hero, location) {
+    const rc = getRarityClass(hero.rarity);
+    let actionBtn = '';
+    if(location === 'equipment') {
+      // Nút chuyển về warehouse
+      actionBtn = `<div class="move-btn" onclick="moveHeroToWarehouse('${hero.id}')">Unequip</div>`;
+    } else {
+      // Nút chuyển lên equipment (nếu chưa đủ 20)
+      actionBtn = `<div class="move-btn" onclick="moveHeroToEquipment('${hero.id}')">Equip</div>`;
     }
-    if(!found) {
-      for(let i=0; i<currentUser.heroesWarehouse.length; i++){
-        if(currentUser.heroesWarehouse[i].id === heroId){
-          found = currentUser.heroesWarehouse[i];
-          from = 'warehouse';
-          currentUser.heroesWarehouse.splice(i,1);
-          break;
-        }
-      }
-    }
-    if(!found) {
-      alert('Hero not found!');
+    // Nút convert
+    const disBtn = `<div class="disassemble-btn" onclick="disassembleHero('${hero.id}')">Convert</div>`;
+
+    return `
+    <div class="hero-card">
+      <img src="${hero.image}" alt="${hero.name}" />
+      <div class="rarity ${rc}">${hero.rarity}</div>
+      <div style="font-weight:bold;">${hero.name}</div>
+      <div>DMG: ${hero.damage}</div>
+      <div class="attribute">Attribute: ${hero.attribute}</div>
+      <div class="btn-row">
+        ${actionBtn}
+        ${disBtn}
+      </div>
+    </div>
+    `;
+  }
+  // Di chuyển hero sang equipment
+  function moveHeroToEquipment(heroId) {
+    if(currentUser.heroesEquipment.length >= 20) {
+      alert('Your Equipment is full (20/20).');
       return;
     }
-    // reward example: hero.damage / 2
-    const reward = Math.floor(found.damage/2);
+    // Tìm hero trong warehouse
+    const idx = currentUser.heroesWarehouse.findIndex(h=>h.id===heroId);
+    if(idx < 0) return;
+    const hero = currentUser.heroesWarehouse[idx];
+    currentUser.heroesWarehouse.splice(idx,1);
+    currentUser.heroesEquipment.push(hero);
+    saveUserData();
+    refreshBoat();
+  }
+  // Di chuyển hero sang warehouse
+  function moveHeroToWarehouse(heroId) {
+    const idx = currentUser.heroesEquipment.findIndex(h=>h.id===heroId);
+    if(idx < 0) return;
+    const hero = currentUser.heroesEquipment[idx];
+    currentUser.heroesEquipment.splice(idx,1);
+    currentUser.heroesWarehouse.push(hero);
+    saveUserData();
+    refreshBoat();
+  }
+  // Convert (Disassemble) 1 hero
+  function disassembleHero(heroId) {
+    let found = null;
+    let fromEquip = currentUser.heroesEquipment.findIndex(h=>h.id===heroId);
+    if(fromEquip >= 0) {
+      found = currentUser.heroesEquipment[fromEquip];
+      currentUser.heroesEquipment.splice(fromEquip,1);
+    } else {
+      let fromWh = currentUser.heroesWarehouse.findIndex(h=>h.id===heroId);
+      if(fromWh >= 0) {
+        found = currentUser.heroesWarehouse[fromWh];
+        currentUser.heroesWarehouse.splice(fromWh,1);
+      }
+    }
+    if(!found) {
+      alert('Hero not found');
+      return;
+    }
+    // Reward = damage/2
+    let reward = Math.floor(found.damage/2);
     currentUser.rfmTokens += reward;
     saveUserData();
-    alert(`Disassembled '${found.name}' and earned ${reward} RFM!`);
+    alert(`Converted "${found.name}" => +${reward} RFM.`);
+    refreshBoat();
+  }
+  // Quick convert toàn bộ hero trong warehouse
+  function quickConvert() {
+    if(currentUser.heroesWarehouse.length === 0) {
+      alert('No heroes in warehouse to convert.');
+      return;
+    }
+    if(!confirm('Are you sure to convert ALL heroes in warehouse to RFM?')) {
+      return;
+    }
+    let totalReward = 0;
+    currentUser.heroesWarehouse.forEach(hero=>{
+      totalReward += Math.floor(hero.damage/2);
+    });
+    currentUser.heroesWarehouse = []; 
+    currentUser.rfmTokens += totalReward;
+    saveUserData();
+    alert(`All warehouse heroes converted => +${totalReward} RFM!`);
     refreshBoat();
   }
 
-  // =============== Quest Page ===============
+  // ========== QUEST ========== 
   function refreshQuest() {
-    // let's define 3 sample daily quests
     const dailyQuests = [
       { id: 'follow_group',   desc: 'Follow Rost & Flame Group',   reward: 10 },
       { id: 'vote_like',      desc: 'Give us a Like',              reward: 5  },
@@ -506,9 +584,9 @@
     questListEl.innerHTML = '';
 
     dailyQuests.forEach(q => {
-      const isDone = currentUser.questsCompleted.includes(q.id);
-      const btnLabel = isDone ? 'Completed' : `Claim +${q.reward} RFM`;
-      const disabled = isDone ? 'disabled' : '';
+      let done = currentUser.questsCompleted.includes(q.id);
+      let btnLabel = done ? 'Completed' : `Claim +${q.reward} RFM`;
+      let disabled = done ? 'disabled' : '';
       questListEl.innerHTML += `
         <p>
           <strong>${q.desc}</strong><br/>
@@ -516,33 +594,30 @@
         </p>
       `;
     });
-
     document.getElementById('referral-pending').innerText = currentUser.referrals.pendingReward;
   }
-
   function finishQuest(qid) {
-    const dailyQuests = {
+    const questRewards = {
       'follow_group': 10,
       'vote_like': 5,
       'connect_wallet': 15
     };
-    if(!dailyQuests[qid]) {
+    if(!questRewards[qid]) {
       alert('Quest not found');
       return;
     }
     if(currentUser.questsCompleted.includes(qid)) {
-      alert('You already completed this quest!');
+      alert('Quest already completed.');
       return;
     }
     currentUser.questsCompleted.push(qid);
-    currentUser.rfmTokens += dailyQuests[qid];
+    currentUser.rfmTokens += questRewards[qid];
     saveUserData();
-    alert(`You gained ${dailyQuests[qid]} RFM!`);
+    alert(`+${questRewards[qid]} RFM!`);
     refreshQuest();
   }
-
   function withdrawReferral() {
-    const amt = currentUser.referrals.pendingReward || 0;
+    const amt = currentUser.referrals.pendingReward;
     if(amt <= 0) {
       alert('No referral reward to withdraw.');
       return;
@@ -550,72 +625,60 @@
     currentUser.rfmTokens += amt;
     currentUser.referrals.pendingReward = 0;
     saveUserData();
-    alert(`Withdrawn ${amt} RFM to your in-game balance!`);
+    alert(`Withdrawn ${amt} RFM to your balance.`);
     refreshQuest();
   }
 
-  // =============== Wallet Page ===============
+  // ========== WALLET ========== 
   function refreshWallet() {
     document.getElementById('wallet-balance').innerText = currentUser.rfmTokens;
   }
-
   function connectTON() {
-    // TODO: integrate actual TON Connect
-    // e.g. https://github.com/ton-blockchain/ton-connect
+    // TODO: integrate TON Connect / real wallet
     alert('TON Wallet connected (mock).');
   }
-
   function withdrawRFM() {
-    // In real scenario: call TON API to send RFM => TON. 
-    // Or a bridge to handle your token on chain.
-    // For demo, we just set RFM=0
+    // Mock: send all RFM to TON
     if(currentUser.rfmTokens < 1) {
-      alert('Not enough RFM to withdraw!');
+      alert('Not enough RFM to withdraw.');
       return;
     }
-    const amt = currentUser.rfmTokens;
+    let amt = currentUser.rfmTokens;
     currentUser.rfmTokens = 0;
     saveUserData();
     alert(`Withdrew ${amt} RFM to TON (mock).`);
     refreshWallet();
   }
-
   function swapRFM() {
     // Example: 1 RFM => 0.001 TON
     if(currentUser.rfmTokens < 1) {
-      alert('Not enough RFM to swap!');
+      alert('No RFM to swap.');
       return;
     }
-    const amt = currentUser.rfmTokens;
+    let amt = currentUser.rfmTokens;
     currentUser.rfmTokens = 0;
     saveUserData();
-    const tonAmount = amt * 0.001;
-    alert(`Swapped ${amt} RFM => ${tonAmount} TON (mock).`);
+    let ton = amt * 0.001;
+    alert(`Swapped ${amt} RFM => ${ton} TON (mock).`);
     refreshWallet();
   }
 
-  // =============== Init ===============
+  // ========== INIT ========== 
   function init() {
-    // Load user from localStorage or create default
     const stored = loadUserData();
-    if(stored) {
-      currentUser = stored;
-    } else {
+    if(stored) currentUser = stored;
+    else {
       currentUser = JSON.parse(JSON.stringify(defaultUserData));
       saveUserData();
     }
+    document.getElementById('btn-home').addEventListener('click', ()=>showTab('home'));
+    document.getElementById('btn-shop').addEventListener('click', ()=>showTab('shop'));
+    document.getElementById('btn-boat').addEventListener('click', ()=>showTab('boat'));
+    document.getElementById('btn-quest').addEventListener('click', ()=>showTab('quest'));
+    document.getElementById('btn-wallet').addEventListener('click', ()=>showTab('wallet'));
 
-    // Setup tab listeners
-    document.getElementById('btn-home').addEventListener('click', () => showTab('home'));
-    document.getElementById('btn-shop').addEventListener('click', () => showTab('shop'));
-    document.getElementById('btn-boat').addEventListener('click', () => showTab('boat'));
-    document.getElementById('btn-quest').addEventListener('click', () => showTab('quest'));
-    document.getElementById('btn-wallet').addEventListener('click', () => showTab('wallet'));
-
-    // Show home by default
     showTab('home');
   }
-
   document.addEventListener('DOMContentLoaded', init);
   </script>
 </body>
