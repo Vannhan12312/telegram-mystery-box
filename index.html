@@ -96,6 +96,21 @@
       cursor: pointer;
       border-radius: 5px;
     }
+    .color-common {
+      color: #AAAAAA;
+    }
+    .color-rare {
+      color: #54FFFE;
+    }
+    .color-epic {
+      color: #C66CC5;
+    }
+    .color-legendary {
+      color: #FFA800;
+    }
+    .color-mythic {
+      color: #FF0000;
+    }
   </style>
 </head>
 <body>
@@ -173,34 +188,7 @@
         { name: 'Old Man Jang', img: 'https://i.imgur.com/XMUx21e.png', attribute: 'Earth', symbol: '🌎', earnRate: 4 },
         { name: 'Rookie Roy', img: 'https://i.imgur.com/eVNSFSH.png', attribute: 'Fire', symbol: '🔥', earnRate: 8 }
       ],
-      Rare: [
-        { name: 'River Ronin', img: 'https://i.imgur.com/3l9MKIl.png', attribute: 'Water', symbol: '💧', earnRate: 10 },
-        { name: 'Mermaid Mia', img: 'https://i.imgur.com/cSy6okk.png', attribute: 'Water', symbol: '💧', earnRate: 12 },
-        { name: 'Turtle Tuner', img: 'https://i.imgur.com/QRJyOyp.png', attribute: 'Earth', symbol: '🌎', earnRate: 8 },
-        { name: 'Clam Collector', img: 'https://i.imgur.com/NK8EQm1.png', attribute: 'Water', symbol: '💧', earnRate: 9 },
-        { name: 'Jelly Jill', img: 'https://i.imgur.com/Aa396uh.png', attribute: 'Fire', symbol: '🔥', earnRate: 11 }
-      ],
-      Epic: [
-        { name: 'Coral Commander', img: 'https://i.imgur.com/02jTwGp.png', attribute: 'Water', symbol: '💧', earnRate: 20 },
-        { name: 'Storm Summoner', img: 'https://i.imgur.com/JOCwUzy.png', attribute: 'Wind', symbol: '🍃', earnRate: 18 },
-        { name: 'Deep Diver', img: 'https://i.imgur.com/wr71ePx.png', attribute: 'Water', symbol: '💧', earnRate: 17 },
-        { name: 'Aqua Archer', img: 'https://i.imgur.com/OXjxfTK.png', attribute: 'Water', symbol: '💧', earnRate: 15 },
-        { name: 'Kraken Knight', img: 'https://i.imgur.com/PqCgXay.png', attribute: 'Earth', symbol: '🌎', earnRate: 16 }
-      ],
-      Legendary: [
-        { name: 'Poseidon’s Heir', img: 'https://i.imgur.com/23DhlYC.png', attribute: 'Water', symbol: '💧', earnRate: 30 },
-        { name: 'Orca Overlord', img: 'https://i.imgur.com/Rhu6apu.png', attribute: 'Water', symbol: '💧', earnRate: 28 },
-        { name: 'Lighthouse Lord', img: 'https://i.imgur.com/OCaOjCv.png', attribute: 'Fire', symbol: '🔥', earnRate: 25 },
-        { name: 'Seismic Sailor', img: 'https://i.imgur.com/SXQMxBI.png', attribute: 'Earth', symbol: '🌎', earnRate: 26 },
-        { name: 'Aurora Amazon', img: 'https://i.imgur.com/5HE6crv.png', attribute: 'Wind', symbol: '🍃', earnRate: 27 }
-      ],
-      Mythic: [
-        { name: 'Eternal Eel', img: 'https://i.imgur.com/tFzK3iu.png', attribute: 'Water', symbol: '💧', earnRate: 50 },
-        { name: 'Dragon Diver', img: 'https://i.imgur.com/ujlhSVK.png', attribute: 'Fire', symbol: '🔥', earnRate: 48 },
-        { name: 'Celestial Caster', img: 'https://i.imgur.com/1K8xEcc.png', attribute: 'Wind', symbol: '🍃', earnRate: 45 },
-        { name: 'Phoenix Piercer', img: 'https://i.imgur.com/EokU1JU.png', attribute: 'Fire', symbol: '🔥', earnRate: 47 },
-        { name: 'World-Shaper', img: 'https://i.imgur.com/Qg9MLyO.png', attribute: 'Earth', symbol: '🌎', earnRate: 49 }
-      ]
+      // Add other rarities here if necessary.
     };
 
     function switchTab(tabId) {
@@ -221,9 +209,10 @@
       container.innerHTML = player.heroes.map((hero, index) => `
         <div class="hero-card" onclick="showHeroDetails(${index})">
           <img src="${hero.img}" alt="${hero.name}" />
-          <p>${hero.name}</p>
+          <p class="color-${hero.rarity.toLowerCase()}">${hero.name} (${hero.rarity})</p>
           <p>${hero.symbol} ${hero.attribute}</p>
         </div>`).join('');
+      autoUpgradeHeroes();
     }
 
     function buyChest(count) {
@@ -232,7 +221,7 @@
         for (let i = 0; i < count; i++) {
           const rarities = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
           const rarity = rarities[Math.floor(Math.random() * rarities.length)];
-          const hero = heroData[rarity][Math.floor(Math.random() * heroData[rarity].length)];
+          const hero = { ...heroData.Common[Math.floor(Math.random() * heroData.Common.length)], rarity: rarity, level: 1, damage: Math.floor(Math.random() * 100) + 50 };
           player.heroes.push(hero);
         }
         updateHome();
@@ -242,11 +231,41 @@
       }
     }
 
+    function autoUpgradeHeroes() {
+      const grouped = {};
+      player.heroes.forEach((hero, index) => {
+        const key = `${hero.name}-lv${hero.level}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(index);
+      });
+
+      for (const key in grouped) {
+        const indices = grouped[key];
+        while (indices.length >= 2) {
+          const index1 = indices.pop();
+          const index2 = indices.pop();
+
+          const hero1 = player.heroes[index1];
+          const hero2 = player.heroes[index2];
+
+          const upgradedHero = {
+            ...hero1,
+            level: hero1.level + 1,
+            damage: Math.floor(hero1.damage * (hero1.level < 5 ? 1.5 : 2)),
+          };
+
+          player.heroes.splice(index1, 1);
+          player.heroes.splice(index2, 1);
+          player.heroes.push(upgradedHero);
+        }
+      }
+    }
+
     function showHeroDetails(index) {
       const hero = player.heroes[index];
       document.getElementById('modal-hero-img').src = hero.img;
       document.getElementById('modal-hero-name').textContent = `${hero.name} (${hero.symbol} ${hero.attribute})`;
-      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${Math.floor(Math.random() * 100) + 50}`;
+      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${hero.damage}`;
       document.getElementById('modal-hero-skill').textContent = `Skill: Special Move`;
       document.getElementById('modal-hero-earn').textContent = `Farm Rate: ${hero.earnRate} tokens/day`;
       document.getElementById('modal-overlay').style.display = 'flex';
