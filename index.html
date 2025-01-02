@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rost & Flame - Complete Game</title>
+    <title>Idle Fishing P2E - Farm Logic</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -42,7 +42,7 @@
             position: fixed;
             bottom: 0;
             width: 100%;
-            background: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.6);
             padding: 10px;
         }
         .menu button {
@@ -57,229 +57,161 @@
         .menu button:hover {
             background: #1d3557;
         }
-        .modal {
-            display: none;
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80%;
-            max-width: 400px;
-            background: rgba(255, 255, 255, 0.9);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            text-align: center;
+        .farmContainer {
+            margin: 20px 0;
         }
-        .modal h3 {
-            margin-bottom: 20px;
-        }
-        .modal button {
-            background: #e63946;
-            padding: 10px 20px;
-            border: none;
-            color: #fff;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        .modal button:hover {
-            background: #d62828;
-        }
-        .shop-item {
-            background: #2a9d8f;
+        .farmHouse {
+            background: rgba(255, 255, 255, 0.1);
             padding: 10px;
             margin: 10px 0;
-            border-radius: 5px;
-            color: #fff;
+            border-radius: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 16px;
         }
-        .shop-item button {
-            background: #e63946;
-            padding: 5px 10px;
-            color: #fff;
+        .farmHouse .info {
+            text-align: left;
+            font-size: 14px;
+        }
+        .farmHouse button {
+            background: #ff9933;
             border: none;
             border-radius: 5px;
+            padding: 6px 10px;
+            color: #fff;
             cursor: pointer;
         }
-        .referral-list {
-            background: #2a9d8f;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
+        .farmHouse button:hover {
+            background: #ffa64d;
+        }
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.8);
             color: #fff;
-            font-size: 16px;
+            padding: 10px;
+            border-radius: 5px;
+            display: none;
+            z-index: 9999;
         }
     </style>
 </head>
 <body>
     <!-- Header -->
     <div class="header">
-        <h1>Rost & Flame</h1>
-        <img src="https://example.com/ice-phoenix.png" alt="Ice Phoenix">
-        <p id="userInfo">Welcome, Ice Phoenix Keeper</p>
+        <h1>Idle Fishing P2E</h1>
+        <p>Welcome, <span id="playerName">Player</span>!</p>
+    </div>
+
+    <!-- Farm Container -->
+    <div class="container farmContainer">
+        <h3>Your Farm</h3>
+        <div id="farmList"></div>
     </div>
 
     <!-- Menu -->
     <div class="menu">
-        <button onclick="openModal('walletModal')">Wallet</button>
-        <button onclick="openModal('questModal')">Quest</button>
-        <button onclick="openModal('homeModal')">Home</button>
-        <button onclick="openModal('boatModal')">Boat</button>
-        <button onclick="openModal('shopModal')">Shop</button>
-        <button onclick="openModal('referralModal')">Referral</button>
+        <button onclick="collectAllIncome()">Collect All</button>
+        <button onclick="openShop()">Shop</button>
+        <button onclick="openWallet()">Wallet</button>
     </div>
 
-    <!-- Modals -->
-    <div class="modal" id="walletModal">
-        <h3>Wallet</h3>
-        <p><strong>Address:</strong> <span id="walletAddress">Not Connected</span></p>
-        <p><strong>Balance:</strong> <span id="walletBalance">-- TON</span></p>
-        <button onclick="connectWallet()">Connect Wallet</button>
-        <button onclick="closeModal('walletModal')">Close</button>
-    </div>
-
-    <div class="modal" id="referralModal">
-        <h3>Referral</h3>
-        <p>Your Referral Code:</p>
-        <p><strong id="referralCode">REF1234</strong></p>
-        <p>Invite friends to earn rewards!</p>
-        <h4>Friend List:</h4>
-        <div id="referralList">
-            <!-- Friend list will be dynamically loaded -->
-        </div>
-        <button onclick="addFriend()">Add Test Friend</button>
-        <button onclick="closeModal('referralModal')">Close</button>
-    </div>
-
-    <div class="modal" id="questModal">
-        <h3>Quest</h3>
-        <p>Complete tasks to earn rewards.</p>
-        <p id="questProgress">Train 5 Phoenixes: 0/5</p>
-        <button onclick="claimQuest()">Claim Reward</button>
-        <button onclick="closeModal('questModal')">Close</button>
-    </div>
-
-    <div class="modal" id="homeModal">
-        <h3>Home</h3>
-        <p>Train Phoenixes and manage your Ice Phoenix activities here.</p>
-        <button onclick="trainPhoenix()">Train Phoenix</button>
-        <button onclick="closeModal('homeModal')">Close</button>
-    </div>
-
-    <div class="modal" id="shopModal">
-        <h3>Shop</h3>
-        <div id="shopItems">
-            <!-- Items will be dynamically loaded -->
-        </div>
-        <button onclick="closeModal('shopModal')">Close Shop</button>
-    </div>
+    <!-- Notification -->
+    <div class="notification" id="notification"></div>
 
     <script>
-        let user = {
-            tonBalance: 100,
-            questProgress: 0,
-            referralFriends: [],
-            walletAddress: null,
+        // Mock Data
+        let player = {
+            name: "FishingMaster",
+            balance: 100,
+            farm: [
+                { name: "Tiny House", income: 0.1, level: 1, collected: 0 },
+                { name: "Medium House", income: 0.5, level: 1, collected: 0 },
+                { name: "Large House", income: 1, level: 1, collected: 0 },
+            ],
         };
 
-        const shopItems = [
-            { name: "Ice Crystal", price: 10 },
-            { name: "Phoenix Feather", price: 15 },
-            { name: "Mystic Flame", price: 20 },
-        ];
+        // Update Player Name
+        document.getElementById("playerName").innerText = player.name;
 
-        function openModal(modalId) {
-            document.getElementById(modalId).style.display = 'block';
-        }
-
-        function closeModal(modalId) {
-            document.getElementById(modalId).style.display = 'none';
-        }
-
-        function connectWallet() {
-            user.walletAddress = "EQABC1234...XYZ"; // Mock wallet address
-            user.walletBalance = 200; // Mock wallet balance
-            document.getElementById("walletAddress").textContent = user.walletAddress;
-            document.getElementById("walletBalance").textContent = `${user.walletBalance} TON`;
-            alert("Wallet connected successfully!");
-        }
-
-        function trainPhoenix() {
-            if (user.questProgress < 5) {
-                user.questProgress++;
-                user.tonBalance += 0.5;
-                alert("Phoenix trained successfully! You earned 0.5 TON.");
-                updateStats();
-            } else {
-                alert("You have already trained 5 Phoenixes today!");
-            }
-        }
-
-        function claimQuest() {
-            if (user.questProgress >= 5) {
-                user.tonBalance += 10;
-                user.questProgress = 0;
-                alert("Quest reward claimed! You earned 10 TON.");
-                updateStats();
-            } else {
-                alert("You need to train 5 Phoenixes to claim the reward.");
-            }
-        }
-
-        function loadShopItems() {
-            const shopContainer = document.getElementById("shopItems");
-            shopContainer.innerHTML = "";
-            shopItems.forEach(item => {
-                const div = document.createElement("div");
-                div.className = "shop-item";
-                div.innerHTML = `
-                    <span>${item.name} - ${item.price} TON</span>
-                    <button onclick="buyItem('${item.name}', ${item.price})">Buy</button>
+        // Render Farm
+        function renderFarm() {
+            const farmList = document.getElementById("farmList");
+            farmList.innerHTML = "";
+            player.farm.forEach((house, index) => {
+                const houseDiv = document.createElement("div");
+                houseDiv.className = "farmHouse";
+                houseDiv.innerHTML = `
+                    <div class="info">
+                        <strong>${house.name}</strong> (Level ${house.level})<br>
+                        Income: ${house.income} TON/sec<br>
+                        Collected: ${house.collected.toFixed(2)} TON
+                    </div>
+                    <div>
+                        <button onclick="collectIncome(${index})">Collect</button>
+                        <button onclick="upgradeHouse(${index})">Upgrade</button>
+                    </div>
                 `;
-                shopContainer.appendChild(div);
+                farmList.appendChild(houseDiv);
             });
         }
 
-        function buyItem(itemName, price) {
-            if (user.tonBalance >= price) {
-                user.tonBalance -= price;
-                alert(`You bought ${itemName}!`);
-                updateStats();
+        // Collect Income
+        function collectIncome(index) {
+            const house = player.farm[index];
+            player.balance += house.collected;
+            house.collected = 0;
+            showNotification(`Collected ${house.collected.toFixed(2)} TON from ${house.name}`);
+            renderFarm();
+        }
+
+        // Collect All Income
+        function collectAllIncome() {
+            player.farm.forEach((house) => {
+                player.balance += house.collected;
+                house.collected = 0;
+            });
+            showNotification("Collected all income!");
+            renderFarm();
+        }
+
+        // Upgrade House
+        function upgradeHouse(index) {
+            const house = player.farm[index];
+            const upgradeCost = house.level * 10;
+            if (player.balance >= upgradeCost) {
+                player.balance -= upgradeCost;
+                house.level++;
+                house.income += house.level * 0.1; // Increase income per upgrade
+                showNotification(`Upgraded ${house.name} to Level ${house.level}`);
+                renderFarm();
             } else {
-                alert("Not enough TON to buy this item.");
+                showNotification("Not enough balance to upgrade!");
             }
         }
 
-        function addFriend() {
-            const friendName = prompt("Enter friend's name:");
-            if (friendName) {
-                user.referralFriends.push(friendName);
-                alert(`You invited ${friendName}!`);
-                updateReferralList();
-            }
+        // Notification
+        function showNotification(message) {
+            const notification = document.getElementById("notification");
+            notification.innerText = message;
+            notification.style.display = "block";
+            setTimeout(() => {
+                notification.style.display = "none";
+            }, 2000);
         }
 
-        function updateReferralList() {
-            const referralList = document.getElementById("referralList");
-            referralList.innerHTML = "";
-            user.referralFriends.forEach(friend => {
-                const div = document.createElement("div");
-                div.className = "referral-list";
-                div.textContent = friend;
-                referralList.appendChild(div);
+        // Simulate Income
+        setInterval(() => {
+            player.farm.forEach((house) => {
+                house.collected += house.income;
             });
-        }
+            renderFarm();
+        }, 1000);
 
-        function updateStats() {
-            document.getElementById("questProgress").textContent = `Train 5 Phoenixes: ${user.questProgress}/5`;
-        }
-
-        loadShopItems();
-        updateReferralList();
-        updateStats();
+        // Initialize
+        renderFarm();
     </script>
 </body>
 </html>
