@@ -260,7 +260,7 @@
           player.heroes.push({ ...hero });
         }
         updateHome();
-        updateHero(); // Ensure hero list updates immediately after buying chest
+        updateHero();
       } else {
         alert("Not enough tokens!");
       }
@@ -324,6 +324,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateHome();
+      updateHero();
     });
   </script>
 </body>
