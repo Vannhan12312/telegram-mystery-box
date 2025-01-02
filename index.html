@@ -47,7 +47,7 @@
     }
     .hero-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      grid-template-columns: repeat(4, 1fr);
       gap: 10px;
     }
     .hero-card {
@@ -129,7 +129,7 @@
   <nav>
     <button class="active-tab" onclick="switchTab('home')">Home</button>
     <button onclick="switchTab('shop')">Shop</button>
-    <button onclick="switchTab('boat')">Boat</button>
+    <button onclick="switchTab('hero')">Hero</button>
     <button onclick="switchTab('quest')">Quest</button>
     <button onclick="switchTab('wallet')">Wallet</button>
   </nav>
@@ -146,8 +146,8 @@
     <p id="shop-message"></p>
   </main>
 
-  <main id="boat">
-    <h2>Boat</h2>
+  <main id="hero">
+    <h2>Hero</h2>
     <div class="hero-container" id="hero-list"></div>
   </main>
 
@@ -171,6 +171,7 @@
       <p id="modal-hero-damage"></p>
       <p id="modal-hero-skill"></p>
       <p id="modal-hero-earn"></p>
+      <p id="modal-hero-level"></p>
     </div>
   </div>
 
@@ -181,15 +182,33 @@
   <script>
     const player = {
       tokens: 100,
-      heroes: Array(25).fill().map((_, i) => ({
-        name: `Hero ${i + 1}`,
-        rarity: ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'][i % 5],
-        img: `https://i.imgur.com/placeholder-${i + 1}.png`,
-        attribute: ['Fire', 'Water', 'Earth', 'Wind', 'Electric'][i % 5],
-        symbol: ['🔥', '💧', '🌎', '🍃', '⚡'][i % 5],
-        earnRate: Math.floor(Math.random() * 10 + 5),
-        level: 1
-      })),
+      heroes: [
+        { name: 'Hero 1', rarity: 'Common', img: 'https://i.imgur.com/wY0nzE9.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
+        { name: 'Hero 2', rarity: 'Rare', img: 'https://i.imgur.com/Iy1X8r1.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
+        { name: 'Hero 3', rarity: 'Epic', img: 'https://i.imgur.com/81Ypu1S.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
+        { name: 'Hero 4', rarity: 'Legendary', img: 'https://i.imgur.com/XMUx21e.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
+        { name: 'Hero 5', rarity: 'Mythic', img: 'https://i.imgur.com/eVNSFSH.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
+        { name: 'Hero 6', rarity: 'Common', img: 'https://i.imgur.com/3l9MKIl.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
+        { name: 'Hero 7', rarity: 'Rare', img: 'https://i.imgur.com/cSy6okk.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
+        { name: 'Hero 8', rarity: 'Epic', img: 'https://i.imgur.com/QRJyOyp.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
+        { name: 'Hero 9', rarity: 'Legendary', img: 'https://i.imgur.com/NK8EQm1.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
+        { name: 'Hero 10', rarity: 'Mythic', img: 'https://i.imgur.com/Aa396uh.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
+        { name: 'Hero 11', rarity: 'Common', img: 'https://i.imgur.com/02jTwGp.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
+        { name: 'Hero 12', rarity: 'Rare', img: 'https://i.imgur.com/JOCwUzy.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
+        { name: 'Hero 13', rarity: 'Epic', img: 'https://i.imgur.com/wr71ePx.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
+        { name: 'Hero 14', rarity: 'Legendary', img: 'https://i.imgur.com/OXjxfTK.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
+        { name: 'Hero 15', rarity: 'Mythic', img: 'https://i.imgur.com/PqCgXay.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
+        { name: 'Hero 16', rarity: 'Common', img: 'https://i.imgur.com/23DhlYC.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
+        { name: 'Hero 17', rarity: 'Rare', img: 'https://i.imgur.com/Rhu6apu.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
+        { name: 'Hero 18', rarity: 'Epic', img: 'https://i.imgur.com/OCaOjCv.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
+        { name: 'Hero 19', rarity: 'Legendary', img: 'https://i.imgur.com/SXQMxBI.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
+        { name: 'Hero 20', rarity: 'Mythic', img: 'https://i.imgur.com/5HE6crv.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
+        { name: 'Hero 21', rarity: 'Common', img: 'https://i.imgur.com/tFzK3iu.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
+        { name: 'Hero 22', rarity: 'Rare', img: 'https://i.imgur.com/ujlhSVK.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
+        { name: 'Hero 23', rarity: 'Epic', img: 'https://i.imgur.com/1K8xEcc.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
+        { name: 'Hero 24', rarity: 'Legendary', img: 'https://i.imgur.com/EokU1JU.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
+        { name: 'Hero 25', rarity: 'Mythic', img: 'https://i.imgur.com/Qg9MLyO.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 }
+      ],
       quests: [
         { id: 1, name: "Complete Tutorial", completed: false, reward: 10 },
       ]
@@ -201,20 +220,21 @@
       document.getElementById(tabId).classList.add('active');
       document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
       if (tabId === 'home') updateHome();
-      if (tabId === 'boat') updateBoat();
+      if (tabId === 'hero') updateHero();
     }
 
     function updateHome() {
       document.getElementById('player-summary').textContent = `Tokens: ${player.tokens}, Heroes: ${player.heroes.length}`;
     }
 
-    function updateBoat() {
+    function updateHero() {
       const container = document.getElementById('hero-list');
       container.innerHTML = player.heroes.map((hero, index) => `
         <div class="hero-card" onclick="showHeroDetails(${index})">
           <img src="${hero.img}" alt="${hero.name}" />
           <p class="color-${hero.rarity.toLowerCase()}">${hero.name} (${hero.rarity})</p>
           <p>${hero.symbol} ${hero.attribute}</p>
+          <p>Lv: ${hero.level}</p>
         </div>`).join('');
     }
 
@@ -225,6 +245,7 @@
       document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${Math.floor(Math.random() * 100) + 50}`;
       document.getElementById('modal-hero-skill').textContent = `Skill: Special Move`;
       document.getElementById('modal-hero-earn').textContent = `Farm Rate: ${hero.earnRate} tokens/day`;
+      document.getElementById('modal-hero-level').textContent = `Level: ${hero.level}`;
       document.getElementById('modal-overlay').style.display = 'flex';
     }
 
@@ -234,7 +255,7 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateHome();
-      updateBoat();
+      updateHero();
     });
   </script>
 </body>
