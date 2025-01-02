@@ -182,35 +182,29 @@
   <script>
     const player = {
       tokens: 100,
-      heroes: [
-        { name: 'Hero 1', rarity: 'Common', img: 'https://i.imgur.com/wY0nzE9.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
-        { name: 'Hero 2', rarity: 'Rare', img: 'https://i.imgur.com/Iy1X8r1.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
-        { name: 'Hero 3', rarity: 'Epic', img: 'https://i.imgur.com/81Ypu1S.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
-        { name: 'Hero 4', rarity: 'Legendary', img: 'https://i.imgur.com/XMUx21e.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
-        { name: 'Hero 5', rarity: 'Mythic', img: 'https://i.imgur.com/eVNSFSH.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
-        { name: 'Hero 6', rarity: 'Common', img: 'https://i.imgur.com/3l9MKIl.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
-        { name: 'Hero 7', rarity: 'Rare', img: 'https://i.imgur.com/cSy6okk.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
-        { name: 'Hero 8', rarity: 'Epic', img: 'https://i.imgur.com/QRJyOyp.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
-        { name: 'Hero 9', rarity: 'Legendary', img: 'https://i.imgur.com/NK8EQm1.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
-        { name: 'Hero 10', rarity: 'Mythic', img: 'https://i.imgur.com/Aa396uh.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
-        { name: 'Hero 11', rarity: 'Common', img: 'https://i.imgur.com/02jTwGp.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
-        { name: 'Hero 12', rarity: 'Rare', img: 'https://i.imgur.com/JOCwUzy.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
-        { name: 'Hero 13', rarity: 'Epic', img: 'https://i.imgur.com/wr71ePx.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
-        { name: 'Hero 14', rarity: 'Legendary', img: 'https://i.imgur.com/OXjxfTK.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
-        { name: 'Hero 15', rarity: 'Mythic', img: 'https://i.imgur.com/PqCgXay.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
-        { name: 'Hero 16', rarity: 'Common', img: 'https://i.imgur.com/23DhlYC.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
-        { name: 'Hero 17', rarity: 'Rare', img: 'https://i.imgur.com/Rhu6apu.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
-        { name: 'Hero 18', rarity: 'Epic', img: 'https://i.imgur.com/OCaOjCv.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
-        { name: 'Hero 19', rarity: 'Legendary', img: 'https://i.imgur.com/SXQMxBI.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
-        { name: 'Hero 20', rarity: 'Mythic', img: 'https://i.imgur.com/5HE6crv.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 },
-        { name: 'Hero 21', rarity: 'Common', img: 'https://i.imgur.com/tFzK3iu.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
-        { name: 'Hero 22', rarity: 'Rare', img: 'https://i.imgur.com/ujlhSVK.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 },
-        { name: 'Hero 23', rarity: 'Epic', img: 'https://i.imgur.com/1K8xEcc.png', attribute: 'Earth', symbol: '🌎', earnRate: 7, level: 1 },
-        { name: 'Hero 24', rarity: 'Legendary', img: 'https://i.imgur.com/EokU1JU.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 },
-        { name: 'Hero 25', rarity: 'Mythic', img: 'https://i.imgur.com/Qg9MLyO.png', attribute: 'Electric', symbol: '⚡', earnRate: 9, level: 1 }
-      ],
+      heroes: [],
       quests: [
         { id: 1, name: "Complete Tutorial", completed: false, reward: 10 },
+      ]
+    };
+
+    const heroData = {
+      Common: [
+        { name: 'Crab Catcher', img: 'https://i.imgur.com/wY0nzE9.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1 },
+        { name: 'Rookie Roy', img: 'https://i.imgur.com/eVNSFSH.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1 }
+      ],
+      Rare: [
+        { name: 'Mermaid Mia', img: 'https://i.imgur.com/cSy6okk.png', attribute: 'Water', symbol: '💧', earnRate: 7, level: 1 },
+        { name: 'River Ronin', img: 'https://i.imgur.com/3l9MKIl.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1 }
+      ],
+      Epic: [
+        { name: 'Storm Summoner', img: 'https://i.imgur.com/JOCwUzy.png', attribute: 'Earth', symbol: '🌎', earnRate: 9, level: 1 }
+      ],
+      Legendary: [
+        { name: 'Poseidon’s Heir', img: 'https://i.imgur.com/23DhlYC.png', attribute: 'Water', symbol: '💧', earnRate: 10, level: 1 }
+      ],
+      Mythic: [
+        { name: 'Eternal Eel', img: 'https://i.imgur.com/tFzK3iu.png', attribute: 'Electric', symbol: '⚡', earnRate: 15, level: 1 }
       ]
     };
 
@@ -236,13 +230,70 @@
           <p>${hero.symbol} ${hero.attribute}</p>
           <p>Lv: ${hero.level}</p>
         </div>`).join('');
+      autoUpgradeHeroes();
+    }
+
+    function buyChest(count) {
+      if (player.tokens >= count * 10) {
+        player.tokens -= count * 10;
+        for (let i = 0; i < count; i++) {
+          const rarity = getRandomRarity();
+          const hero = heroData[rarity][Math.floor(Math.random() * heroData[rarity].length)];
+          player.heroes.push({ ...hero });
+        }
+        updateHome();
+        updateHero();
+      } else {
+        alert("Not enough tokens!");
+      }
+    }
+
+    function getRandomRarity() {
+      const roll = Math.random() * 100;
+      const chances = { Common: 50, Rare: 30, Epic: 15, Legendary: 4, Mythic: 1 };
+      let cumulative = 0;
+      for (const rarity in chances) {
+        cumulative += chances[rarity];
+        if (roll < cumulative) return rarity;
+      }
+      return 'Common';
+    }
+
+    function autoUpgradeHeroes() {
+      const grouped = {};
+      player.heroes.forEach((hero, index) => {
+        const key = `${hero.name}-lv${hero.level}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(index);
+      });
+
+      for (const key in grouped) {
+        const indices = grouped[key];
+        while (indices.length >= 2) {
+          const index1 = indices.pop();
+          const index2 = indices.pop();
+
+          const hero1 = player.heroes[index1];
+          const hero2 = player.heroes[index2];
+
+          const upgradedHero = {
+            ...hero1,
+            level: hero1.level + 1,
+            damage: Math.floor(hero1.damage * (hero1.level === 1 ? 1.5 : hero1.level === 2 ? 1.75 : 2))
+          };
+
+          player.heroes.splice(index1, 1);
+          player.heroes.splice(index2, 1);
+          player.heroes.push(upgradedHero);
+        }
+      }
     }
 
     function showHeroDetails(index) {
       const hero = player.heroes[index];
       document.getElementById('modal-hero-img').src = hero.img;
       document.getElementById('modal-hero-name').textContent = `${hero.name} (${hero.symbol} ${hero.attribute})`;
-      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${Math.floor(Math.random() * 100) + 50}`;
+      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${hero.damage || 50}`;
       document.getElementById('modal-hero-skill').textContent = `Skill: Special Move`;
       document.getElementById('modal-hero-earn').textContent = `Farm Rate: ${hero.earnRate} tokens/day`;
       document.getElementById('modal-hero-level').textContent = `Level: ${hero.level}`;
@@ -255,7 +306,6 @@
 
     document.addEventListener('DOMContentLoaded', () => {
       updateHome();
-      updateHero();
     });
   </script>
 </body>
