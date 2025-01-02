@@ -474,3 +474,23 @@
     function copyReferralCode() {
       const referralCode = document.getElementById("referral-code");
       navigator.clipboard.writeText(referral
+<script>
+  function copyReferralCode() {
+    const referralCode = document.getElementById("referral-code");
+    navigator.clipboard
+      .writeText(referralCode.value)
+      .then(() => alert("Referral code copied to clipboard!"))
+      .catch(() => alert("Failed to copy referral code."));
+  }
+
+  function shareOnTelegram() {
+    const referralLink = document.getElementById("referral-code").value;
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(referralLink)}&text=Join%20COST%20%26%20FLAME%20and%20earn%20TON%20rewards!`;
+    window.open(telegramUrl, "_blank");
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateHeroList(); // Cập nhật danh sách hero sau khi tải trang
+  });
+</script>
+
