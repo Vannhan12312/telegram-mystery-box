@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rost & Flame</title>
+    <title>Rost & Flame - Complete Game</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -104,6 +104,14 @@
             border-radius: 5px;
             cursor: pointer;
         }
+        .referral-list {
+            background: #2a9d8f;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 5px;
+            color: #fff;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
@@ -121,6 +129,7 @@
         <button onclick="openModal('homeModal')">Home</button>
         <button onclick="openModal('boatModal')">Boat</button>
         <button onclick="openModal('shopModal')">Shop</button>
+        <button onclick="openModal('referralModal')">Referral</button>
     </div>
 
     <!-- Modals -->
@@ -130,6 +139,19 @@
         <p><strong>Balance:</strong> <span id="walletBalance">-- TON</span></p>
         <button onclick="connectWallet()">Connect Wallet</button>
         <button onclick="closeModal('walletModal')">Close</button>
+    </div>
+
+    <div class="modal" id="referralModal">
+        <h3>Referral</h3>
+        <p>Your Referral Code:</p>
+        <p><strong id="referralCode">REF1234</strong></p>
+        <p>Invite friends to earn rewards!</p>
+        <h4>Friend List:</h4>
+        <div id="referralList">
+            <!-- Friend list will be dynamically loaded -->
+        </div>
+        <button onclick="addFriend()">Add Test Friend</button>
+        <button onclick="closeModal('referralModal')">Close</button>
     </div>
 
     <div class="modal" id="questModal">
@@ -147,12 +169,6 @@
         <button onclick="closeModal('homeModal')">Close</button>
     </div>
 
-    <div class="modal" id="boatModal">
-        <h3>Boat Management</h3>
-        <p>Manage and upgrade your boats here.</p>
-        <button onclick="closeModal('boatModal')">Close</button>
-    </div>
-
     <div class="modal" id="shopModal">
         <h3>Shop</h3>
         <div id="shopItems">
@@ -165,6 +181,7 @@
         let user = {
             tonBalance: 100,
             questProgress: 0,
+            referralFriends: [],
             walletAddress: null,
         };
 
@@ -236,12 +253,32 @@
             }
         }
 
+        function addFriend() {
+            const friendName = prompt("Enter friend's name:");
+            if (friendName) {
+                user.referralFriends.push(friendName);
+                alert(`You invited ${friendName}!`);
+                updateReferralList();
+            }
+        }
+
+        function updateReferralList() {
+            const referralList = document.getElementById("referralList");
+            referralList.innerHTML = "";
+            user.referralFriends.forEach(friend => {
+                const div = document.createElement("div");
+                div.className = "referral-list";
+                div.textContent = friend;
+                referralList.appendChild(div);
+            });
+        }
+
         function updateStats() {
-            document.getElementById("walletBalance").textContent = user.walletBalance || "--";
             document.getElementById("questProgress").textContent = `Train 5 Phoenixes: ${user.questProgress}/5`;
         }
 
         loadShopItems();
+        updateReferralList();
         updateStats();
     </script>
 </body>
