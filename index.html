@@ -56,6 +56,7 @@
       padding: 5px;
       border-radius: 5px;
       background: #fff;
+      cursor: pointer;
     }
     .hero-card img {
       max-width: 50px;
@@ -65,6 +66,35 @@
       text-align: center;
       padding: 10px;
       background: #f4f4f4;
+    }
+    #modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 5px;
+      text-align: center;
+      position: relative;
+    }
+    #modal-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 5px;
+      background: #ddd;
+      border: none;
+      cursor: pointer;
+      border-radius: 5px;
     }
   </style>
 </head>
@@ -110,6 +140,18 @@
     <p>RFM Tokens: <span id="wallet-tokens">100</span></p>
   </main>
 
+  <div id="modal-overlay">
+    <div id="modal-content">
+      <button id="modal-close" onclick="closeModal()">X</button>
+      <h3>Hero Details</h3>
+      <img id="modal-hero-img" src="" alt="Hero" style="max-width: 100px; margin: 10px 0;" />
+      <p id="modal-hero-name" style="font-weight: bold;"></p>
+      <p id="modal-hero-damage"></p>
+      <p id="modal-hero-skill"></p>
+      <p id="modal-hero-earn"></p>
+    </div>
+  </div>
+
   <footer>
     &copy; 2023 Rost & Flame
   </footer>
@@ -117,12 +159,47 @@
   <script>
     const player = {
       tokens: 100,
-      heroes: [
-        { name: "Hero 1", img: "https://i.imgur.com/wY0nzE9.png" },
-        { name: "Hero 2", img: "https://i.imgur.com/Iy1X8r1.png" }
-      ],
+      heroes: [],
       quests: [
         { id: 1, name: "Complete Tutorial", completed: false, reward: 10 },
+      ]
+    };
+
+    const heroData = {
+      Common: [
+        { name: 'Fisher Bob', img: 'https://i.imgur.com/wY0nzE9.png', attribute: 'Water', symbol: '💧', earnRate: 5 },
+        { name: 'Crab Catcher', img: 'https://i.imgur.com/Iy1X8r1.png', attribute: 'Water', symbol: '💧', earnRate: 6 },
+        { name: 'Net Master', img: 'https://i.imgur.com/81Ypu1S.png', attribute: 'Water', symbol: '💧', earnRate: 7 },
+        { name: 'Old Man Jang', img: 'https://i.imgur.com/XMUx21e.png', attribute: 'Earth', symbol: '🌎', earnRate: 4 },
+        { name: 'Rookie Roy', img: 'https://i.imgur.com/eVNSFSH.png', attribute: 'Fire', symbol: '🔥', earnRate: 8 }
+      ],
+      Rare: [
+        { name: 'River Ronin', img: 'https://i.imgur.com/3l9MKIl.png', attribute: 'Water', symbol: '💧', earnRate: 10 },
+        { name: 'Mermaid Mia', img: 'https://i.imgur.com/cSy6okk.png', attribute: 'Water', symbol: '💧', earnRate: 12 },
+        { name: 'Turtle Tuner', img: 'https://i.imgur.com/QRJyOyp.png', attribute: 'Earth', symbol: '🌎', earnRate: 8 },
+        { name: 'Clam Collector', img: 'https://i.imgur.com/NK8EQm1.png', attribute: 'Water', symbol: '💧', earnRate: 9 },
+        { name: 'Jelly Jill', img: 'https://i.imgur.com/Aa396uh.png', attribute: 'Fire', symbol: '🔥', earnRate: 11 }
+      ],
+      Epic: [
+        { name: 'Coral Commander', img: 'https://i.imgur.com/02jTwGp.png', attribute: 'Water', symbol: '💧', earnRate: 20 },
+        { name: 'Storm Summoner', img: 'https://i.imgur.com/JOCwUzy.png', attribute: 'Wind', symbol: '🍃', earnRate: 18 },
+        { name: 'Deep Diver', img: 'https://i.imgur.com/wr71ePx.png', attribute: 'Water', symbol: '💧', earnRate: 17 },
+        { name: 'Aqua Archer', img: 'https://i.imgur.com/OXjxfTK.png', attribute: 'Water', symbol: '💧', earnRate: 15 },
+        { name: 'Kraken Knight', img: 'https://i.imgur.com/PqCgXay.png', attribute: 'Earth', symbol: '🌎', earnRate: 16 }
+      ],
+      Legendary: [
+        { name: 'Poseidon’s Heir', img: 'https://i.imgur.com/23DhlYC.png', attribute: 'Water', symbol: '💧', earnRate: 30 },
+        { name: 'Orca Overlord', img: 'https://i.imgur.com/Rhu6apu.png', attribute: 'Water', symbol: '💧', earnRate: 28 },
+        { name: 'Lighthouse Lord', img: 'https://i.imgur.com/OCaOjCv.png', attribute: 'Fire', symbol: '🔥', earnRate: 25 },
+        { name: 'Seismic Sailor', img: 'https://i.imgur.com/SXQMxBI.png', attribute: 'Earth', symbol: '🌎', earnRate: 26 },
+        { name: 'Aurora Amazon', img: 'https://i.imgur.com/5HE6crv.png', attribute: 'Wind', symbol: '🍃', earnRate: 27 }
+      ],
+      Mythic: [
+        { name: 'Eternal Eel', img: 'https://i.imgur.com/tFzK3iu.png', attribute: 'Water', symbol: '💧', earnRate: 50 },
+        { name: 'Dragon Diver', img: 'https://i.imgur.com/ujlhSVK.png', attribute: 'Fire', symbol: '🔥', earnRate: 48 },
+        { name: 'Celestial Caster', img: 'https://i.imgur.com/1K8xEcc.png', attribute: 'Wind', symbol: '🍃', earnRate: 45 },
+        { name: 'Phoenix Piercer', img: 'https://i.imgur.com/EokU1JU.png', attribute: 'Fire', symbol: '🔥', earnRate: 47 },
+        { name: 'World-Shaper', img: 'https://i.imgur.com/Qg9MLyO.png', attribute: 'Earth', symbol: '🌎', earnRate: 49 }
       ]
     };
 
@@ -141,10 +218,11 @@
 
     function updateBoat() {
       const container = document.getElementById('hero-list');
-      container.innerHTML = player.heroes.map(hero => `
-        <div class="hero-card">
+      container.innerHTML = player.heroes.map((hero, index) => `
+        <div class="hero-card" onclick="showHeroDetails(${index})">
           <img src="${hero.img}" alt="${hero.name}" />
           <p>${hero.name}</p>
+          <p>${hero.symbol} ${hero.attribute}</p>
         </div>`).join('');
     }
 
@@ -152,7 +230,10 @@
       if (player.tokens >= count * 10) {
         player.tokens -= count * 10;
         for (let i = 0; i < count; i++) {
-          player.heroes.push({ name: `Hero ${player.heroes.length + 1}`, img: "https://i.imgur.com/Xsqp1Zl.png" });
+          const rarities = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
+          const rarity = rarities[Math.floor(Math.random() * rarities.length)];
+          const hero = heroData[rarity][Math.floor(Math.random() * heroData[rarity].length)];
+          player.heroes.push(hero);
         }
         updateHome();
         updateBoat();
@@ -161,8 +242,31 @@
       }
     }
 
+    function showHeroDetails(index) {
+      const hero = player.heroes[index];
+      document.getElementById('modal-hero-img').src = hero.img;
+      document.getElementById('modal-hero-name').textContent = `${hero.name} (${hero.symbol} ${hero.attribute})`;
+      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${Math.floor(Math.random() * 100) + 50}`;
+      document.getElementById('modal-hero-skill').textContent = `Skill: Special Move`;
+      document.getElementById('modal-hero-earn').textContent = `Farm Rate: ${hero.earnRate} tokens/day`;
+      document.getElementById('modal-overlay').style.display = 'flex';
+    }
+
+    function closeModal() {
+      document.getElementById('modal-overlay').style.display = 'none';
+    }
+
+    function startAutoFarm() {
+      setInterval(() => {
+        const dailyEarn = player.heroes.reduce((sum, hero) => sum + hero.earnRate, 0);
+        player.tokens += dailyEarn;
+        updateHome();
+      }, 86400000); // 1 day in milliseconds
+    }
+
     document.addEventListener('DOMContentLoaded', () => {
       updateHome();
+      startAutoFarm();
     });
   </script>
 </body>
