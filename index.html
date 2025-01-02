@@ -1,217 +1,622 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Idle Fishing P2E - Farm Logic</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background: linear-gradient(to bottom, #a9d6e5, #457b9d);
-            color: #fff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 20px;
-            border-radius: 10px;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-            width: 90%;
-            max-width: 500px;
-            margin-top: 20px;
-        }
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-            color: #f4f4f4;
-        }
-        .header img {
-            width: 150px;
-            height: auto;
-            margin-top: 10px;
-        }
-        .menu {
-            display: flex;
-            justify-content: space-around;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            padding: 10px;
-        }
-        .menu button {
-            background: #2a9d8f;
-            border: none;
-            border-radius: 5px;
-            padding: 10px;
-            font-size: 16px;
-            color: #fff;
-            cursor: pointer;
-        }
-        .menu button:hover {
-            background: #1d3557;
-        }
-        .farmContainer {
-            margin: 20px 0;
-        }
-        .farmHouse {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .farmHouse .info {
-            text-align: left;
-            font-size: 14px;
-        }
-        .farmHouse button {
-            background: #ff9933;
-            border: none;
-            border-radius: 5px;
-            padding: 6px 10px;
-            color: #fff;
-            cursor: pointer;
-        }
-        .farmHouse button:hover {
-            background: #ffa64d;
-        }
-        .notification {
-            position: fixed;
-            top: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0, 0, 0, 0.8);
-            color: #fff;
-            padding: 10px;
-            border-radius: 5px;
-            display: none;
-            z-index: 9999;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <title>Rost & Flame - Telegram Mini Game</title>
+  <style>
+    * { box-sizing: border-box; font-family: sans-serif; }
+    body {
+      margin: 0; padding: 0;
+      background: #fafafa;
+    }
+    header, nav, main, footer {
+      padding: 10px; margin: 10px;
+    }
+    header {
+      background: #f55742; 
+      color: #fff;
+      text-align: center;
+      border-radius: 5px;
+    }
+    nav {
+      text-align: center;
+      margin-top: 0;
+      margin-bottom: 10px;
+    }
+    nav button {
+      margin: 5px;
+      padding: 10px 15px;
+      cursor: pointer;
+      border-radius: 5px;
+      border: none;
+      background: #efefef;
+      font-weight: bold;
+    }
+    .active-tab {
+      background: #c3f0d1;
+    }
+    .hidden { display: none; }
+    .hero-container {
+      display: flex; 
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .hero-card {
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      width: 140px;
+      text-align: center;
+      background: #fff;
+      padding: 5px;
+    }
+    .hero-card img {
+      max-width: 120px;
+      max-height: 120px;
+      border-radius: 5px;
+      margin: 0 auto;
+      display: block;
+    }
+    .hero-card .rarity {
+      font-weight: bold;
+    }
+    .disassemble-btn {
+      display: inline-block;
+      padding: 3px 6px;
+      margin-top: 5px;
+      background: #ffcccc;
+      border: 1px solid #ff8888;
+      color: #333;
+      cursor: pointer;
+      border-radius: 3px;
+      font-size: 12px;
+    }
+    .attribute {
+      font-size: 12px; 
+      color: #666;
+    }
+    .color-common    { color: #AAAAAA; }
+    .color-rare      { color: #54FFFE; }
+    .color-epic      { color: #C66CC5; }
+    .color-legendary { color: #FFA800; }
+    .color-mythic    { color: #FF0000; }
+    #home .summary {
+      margin-top: 15px;
+      font-size: 16px;
+      background: #fff;
+      border: 1px solid #ddd;
+      padding: 10px;
+      border-radius: 5px;
+    }
+    #shop .shop-items button {
+      margin: 5px; 
+      padding: 8px 12px; 
+      border-radius: 5px; 
+      border: none;
+      cursor: pointer;
+      background: #eee;
+    }
+    #quest button {
+      margin: 3px;
+      cursor: pointer;
+    }
+    #wallet button {
+      margin: 5px;
+      cursor: pointer;
+    }
+    footer {
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+    }
+  </style>
 </head>
 <body>
-    <!-- Header -->
-    <div class="header">
-        <h1>Idle Fishing P2E</h1>
-        <p>Welcome, <span id="playerName">Player</span>!</p>
+  <header>
+    <h1>Rost & Flame</h1>
+    <p>The Ultimate Telegram Mini Game</p>
+  </header>
+
+  <nav>
+    <button id="btn-home" class="active-tab">Home</button>
+    <button id="btn-shop">Shop</button>
+    <button id="btn-boat">Boat</button>
+    <button id="btn-quest">Quest</button>
+    <button id="btn-wallet">Wallet</button>
+  </nav>
+
+  <!-- HOME -->
+  <main id="home">
+    <div class="summary">
+      <p id="player-welcome"></p>
+      <p id="player-info"></p>
+      <p id="player-heroes"></p>
     </div>
-
-    <!-- Farm Container -->
-    <div class="container farmContainer">
-        <h3>Your Farm</h3>
-        <div id="farmList"></div>
+    <!-- A simple "canvas" placeholder -->
+    <div style="
+      width: 100%; 
+      height: 150px; 
+      background: url('https://i.imgur.com/f4bELuK.png') center/cover no-repeat;
+      border-radius: 5px;
+      margin-top: 15px;">
+      <!-- This can be your boat placeholder. -->
     </div>
+  </main>
 
-    <!-- Menu -->
-    <div class="menu">
-        <button onclick="collectAllIncome()">Collect All</button>
-        <button onclick="openShop()">Shop</button>
-        <button onclick="openWallet()">Wallet</button>
+  <!-- SHOP -->
+  <main id="shop" class="hidden">
+    <h2>Shop - Buy Chests</h2>
+    <p>Exchange your RFM tokens for chests. Each chest grants a random Hero with certain rarity.</p>
+    <div class="shop-items">
+      <button onclick="buyChests(10)">Buy 10 Chests</button>
+      <button onclick="buyChests(20)">Buy 20 Chests</button>
+      <button onclick="buyChests(100)">Buy 100 Chests</button>
+      <button onclick="buyChests(200)">Buy 200 Chests</button>
     </div>
+    <p id="shop-msg" style="margin-top:10px; font-weight:bold;"></p>
+  </main>
 
-    <!-- Notification -->
-    <div class="notification" id="notification"></div>
+  <!-- BOAT -->
+  <main id="boat" class="hidden">
+    <h2>Your Boat</h2>
+    <p>Manage your active heroes and warehouse.</p>
+    
+    <h3>Active Heroes (max 20)</h3>
+    <div id="boat-active-heroes" class="hero-container"></div>
+    
+    <h3>Warehouse</h3>
+    <div id="boat-warehouse-heroes" class="hero-container"></div>
 
-    <script>
-        // Mock Data
-        let player = {
-            name: "FishingMaster",
-            balance: 100,
-            farm: [
-                { name: "Tiny House", income: 0.1, level: 1, collected: 0 },
-                { name: "Medium House", income: 0.5, level: 1, collected: 0 },
-                { name: "Large House", income: 1, level: 1, collected: 0 },
-            ],
-        };
+  </main>
 
-        // Update Player Name
-        document.getElementById("playerName").innerText = player.name;
+  <!-- QUEST -->
+  <main id="quest" class="hidden">
+    <h2>Daily Quests & Referrals</h2>
+    <div id="quest-list"></div>
+    <hr/>
+    <p><strong>Referrals:</strong></p>
+    <p>You have <span id="referral-pending"></span> RFM pending from referrals.</p>
+    <button onclick="withdrawReferral()">Withdraw Referral Reward</button>
+  </main>
 
-        // Render Farm
-        function renderFarm() {
-            const farmList = document.getElementById("farmList");
-            farmList.innerHTML = "";
-            player.farm.forEach((house, index) => {
-                const houseDiv = document.createElement("div");
-                houseDiv.className = "farmHouse";
-                houseDiv.innerHTML = `
-                    <div class="info">
-                        <strong>${house.name}</strong> (Level ${house.level})<br>
-                        Income: ${house.income} TON/sec<br>
-                        Collected: ${house.collected.toFixed(2)} TON
-                    </div>
-                    <div>
-                        <button onclick="collectIncome(${index})">Collect</button>
-                        <button onclick="upgradeHouse(${index})">Upgrade</button>
-                    </div>
-                `;
-                farmList.appendChild(houseDiv);
-            });
+  <!-- WALLET -->
+  <main id="wallet" class="hidden">
+    <h2>Wallet</h2>
+    <p>Manage your RFM balance and integrate with TON coin payment.</p>
+    <p>RFM Balance: <span id="wallet-balance"></span></p>
+    <button onclick="connectTON()">Connect TON Wallet (Mock)</button>
+    <button onclick="withdrawRFM()">Withdraw (to TON) - Mock</button>
+    <button onclick="swapRFM()">Swap RFM -> TON (Mock)</button>
+    <p style="margin-top: 10px;">
+      <!-- We can show some placeholder info about TON -->
+      <em>Note: Real TON integration requires TON Connect or custom API.</em>
+    </p>
+  </main>
+
+  <footer>
+    <p>&copy; 2023 Rost & Flame</p>
+  </footer>
+
+  <script>
+  /************************************************************
+   * ALL GAME LOGIC IN ONE HTML FILE
+   ************************************************************/
+  // For a real Telegram Mini App, you can use
+  // const tg = window.Telegram.WebApp;
+  // tg.expand();
+  // Then handle data with tg.sendData(), etc.
+  // Here we just do a normal JavaScript + localStorage approach.
+
+  // =============== Data & Structures ===============
+  // Keep user data in localStorage
+  // Format: { userId, userName, rfmTokens, heroesEquipment, heroesWarehouse, questsCompleted, referrals }
+
+  let currentUser = null;
+
+  // Hardcode random user ID for local test (in real Telegram, you get from ctx.from.id).
+  const LOCAL_USER_ID = 'demoUser_123'; 
+  const LOCAL_USER_NAME = 'DemoPlayer';
+
+  const defaultUserData = {
+    userId: LOCAL_USER_ID,
+    userName: LOCAL_USER_NAME,
+    rfmTokens: 1000,
+    heroesEquipment: [],
+    heroesWarehouse: [],
+    questsCompleted: [],
+    referrals: {
+      invitedUsers: [],
+      pendingReward: 0
+    }
+  };
+
+  // Rarities & Probability
+  const rarityRates = [
+    { rarity: 'Common',    rate: 55 },
+    { rarity: 'Rare',      rate: 25 },
+    { rarity: 'Epic',      rate: 12 },
+    { rarity: 'Legendary', rate: 6  },
+    { rarity: 'Mythic',    rate: 2  },
+  ];
+
+  // Rarity Color Class
+  function getRarityClass(rarity) {
+    switch(rarity) {
+      case 'Common':    return 'color-common';
+      case 'Rare':      return 'color-rare';
+      case 'Epic':      return 'color-epic';
+      case 'Legendary': return 'color-legendary';
+      case 'Mythic':    return 'color-mythic';
+    }
+    return '';
+  }
+
+  // For each rarity, store an array of heroes (name, image)
+  const allHeroesList = {
+    'Common': [
+      { name: 'Fisher Bob',   image: 'https://i.imgur.com/wY0nzE9.png' },
+      { name: 'Crab Catcher', image: 'https://i.imgur.com/Iy1X8r1.png' },
+      { name: 'Net Master',   image: 'https://i.imgur.com/81Ypu1S.png' },
+      { name: 'Old Man Jang', image: 'https://i.imgur.com/XMUx21e.png' },
+      { name: 'Rookie Roy',   image: 'https://i.imgur.com/eVNSFSH.png' },
+      { name: 'Hook Herman',  image: 'https://i.imgur.com/hjZPOpf.png' },
+      { name: 'Spear Sally',  image: 'https://i.imgur.com/TvssIKL.png' },
+      { name: 'Rod Ricky',    image: 'https://i.imgur.com/9soOAZz.png' },
+      { name: 'Bait Brad',    image: 'https://i.imgur.com/ZRG9eiQ.png' },
+      { name: 'Anchor Anne',  image: 'https://i.imgur.com/aOV5P1e.png' },
+    ],
+    'Rare': [
+      { name: 'River Ronin',     image: 'https://i.imgur.com/3l9MKIl.png' },
+      { name: 'Mermaid Mia',     image: 'https://i.imgur.com/cSy6okk.png' },
+      { name: 'Turtle Tuner',    image: 'https://i.imgur.com/QRJyOyp.png' },
+      { name: 'Clam Collector',  image: 'https://i.imgur.com/NK8EQm1.png' },
+      { name: 'Jelly Jill',      image: 'https://i.imgur.com/Aa396uh.png' },
+      { name: 'Pearl Prince',    image: 'https://i.imgur.com/aUTGKeg.png' },
+      { name: 'Wave Warrioress', image: 'https://i.imgur.com/H65ycJW.png' },
+      { name: 'Foam Fencer',     image: 'https://i.imgur.com/TcSRW3O.png' },
+      { name: 'Surf Samurai',    image: 'https://i.imgur.com/Juwfrcz.png' },
+      { name: 'Shell Shooter',   image: 'https://i.imgur.com/8rZaJYc.png' },
+    ],
+    'Epic': [
+      { name: 'Coral Commander', image: 'https://i.imgur.com/02jTwGp.png' },
+      { name: 'Storm Summoner',  image: 'https://i.imgur.com/JOCwUzy.png' },
+      { name: 'Deep Diver',      image: 'https://i.imgur.com/wr71ePx.png' },
+      { name: 'Aqua Archer',     image: 'https://i.imgur.com/OXjxfTK.png' },
+      { name: 'Kraken Knight',   image: 'https://i.imgur.com/PqCgXay.png' },
+      { name: 'Hydro Hurler',    image: 'https://i.imgur.com/wxAAFkK.png' },
+      { name: 'Gale Guardian',   image: 'https://i.imgur.com/EB7WHnW.png' },
+      { name: 'Tidal Titan',     image: 'https://i.imgur.com/EmWFXPq.png' },
+      { name: 'Maelstrom Mage',  image: 'https://i.imgur.com/mnMCDvt.png' },
+      { name: 'Reef Ranger',     image: 'https://i.imgur.com/QkkGPnK.png' },
+    ],
+    'Legendary': [
+      { name: 'Poseidon’s Heir',  image: 'https://i.imgur.com/23DhlYC.png' },
+      { name: 'Orca Overlord',    image: 'https://i.imgur.com/Rhu6apu.png' },
+      { name: 'Lighthouse Lord',  image: 'https://i.imgur.com/OCaOjCv.png' },
+      { name: 'Seismic Sailor',   image: 'https://i.imgur.com/SXQMxBI.png' },
+      { name: 'Aurora Amazon',    image: 'https://i.imgur.com/5HE6crv.png' },
+      { name: 'Lava Leviathan',   image: 'https://i.imgur.com/NKvEj0j.png' },
+      { name: 'Thunder Triton',   image: 'https://i.imgur.com/6sHJI0I.png' },
+      { name: 'Volcano Valkyrie', image: 'https://i.imgur.com/qhSP9PR.png' },
+      { name: 'Sunken Sentinel',  image: 'https://i.imgur.com/uqiRB2H.png' },
+      { name: 'Twilight Templar', image: 'https://i.imgur.com/NnVOlP8.png' },
+    ],
+    'Mythic': [
+      { name: 'Eternal Eel',       image: 'https://i.imgur.com/tFzK3iu.png' },
+      { name: 'Dragon Diver',      image: 'https://i.imgur.com/ujlhSVK.png' },
+      { name: 'Celestial Caster',  image: 'https://i.imgur.com/1K8xEcc.png' },
+      { name: 'Phoenix Piercer',   image: 'https://i.imgur.com/EokU1JU.png' },
+      { name: 'World-Shaper',      image: 'https://i.imgur.com/Qg9MLyO.png' },
+      { name: 'Arcane Albatross',  image: 'https://i.imgur.com/Xsqp1Zl.png' },
+      { name: 'Godly Golem',       image: 'https://i.imgur.com/YeDYlBO.png' },
+      { name: 'Time Tornado',      image: 'https://i.imgur.com/h8LyWQG.png' },
+      { name: 'Infinity Impaler',  image: 'https://i.imgur.com/u2hcKvV.png' },
+      { name: 'Universe Unleashed',image: 'https://i.imgur.com/WWF50XS.png' },
+    ]
+  };
+
+  const attributes = ['Fire','Water','Wind','Earth','Electric'];
+
+  // =============== Utility Functions ===============
+  function saveUserData() {
+    localStorage.setItem('RostFlameUser', JSON.stringify(currentUser));
+  }
+
+  function loadUserData() {
+    const stored = localStorage.getItem('RostFlameUser');
+    if(stored) {
+      return JSON.parse(stored);
+    }
+    return null;
+  }
+
+  // Generate a random hero
+  function getRandomRarity() {
+    let roll = Math.random() * 100;
+    let sum = 0;
+    for (let r of rarityRates) {
+      sum += r.rate;
+      if (roll < sum) return r.rarity;
+    }
+    return 'Common';
+  }
+
+  function createRandomHero() {
+    const rarity = getRandomRarity();
+    const heroesOfThatRarity = allHeroesList[rarity];
+    const rndIndex = Math.floor(Math.random() * heroesOfThatRarity.length);
+    const base = heroesOfThatRarity[rndIndex];
+
+    // random damage 10-100
+    const dmg = Math.floor(Math.random() * 91) + 10; 
+    const attr = attributes[Math.floor(Math.random()*attributes.length)];
+
+    return {
+      id: 'hero_' + Math.random().toString(36).substr(2),
+      name: base.name,
+      image: base.image,
+      rarity,
+      damage: dmg,
+      attribute: attr
+    };
+  }
+
+  function createRandomHeroes(count) {
+    let arr = [];
+    for (let i=0; i<count; i++) {
+      arr.push(createRandomHero());
+    }
+    return arr;
+  }
+
+  // Format hero card HTML
+  function heroCardHTML(hero, location) {
+    // location = 'equipment' or 'warehouse'
+    const rClass = getRarityClass(hero.rarity);
+    return `
+      <div class="hero-card">
+        <img src="${hero.image}" alt="${hero.name}" />
+        <div class="rarity ${rClass}">${hero.rarity}</div>
+        <div style="font-weight:bold;">${hero.name}</div>
+        <div>DMG: ${hero.damage}</div>
+        <div class="attribute">Attribute: ${hero.attribute}</div>
+        <div class="disassemble-btn" onclick="disassembleHero('${hero.id}')">Disassemble</div>
+      </div>
+    `;
+  }
+
+  // =============== Main Tabs ===============
+  const tabs = ['home','shop','boat','quest','wallet'];
+  function showTab(tabId) {
+    tabs.forEach(t => {
+      document.getElementById(t).classList.add('hidden');
+      document.getElementById('btn-'+t).classList.remove('active-tab');
+    });
+    document.getElementById(tabId).classList.remove('hidden');
+    document.getElementById('btn-'+tabId).classList.add('active-tab');
+    if(tabId === 'home') refreshHome();
+    if(tabId === 'shop') refreshShop();
+    if(tabId === 'boat') refreshBoat();
+    if(tabId === 'quest') refreshQuest();
+    if(tabId === 'wallet') refreshWallet();
+  }
+
+  // =============== Home Page ===============
+  function refreshHome() {
+    const welcomeEl = document.getElementById('player-welcome');
+    const infoEl = document.getElementById('player-info');
+    const heroesEl = document.getElementById('player-heroes');
+
+    welcomeEl.innerHTML = `Welcome <strong>${currentUser.userName}</strong>!`;
+    infoEl.innerHTML = `You have <strong>${currentUser.rfmTokens}</strong> RFM tokens.`;
+
+    const totalHeroes = currentUser.heroesEquipment.length + currentUser.heroesWarehouse.length;
+    heroesEl.innerHTML = `You currently own <strong>${totalHeroes}</strong> heroes.`;
+  }
+
+  // =============== Shop Page ===============
+  function refreshShop() {
+    document.getElementById('shop-msg').innerHTML = '';
+  }
+  function buyChests(num) {
+    // Price example: 1 chest = 2 RFM => num * 2
+    // You can adjust cost as you like
+    const cost = num * 2;
+    if(currentUser.rfmTokens < cost) {
+      document.getElementById('shop-msg').innerHTML = `Not enough RFM. You need ${cost}.`;
+      return;
+    }
+    currentUser.rfmTokens -= cost;
+    // create heroes
+    const newHeroes = createRandomHeroes(num);
+    newHeroes.forEach(hero => {
+      if(currentUser.heroesEquipment.length < 20) {
+        currentUser.heroesEquipment.push(hero);
+      } else {
+        currentUser.heroesWarehouse.push(hero);
+      }
+    });
+    saveUserData();
+    document.getElementById('shop-msg').innerHTML = 
+      `You bought ${num} chests for ${cost} RFM!<br/>
+       You obtained ${newHeroes.length} heroes.<br/>
+       Current RFM: ${currentUser.rfmTokens}`;
+  }
+
+  // =============== Boat Page ===============
+  function refreshBoat() {
+    // Active heroes
+    const activeDiv = document.getElementById('boat-active-heroes');
+    const whDiv = document.getElementById('boat-warehouse-heroes');
+
+    if(currentUser.heroesEquipment.length === 0) {
+      activeDiv.innerHTML = `<p>No active heroes.</p>`;
+    } else {
+      activeDiv.innerHTML = currentUser.heroesEquipment.map(h => heroCardHTML(h, 'equipment')).join('');
+    }
+
+    if(currentUser.heroesWarehouse.length === 0) {
+      whDiv.innerHTML = `<p>Warehouse empty.</p>`;
+    } else {
+      whDiv.innerHTML = currentUser.heroesWarehouse.map(h => heroCardHTML(h, 'warehouse')).join('');
+    }
+  }
+  // Disassemble hero => get reward
+  function disassembleHero(heroId) {
+    let found = null;
+    let from = null;
+    for(let i=0; i<currentUser.heroesEquipment.length; i++){
+      if(currentUser.heroesEquipment[i].id === heroId){
+        found = currentUser.heroesEquipment[i];
+        from = 'equipment';
+        currentUser.heroesEquipment.splice(i,1);
+        break;
+      }
+    }
+    if(!found) {
+      for(let i=0; i<currentUser.heroesWarehouse.length; i++){
+        if(currentUser.heroesWarehouse[i].id === heroId){
+          found = currentUser.heroesWarehouse[i];
+          from = 'warehouse';
+          currentUser.heroesWarehouse.splice(i,1);
+          break;
         }
+      }
+    }
+    if(!found) {
+      alert('Hero not found!');
+      return;
+    }
+    // reward example: hero.damage / 2
+    const reward = Math.floor(found.damage/2);
+    currentUser.rfmTokens += reward;
+    saveUserData();
+    alert(`Disassembled '${found.name}' and earned ${reward} RFM!`);
+    refreshBoat();
+  }
 
-        // Collect Income
-        function collectIncome(index) {
-            const house = player.farm[index];
-            player.balance += house.collected;
-            house.collected = 0;
-            showNotification(`Collected ${house.collected.toFixed(2)} TON from ${house.name}`);
-            renderFarm();
-        }
+  // =============== Quest Page ===============
+  function refreshQuest() {
+    // let's define 3 sample daily quests
+    const dailyQuests = [
+      { id: 'follow_group',   desc: 'Follow Rost & Flame Group',   reward: 10 },
+      { id: 'vote_like',      desc: 'Give us a Like',              reward: 5  },
+      { id: 'connect_wallet', desc: 'Connect your TON Wallet',     reward: 15 }
+    ];
+    const questListEl = document.getElementById('quest-list');
+    questListEl.innerHTML = '';
 
-        // Collect All Income
-        function collectAllIncome() {
-            player.farm.forEach((house) => {
-                player.balance += house.collected;
-                house.collected = 0;
-            });
-            showNotification("Collected all income!");
-            renderFarm();
-        }
+    dailyQuests.forEach(q => {
+      const isDone = currentUser.questsCompleted.includes(q.id);
+      const btnLabel = isDone ? 'Completed' : `Claim +${q.reward} RFM`;
+      const disabled = isDone ? 'disabled' : '';
+      questListEl.innerHTML += `
+        <p>
+          <strong>${q.desc}</strong><br/>
+          <button onclick="finishQuest('${q.id}')" ${disabled}>${btnLabel}</button>
+        </p>
+      `;
+    });
 
-        // Upgrade House
-        function upgradeHouse(index) {
-            const house = player.farm[index];
-            const upgradeCost = house.level * 10;
-            if (player.balance >= upgradeCost) {
-                player.balance -= upgradeCost;
-                house.level++;
-                house.income += house.level * 0.1; // Increase income per upgrade
-                showNotification(`Upgraded ${house.name} to Level ${house.level}`);
-                renderFarm();
-            } else {
-                showNotification("Not enough balance to upgrade!");
-            }
-        }
+    document.getElementById('referral-pending').innerText = currentUser.referrals.pendingReward;
+  }
 
-        // Notification
-        function showNotification(message) {
-            const notification = document.getElementById("notification");
-            notification.innerText = message;
-            notification.style.display = "block";
-            setTimeout(() => {
-                notification.style.display = "none";
-            }, 2000);
-        }
+  function finishQuest(qid) {
+    const dailyQuests = {
+      'follow_group': 10,
+      'vote_like': 5,
+      'connect_wallet': 15
+    };
+    if(!dailyQuests[qid]) {
+      alert('Quest not found');
+      return;
+    }
+    if(currentUser.questsCompleted.includes(qid)) {
+      alert('You already completed this quest!');
+      return;
+    }
+    currentUser.questsCompleted.push(qid);
+    currentUser.rfmTokens += dailyQuests[qid];
+    saveUserData();
+    alert(`You gained ${dailyQuests[qid]} RFM!`);
+    refreshQuest();
+  }
 
-        // Simulate Income
-        setInterval(() => {
-            player.farm.forEach((house) => {
-                house.collected += house.income;
-            });
-            renderFarm();
-        }, 1000);
+  function withdrawReferral() {
+    const amt = currentUser.referrals.pendingReward || 0;
+    if(amt <= 0) {
+      alert('No referral reward to withdraw.');
+      return;
+    }
+    currentUser.rfmTokens += amt;
+    currentUser.referrals.pendingReward = 0;
+    saveUserData();
+    alert(`Withdrawn ${amt} RFM to your in-game balance!`);
+    refreshQuest();
+  }
 
-        // Initialize
-        renderFarm();
-    </script>
+  // =============== Wallet Page ===============
+  function refreshWallet() {
+    document.getElementById('wallet-balance').innerText = currentUser.rfmTokens;
+  }
+
+  function connectTON() {
+    // TODO: integrate actual TON Connect
+    // e.g. https://github.com/ton-blockchain/ton-connect
+    alert('TON Wallet connected (mock).');
+  }
+
+  function withdrawRFM() {
+    // In real scenario: call TON API to send RFM => TON. 
+    // Or a bridge to handle your token on chain.
+    // For demo, we just set RFM=0
+    if(currentUser.rfmTokens < 1) {
+      alert('Not enough RFM to withdraw!');
+      return;
+    }
+    const amt = currentUser.rfmTokens;
+    currentUser.rfmTokens = 0;
+    saveUserData();
+    alert(`Withdrew ${amt} RFM to TON (mock).`);
+    refreshWallet();
+  }
+
+  function swapRFM() {
+    // Example: 1 RFM => 0.001 TON
+    if(currentUser.rfmTokens < 1) {
+      alert('Not enough RFM to swap!');
+      return;
+    }
+    const amt = currentUser.rfmTokens;
+    currentUser.rfmTokens = 0;
+    saveUserData();
+    const tonAmount = amt * 0.001;
+    alert(`Swapped ${amt} RFM => ${tonAmount} TON (mock).`);
+    refreshWallet();
+  }
+
+  // =============== Init ===============
+  function init() {
+    // Load user from localStorage or create default
+    const stored = loadUserData();
+    if(stored) {
+      currentUser = stored;
+    } else {
+      currentUser = JSON.parse(JSON.stringify(defaultUserData));
+      saveUserData();
+    }
+
+    // Setup tab listeners
+    document.getElementById('btn-home').addEventListener('click', () => showTab('home'));
+    document.getElementById('btn-shop').addEventListener('click', () => showTab('shop'));
+    document.getElementById('btn-boat').addEventListener('click', () => showTab('boat'));
+    document.getElementById('btn-quest').addEventListener('click', () => showTab('quest'));
+    document.getElementById('btn-wallet').addEventListener('click', () => showTab('wallet'));
+
+    // Show home by default
+    showTab('home');
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  </script>
 </body>
 </html>
