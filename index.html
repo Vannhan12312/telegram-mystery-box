@@ -513,4 +513,46 @@
   document.addEventListener("DOMContentLoaded", () => {
     updateHeroList();
   });
-</script>
+</script>      referralCode.value)
+      .then(() => alert("Referral code copied to clipboard!"))
+      .catch(() => alert("Failed to copy referral code."));
+    }
+
+    function shareOnTelegram() {
+      const referralLink = document.getElementById("referral-code").value;
+      const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(
+        referralLink
+      )}&text=Join%20COST%20%26%20FLAME%20and%20earn%20TON%20rewards!`;
+      window.open(telegramUrl, "_blank");
+    }
+
+    function startFarming() {
+      if (player.isFarming) {
+        alert("Farming is already in progress!");
+        return;
+      }
+      player.isFarming = true;
+      alert("Farming started! Heroes are earning TON tokens.");
+      setTimeout(() => {
+        player.tokens += 50;
+        player.isFarming = false;
+        alert("Farming completed! You earned 50 TON tokens.");
+        updateHeroList();
+      }, 10000);
+    }
+
+    function toggleSound() {
+      alert("Sound toggled!");
+    }
+
+    function changeTheme() {
+      alert("Theme changed!");
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+      updateHeroList();
+    });
+  </script>
+</body>
+</html>
+
