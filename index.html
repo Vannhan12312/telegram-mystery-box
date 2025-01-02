@@ -276,6 +276,37 @@
       return 'Common';
     }
 
+    function autoUpgradeHeroes() {
+      const grouped = {};
+      player.heroes.forEach((hero, index) => {
+        const key = `${hero.name}-lv${hero.level}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(index);
+      });
+
+      for (const key in grouped) {
+        const indices = grouped[key];
+        while (indices.length >= 2) {
+          const index1 = indices.pop();
+          const index2 = indices.pop();
+
+          const hero1 = player.heroes[index1];
+          const hero2 = player.heroes[index2];
+
+          const upgradedHero = {
+            ...hero1,
+            level: hero1.level + 1,
+            damage: Math.floor(hero1.damage * (hero1.level === 1 ? 1.5 : hero1.level === 2 ? 1.75 : 2)),
+            speed: Math.floor(hero1.speed * 1.2)
+          };
+
+          player.heroes.splice(index1, 1);
+          player.heroes.splice(index2, 1);
+          player.heroes.push(upgradedHero);
+        }
+      }
+    }
+
     function showHeroDetails(index) {
       const hero = player.heroes[index];
       document.getElementById('modal-hero-img').src = hero.img;
