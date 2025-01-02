@@ -2,214 +2,266 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>MyP2E - Hero Management</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Idle Fishing Game</title>
   <style>
-    body {
+    * {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #def2f1;
-      color: #333;
+      padding: 0;
+      box-sizing: border-box;
     }
 
-    /* Header */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f4f4;
+      color: #333;
+      overflow: hidden;
+    }
+
     header {
-      background: #0097e6;
+      background: #4caf50;
       color: white;
       padding: 10px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      font-size: 16px;
     }
 
-    header div {
-      margin: 0 10px;
-    }
-
-    /* Navigation Bar */
-    nav {
-      position: fixed;
-      bottom: 0;
-      width: 100%;
-      background: #f5f6fa;
+    #app {
       display: flex;
-      justify-content: space-around;
-      padding: 10px 0;
-      border-top: 1px solid #dcdde1;
+      flex-direction: column;
+      height: calc(100vh - 100px);
     }
 
-    nav button {
-      background: none;
-      border: none;
-      font-size: 14px;
-      color: #2f3640;
-      text-align: center;
+    #contentArea {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 10px;
+      background: #ffffff;
+      border-top: 1px solid #ccc;
     }
 
-    nav button img {
-      width: 32px;
-      height: 32px;
-      display: block;
-      margin: 0 auto 5px;
-    }
-
-    .content {
-      padding: 20px;
-      padding-bottom: 80px; /* Avoid overlap with navigation bar */
-    }
-
-    .section {
+    .tabPage {
       display: none;
     }
 
-    .section.active {
+    .tabPage.active {
       display: block;
     }
 
-    /* Wallet Section */
-    .wallet-info {
-      margin-top: 20px;
+    .heroCard, .shopCard {
+      display: flex;
+      align-items: center;
       padding: 10px;
-      background: #e1f5fe;
-      border: 1px solid #b3e5fc;
-      border-radius: 5px;
+      margin: 10px 0;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fdfdfd;
     }
 
-    .wallet-info h3 {
-      margin: 0;
+    .heroCard img, .shopCard img {
+      width: 60px;
+      height: 60px;
+      border-radius: 8px;
+      margin-right: 10px;
     }
 
-    .btn {
-      background-color: #0097e6;
+    .heroDetails, .shopDetails {
+      flex-grow: 1;
+    }
+
+    .heroActions, .shopActions button {
+      margin-left: 10px;
+      padding: 5px 10px;
+      background: #4caf50;
       color: white;
       border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
+      border-radius: 4px;
       cursor: pointer;
-      margin-top: 10px;
     }
 
-    .btn:hover {
-      background-color: #007bb5;
+    .heroActions button:hover, .shopActions button:hover {
+      background: #388e3c;
     }
 
-    /* Task List */
-    ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    ul li {
-      margin: 10px 0;
-      padding: 10px;
-      background: #f1f2f6;
-      border: 1px solid #dcdde1;
-      border-radius: 5px;
+    #footerTabs {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
+      justify-content: space-around;
+      background: #4caf50;
+      color: white;
+      padding: 10px 0;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+    }
+
+    #footerTabs button {
+      background: none;
+      border: none;
+      color: white;
+      font-size: 14px;
+      text-align: center;
+      cursor: pointer;
+    }
+
+    #footerTabs button img {
+      width: 28px;
+      height: 28px;
+      display: block;
+      margin: 0 auto;
     }
   </style>
 </head>
 <body>
   <header>
-    <div>Balance: <span id="balance">982,092</span></div>
-    <div>Speed: <span id="speed">810,133/day</span></div>
+    <div>Balance: <span id="balance">100.00</span> TON</div>
+    <div>Player: HouseMaster</div>
   </header>
 
-  <main class="content">
-    <!-- Home Section -->
-    <div id="home" class="section active">
-      <h2>Home</h2>
-      <p>Welcome to the game! Start collecting resources now!</p>
-    </div>
+  <div id="app">
+    <div id="contentArea">
+      <!-- Hero Management -->
+      <div id="tabHero" class="tabPage active">
+        <h2>Hero Management</h2>
+        <div id="heroList"></div>
+      </div>
 
-    <!-- Wallet Section -->
-    <div id="wallet" class="section">
-      <h2>Wallet</h2>
-      <div class="wallet-info">
-        <h3>Balance:</h3>
-        <p>982,092 FishUP</p>
-        <button class="btn" onclick="withdraw()">Withdraw</button>
-        <button class="btn" onclick="swap()">Swap</button>
+      <!-- Shop -->
+      <div id="tabShop" class="tabPage">
+        <h2>Shop</h2>
+        <h3>Houses</h3>
+        <div id="shopHouseList"></div>
+        <h3>Buy Boxes</h3>
+        <button onclick="buyBox()">Buy Box (2 TON)</button>
+        <div id="boxResults" style="margin-top: 20px;"></div>
       </div>
     </div>
 
-    <!-- Quest Section -->
-    <div id="quest" class="section">
-      <h2>Quest</h2>
-      <ul>
-        <li>
-          Vote 'Like' to support FISHUP
-          <button class="btn" onclick="claimReward(this)">Claim</button>
-        </li>
-        <li>
-          Follow Idle Fishing Group
-          <button class="btn" onclick="claimReward(this)">Claim</button>
-        </li>
-        <li>
-          Connect Wallet
-          <button class="btn" onclick="claimReward(this)">Claim</button>
-        </li>
-      </ul>
+    <div id="footerTabs">
+      <button onclick="navigate('tabHero')">
+        <img src="https://via.placeholder.com/28/4caf50?text=Hero" alt="Hero">
+        Heroes
+      </button>
+      <button onclick="navigate('tabShop')">
+        <img src="https://via.placeholder.com/28/4caf50?text=Shop" alt="Shop">
+        Shop
+      </button>
     </div>
-
-    <!-- Boat Section -->
-    <div id="boat" class="section">
-      <h2>Boat</h2>
-      <p>Manage your boats and equipment here.</p>
-    </div>
-
-    <!-- Shop Section -->
-    <div id="shop" class="section">
-      <h2>Shop</h2>
-      <p>Buy items and upgrades here.</p>
-    </div>
-  </main>
-
-  <nav>
-    <button onclick="navigate('home')">
-      <img src="home-icon.png" alt="Home">
-      Home
-    </button>
-    <button onclick="navigate('wallet')">
-      <img src="wallet-icon.png" alt="Wallet">
-      Wallet
-    </button>
-    <button onclick="navigate('quest')">
-      <img src="quest-icon.png" alt="Quest">
-      Quest
-    </button>
-    <button onclick="navigate('boat')">
-      <img src="boat-icon.png" alt="Boat">
-      Boat
-    </button>
-    <button onclick="navigate('shop')">
-      <img src="shop-icon.png" alt="Shop">
-      Shop
-    </button>
-  </nav>
+  </div>
 
   <script>
-    function navigate(section) {
-      document.querySelectorAll('.section').forEach((sec) => sec.classList.remove('active'));
-      document.getElementById(section).classList.add('active');
+    // Navigation
+    function navigate(tabId) {
+      document.querySelectorAll('.tabPage').forEach(tab => tab.classList.remove('active'));
+      document.getElementById(tabId).classList.add('active');
     }
 
-    function withdraw() {
-      alert('Withdraw requested!');
+    // Hero Data
+    const heroData = [
+      { name: "SlimeKid", rarity: "Common", img: "https://i.imgur.com/wY0nzE9.png", stats: { atk: 3, def: 1, hp: 10 }, element: "🌱" },
+      { name: "FireCrab", rarity: "Rare", img: "https://i.imgur.com/3l9MKIl.png", stats: { atk: 5, def: 3, hp: 15 }, element: "🔥" },
+      { name: "SharkWar", rarity: "Epic", img: "https://i.imgur.com/02jTwGp.png", stats: { atk: 8, def: 5, hp: 25 }, element: "💧" },
+      { name: "InfernoCrab", rarity: "Legendary", img: "https://i.imgur.com/23DhlYC.png", stats: { atk: 12, def: 7, hp: 40 }, element: "🔥" },
+      { name: "ElderDragon", rarity: "Mythic", img: "https://i.imgur.com/tFzK3iu.png", stats: { atk: 18, def: 10, hp: 60 }, element: "🌟" }
+    ];
+
+    // House Data
+    const houseData = [
+      { name: "Tiny House", img: "https://i.imgur.com/lT8vtE6.png", cost: 20, rent: 2 },
+      { name: "Medium House", img: "https://i.imgur.com/NEhWHbW.png", cost: 50, rent: 5 },
+      { name: "Luxury Villa", img: "https://i.imgur.com/lLJ7gXk.png", cost: 100, rent: 10 }
+    ];
+
+    // Render Hero List
+    function renderHeroList() {
+      const container = document.getElementById("heroList");
+      container.innerHTML = "";
+
+      heroData.forEach(hero => {
+        const heroCard = document.createElement("div");
+        heroCard.classList.add("heroCard");
+
+        const heroImg = document.createElement("img");
+        heroImg.src = hero.img;
+        heroCard.appendChild(heroImg);
+
+        const heroDetails = document.createElement("div");
+        heroDetails.classList.add("heroDetails");
+        heroDetails.innerHTML = `
+          <div><strong>${hero.name}</strong> <span class="heroRarity">(${hero.rarity})</span></div>
+          <div class="heroStats">⚔ ATK: ${hero.stats.atk}, 🛡 DEF: ${hero.stats.def}, ❤ HP: ${hero.stats.hp}</div>
+          <div>Element: ${hero.element}</div>
+        `;
+        heroCard.appendChild(heroDetails);
+
+        const heroActions = document.createElement("div");
+        heroActions.classList.add("heroActions");
+        const selectBtn = document.createElement("button");
+        selectBtn.textContent = "Select";
+        selectBtn.onclick = () => alert(`Selected Hero: ${hero.name}`);
+        heroActions.appendChild(selectBtn);
+
+        heroCard.appendChild(heroActions);
+
+        container.appendChild(heroCard);
+      });
     }
 
-    function swap() {
-      alert('Swap initiated!');
+    // Render Houses in Shop
+    function renderShopHouses() {
+      const container = document.getElementById("shopHouseList");
+      container.innerHTML = "";
+
+      houseData.forEach(house => {
+        const shopCard = document.createElement("div");
+        shopCard.classList.add("shopCard");
+
+        const shopImg = document.createElement("img");
+        shopImg.src = house.img;
+        shopCard.appendChild(shopImg);
+
+        const shopDetails = document.createElement("div");
+        shopDetails.classList.add("shopDetails");
+        shopDetails.innerHTML = `
+          <div><strong>${house.name}</strong></div>
+          <div>Cost: ${house.cost} TON, Rent: ${house.rent} TON/day</div>
+        `;
+        shopCard.appendChild(shopDetails);
+
+        const shopActions = document.createElement("div");
+        shopActions.classList.add("shopActions");
+        const buyBtn = document.createElement("button");
+        buyBtn.textContent = "Buy";
+        buyBtn.onclick = () => alert(`Bought ${house.name}`);
+        shopActions.appendChild(buyBtn);
+
+        shopCard.appendChild(shopActions);
+
+        container.appendChild(shopCard);
+      });
     }
 
-    function claimReward(button) {
-      button.innerText = 'Claimed';
-      button.disabled = true;
-      alert('Reward claimed!');
+    // Buy Box
+    function buyBox() {
+      const randomHero = heroData[Math.floor(Math.random() * heroData.length)];
+      const container = document.getElementById("boxResults");
+      container.innerHTML = `
+        <h4>You got:</h4>
+        <div class="heroCard">
+          <img src="${randomHero.img}" alt="${randomHero.name}">
+          <div>
+            <strong>${randomHero.name}</strong> (${randomHero.rarity})
+            <div>⚔ ATK: ${randomHero.stats.atk}, 🛡 DEF: ${randomHero.stats.def}, ❤ HP: ${randomHero.stats.hp}</div>
+          </div>
+        </div>
+      `;
     }
+
+    // Initialize
+    document.addEventListener("DOMContentLoaded", () => {
+      renderHeroList();
+      renderShopHouses();
+    });
   </script>
 </body>
 </html>
