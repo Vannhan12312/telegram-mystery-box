@@ -326,7 +326,7 @@
   <div id="modal-overlay">
     <div id="modal-content">
       <img id="modal-hero-img" src="" alt="Hero" 
-           onerror="this.src='https://via.placeholder.com/50/ddd/000?text=No+Image';" />
+           onerror="this.src='https://via.placeholder.com/50/ddd/000?text=No+Img';" />
       <p id="modal-hero-name" style="font-weight:bold; margin-bottom:4px;"></p>
       <p id="modal-hero-rarity" style="margin-bottom:4px;"></p>
       <p id="modal-hero-skill" style="margin-bottom:4px;"></p>
@@ -391,12 +391,12 @@
     Fire: "🔥",
     Water: "💧",
     Wind: "🍃",
-    Earth: "🪨",
+    Earth: "🌎",  // đổi 🪨 -> 🌎
     Electric: "⚡"
   };
   const attributeList = ["Fire","Water","Wind","Earth","Electric"];
 
-  // Skill list (để random)
+  // Skill list
   const skillList = [
     "🎯 Fire Blast",
     "🎯 Water Surge",
@@ -406,6 +406,14 @@
     "🎯 Flaming Arrow",
     "🎯 Tsunami Wave"
   ];
+
+  /********************************************************
+   *  NÂNG CẤP HERO KHI TRÙNG: level, baseDamage
+   *  actualDamage = baseDamage + (level-1)*5
+   ********************************************************/
+  // Hero = { id, name, image, rarity, skill, baseDamage, level, speed, pin, attribute }
+  // Lần đầu => level=1
+  // Mở hero trùng (same name + same attribute) => hero cũ level++ => discard hero mới
 
   // Hero data
   const allHeroesList = {
@@ -481,30 +489,26 @@
     return null;
   }
 
-  // Hero creation
-  function getRandomRarity() {
-    let roll = Math.random() * 100;
-    let sum = 0;
-    for (let r of rarityRates) {
-      sum += r.rate;
-      if (roll < sum) return r.rarity;
-    }
-    return 'Common';
+  // Mô phỏng damage = baseDamage + (level-1)*5
+  function getActualDamage(hero) {
+    return hero.baseDamage + (hero.level-1)*5;
   }
+
+  // Tạo hero
   function createRandomHero() {
     const rarity = getRandomRarity();
     const arr = allHeroesList[rarity];
     const base = arr[Math.floor(Math.random() * arr.length)];
 
-    // Random skill
+    // skill
     const skill = skillList[Math.floor(Math.random()*skillList.length)];
-    // Random damage 10..100
-    const dmg = Math.floor(Math.random()*91)+10; 
-    // Random speed 1..20
+    // baseDamage
+    const bDmg = Math.floor(Math.random()*91)+10; 
+    // speed
     const spd = Math.floor(Math.random()*20)+1;
-    // Random pin 50..200
+    // pin
     const pinVal = Math.floor(Math.random()*151)+50;
-    // Random attribute
+    // attribute
     const att = attributeList[Math.floor(Math.random()*attributeList.length)];
 
     return {
@@ -513,18 +517,43 @@
       image: base.image,
       rarity,
       skill,
-      damage: dmg,
+      baseDamage: bDmg,
+      level: 1,
       speed: spd,
       pin: pinVal,
       attribute: att
     };
   }
+
+  // Tạo N hero
   function createRandomHeroes(count) {
     let out = [];
     for(let i=0; i<count; i++){
       out.push(createRandomHero());
     }
     return out;
+  }
+
+  // Tìm hero trùng (same name + same attribute)
+  // => nâng cấp hero cũ (level++), discard hero mới
+  function tryMergeDuplicate(newHero) {
+    // Kiểm tra trong Equipment
+    let exist = currentUser.heroesEquipment.find(h => 
+      h.name===newHero.name && h.attribute===newHero.attribute
+    );
+    if(exist) {
+      exist.level++;
+      return true; // merged
+    }
+    // Nếu ko thấy => kiểm tra Warehouse
+    let exist2 = currentUser.heroesWarehouse.find(h => 
+      h.name===newHero.name && h.attribute===newHero.attribute
+    );
+    if(exist2) {
+      exist2.level++;
+      return true; // merged
+    }
+    return false;
   }
 
   // Tabs
@@ -568,17 +597,24 @@
     }
     currentUser.rfmTokens -= cost;
     let newHeroes = createRandomHeroes(num);
+
     newHeroes.forEach(h=>{
-      if(currentUser.heroesEquipment.length<20) {
-        currentUser.heroesEquipment.push(h);
-      } else {
-        currentUser.heroesWarehouse.push(h);
+      // Thử merge hero trùng
+      let merged = tryMergeDuplicate(h);
+      if(!merged) {
+        // nếu ko trùng => add hero mới
+        if(currentUser.heroesEquipment.length<20) {
+          currentUser.heroesEquipment.push(h);
+        } else {
+          currentUser.heroesWarehouse.push(h);
+        }
       }
     });
+
     saveUserData();
     document.getElementById('shop-msg').innerHTML =
       `You bought ${num} chests for ${cost} RFM.<br/>
-       Gained ${num} heroes.<br/>
+       Gained ${num} heroes (some may have merged).<br/>
        Remaining RFM: ${currentUser.rfmTokens}.`;
   }
 
@@ -609,11 +645,15 @@
     }
     let convBtn = `<div class="disassemble-btn" onclick="confirmConvert('${h.id}');event.stopPropagation();">Convert</div>`;
 
+    // Hiển thị level?
+    // Gợi ý: "Lv2" => user biết hero đang level mấy
+    let levelTag = (h.level>1) ? ` (Lv${h.level})` : '';
+
     return `
     <div class="hero-card" onclick="showHeroDetail('${h.id}')">
       <img src="${h.image}" 
            onerror="this.src='https://via.placeholder.com/45/ddd/000?text=No+Img';" />
-      <div class="hero-rarity ${rclass}">${h.rarity}</div>
+      <div class="hero-rarity ${rclass}">${h.rarity}${levelTag}</div>
       <div class="hero-name">${h.name}</div>
       <div class="btn-row">
         ${actBtn}
@@ -677,7 +717,8 @@
       alert('Hero not found');
       return;
     }
-    let reward = Math.floor(found.damage/2);
+    let dmg = getActualDamage(found); // baseDamage + (level-1)*5
+    let reward = Math.floor(dmg / 2);
     currentUser.rfmTokens += reward;
     saveUserData();
     alert(`Converted "${found.name}" => +${reward} RFM.`);
@@ -691,7 +732,8 @@
     if(!confirm("Convert ALL heroes in warehouse to RFM?")) return;
     let total = 0;
     currentUser.heroesWarehouse.forEach(h=>{
-      total += Math.floor(h.damage/2);
+      let dmg = getActualDamage(h);
+      total += Math.floor(dmg/2);
     });
     currentUser.heroesWarehouse = [];
     currentUser.rfmTokens += total;
@@ -707,9 +749,12 @@
     document.getElementById('modal-hero-img').src = hero.image || 'https://via.placeholder.com/50/ddd/000?text=No+Img';
     document.getElementById('modal-hero-name').innerText = hero.name;
     document.getElementById('modal-hero-rarity').innerHTML =
-      `<span class="${getRarityClass(hero.rarity)}">${hero.rarity}</span>`;
+      `<span class="${getRarityClass(hero.rarity)}">${hero.rarity} Lv${hero.level}</span>`;
     document.getElementById('modal-hero-skill').innerHTML = hero.skill ? hero.skill : '🎯 ???';
-    document.getElementById('modal-hero-damage').innerHTML = `🗡: ${hero.damage ?? '??'}`;
+
+    // Tính damage thực
+    let actualDmg = getActualDamage(hero);
+    document.getElementById('modal-hero-damage').innerHTML = `🗡: ${actualDmg}`;
     document.getElementById('modal-hero-speed').innerHTML = `💨: ${hero.speed ?? '??'}`;
     document.getElementById('modal-hero-pin').innerHTML = `📌: ${hero.pin ?? '??'}`;
     let symbol = attributeSymbols[hero.attribute] || '';
