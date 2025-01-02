@@ -2,879 +2,257 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Rost & Flame - PvP & Boss Raid Extended (Compact Nav)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- OPTIONAL: Google Font -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&display=swap">
-
+  <title>COST & FLAME - P2E Game</title>
   <style>
-    /* BASE RESET & FONT */
     * {
       box-sizing: border-box;
-      margin: 0; 
+      margin: 0;
       padding: 0;
-      font-family: 'Nunito', sans-serif;
-    }
-    html, body {
-      width: 100%; 
-      height: 100%; 
-      background: linear-gradient(130deg, #ffc9e8 0%, #cdfce8 100%);
-      overflow: auto;
-      color: #333;
-    }
-    header {
-      text-align: center; 
-      padding: 14px; 
-      background: linear-gradient(90deg, #ff8552, #ffbe70);
-      color: #fff;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      border-bottom-left-radius: 10px;
-      border-bottom-right-radius: 10px;
-    }
-    header h1 {
-      font-size: 20px; 
-      font-weight: 700; 
-      margin-bottom: 4px;
-    }
-    header p {
-      font-size: 14px; 
-      opacity: 0.9;
+      font-family: Arial, sans-serif;
     }
 
-    /* NEW NAV: 3 MAIN BUTTONS + 1 "MORE" */
-    nav {
-      display: flex; 
-      justify-content: center;
-      align-items: center;
-      gap: 6px;
-      background: #fff; 
-      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      border-bottom: 1px solid #eee;
-      border-top: 1px solid #eee;
-      padding: 8px;
-      flex-wrap: wrap;
-    }
-    nav .nav-btn {
-      background: transparent; 
-      border: none; 
-      cursor: pointer; 
-      font-weight: 600; 
-      padding: 8px 12px;
-      color: #555;
-      transition: 0.2s;
-    }
-    nav .nav-btn:hover {
-      background: #f9f9f9;
-    }
-    nav .active-tab {
-      background: #c1f2dd;
-      color: #333;
-    }
-
-    /* "MORE" DROPDOWN */
-    .dropdown {
-      position: relative;
-      display: inline-block;
-    }
-    .dropdown-content {
-      display: none;
-      position: absolute;
-      top: 42px; /* push below button */
-      right: 0;
-      background: #fff;
-      min-width: 130px;
-      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      border-radius: 6px;
+    body {
+      background: #0e0e0e;
+      color: #f1f1f1;
+      font-size: 14px;
       overflow: hidden;
-      z-index: 999;
-    }
-    .dropdown-content button {
       width: 100%;
-      padding: 8px 10px;
-      background: transparent;
-      border: none;
-      text-align: left;
-      font-weight: 600;
-      color: #555;
-      cursor: pointer;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
-    .dropdown-content button:hover {
-      background: #f9f9f9;
+
+    nav {
+      display: flex;
+      justify-content: space-around;
+      background: #292929;
+      padding: 5px 0;
+      overflow-x: auto;
+    }
+
+    nav button {
+      border: none;
+      padding: 5px;
+      background: #1a1a1a;
+      color: #f1f1f1;
+      cursor: pointer;
+      border-radius: 5px;
+      font-size: 12px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+
+    nav button:hover {
+      background: #3e3e3e;
+    }
+
+    nav .active-tab {
+      background: #00cc66;
+      color: #fff;
     }
 
     main {
-      display: none; 
+      display: none;
+      flex-grow: 1;
       padding: 10px;
-      animation: fadeIn 0.3s ease;
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow-y: auto;
     }
+
     main.active {
       display: block;
     }
-    @keyframes fadeIn {
-      from {opacity:0;}
-      to {opacity:1;}
-    }
 
-    .btn {
-      display: inline-block;
-      background: #ff8b2b; 
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 6px 10px;
-      font-size: 14px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: 0.2s;
-      margin: 2px 0;
-    }
-    .btn:hover {
-      background: #ff6f00; 
-      transform: translateY(-1px);
-    }
-
-    .info-box {
-      background: #fff; 
-      border: 1px solid #ddd; 
-      border-radius: 8px;
-      padding: 8px; 
-      margin-top: 10px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .info-box h4 {
-      margin-bottom: 4px; 
-      font-size: 14px; 
-      color: #444;
-    }
-    .info-box p {
-      font-size: 13px; 
-      margin-bottom: 6px; 
-      line-height: 1.4;
-    }
-
-    /* Hero Container => 5 wide => narrower for Telegram mini */
     .hero-container {
-      display: grid; 
-      grid-template-columns: repeat(5, 1fr);
-      gap: 6px; 
-      justify-items: center;
-      margin-top: 6px;
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+      gap: 10px;
+      padding: 10px;
     }
+
     .hero-card {
-      width: 60px; 
-      height: 90px;
-      background: #fff; 
-      border: 1px solid #ddd; 
-      border-radius: 8px;
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      justify-content: flex-start;
-      cursor: pointer; 
-      padding: 3px; 
-      overflow: hidden;
-      transition: 0.2s;
-    }
-    .hero-card:hover {
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transform: translateY(-2px);
-    }
-    .hero-card img {
-      width: 40px; 
-      height: 40px;
-      object-fit: cover; 
-      border-radius: 6px;
-    }
-    .hero-card p {
-      font-size: 10px; 
-      margin: 2px 0; 
-      text-align: center; 
-      overflow: hidden; 
-      white-space: nowrap; 
-      text-overflow: ellipsis; 
-      max-width: 100%;
-    }
-
-    .color-common    { color: #999; }
-    .color-rare      { color: #54FFFE; }
-    .color-epic      { color: #C66CC5; }
-    .color-legendary { color: #FFA800; }
-    .color-mythic    { color: #FF0000; }
-
-    #modal-overlay {
-      position: fixed; 
-      top: 0; 
-      left: 0; 
-      right: 0; 
-      bottom: 0;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center; 
-      align-items: center;
-      z-index: 9999;
-    }
-    #modal-content {
-      background: #fff; 
-      padding: 12px; 
-      border-radius: 10px; 
-      width: 240px; 
-      position: relative; 
+      background: #292929;
+      border: 1px solid #444;
+      border-radius: 5px;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-      animation: popIn 0.3s ease;
+      padding: 10px;
+      transition: transform 0.3s;
+      cursor: pointer;
     }
-    @keyframes popIn {
-      0% { transform: scale(0.8); opacity: 0; }
-      100% { transform: scale(1); opacity: 1; }
+
+    .hero-card:hover {
+      transform: translateY(-5px);
     }
-    #modal-close {
-      position: absolute; 
-      top: 6px; 
-      right: 6px;
-      background: #ddd;
+
+    .hero-card img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    .hero-card p {
+      margin: 0;
+      font-size: 12px;
+      color: #fff;
+    }
+
+    .wallet {
+      text-align: center;
+      padding: 10px;
+      background: #292929;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .wallet img {
+      width: 20px;
+      vertical-align: middle;
+    }
+
+    .farm-section {
+      text-align: center;
+      padding: 10px;
+      background: #292929;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+
+    .farm-section button {
+      padding: 10px;
+      background: #00cc66;
       border: none;
-      border-radius: 4px;
-      cursor: pointer; 
-      padding: 2px 5px;
+      border-radius: 5px;
+      color: #fff;
       font-weight: bold;
-    }
-    #modal-hero-img {
-      width: 60px; 
-      height: 60px; 
-      object-fit: cover; 
-      border-radius: 6px; 
-      margin-bottom: 6px;
+      cursor: pointer;
     }
 
-    footer {
-      text-align: center; 
-      padding: 6px;
-      background: #fff0f5;
-      font-size: 13px;
-      border-top: 1px solid #eee;
-      margin-top: 10px;
-    }
-
-    .guild-box, .house-box {
-      background: #fff; 
-      border: 1px solid #ddd; 
-      border-radius: 8px; 
-      padding: 8px; 
-      margin: 6px 0; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .guild-box h4, .house-box h4 {
-      margin-bottom: 4px; 
-      font-size: 14px; 
-      color: #444;
-    }
-    .guild-box button, .house-box button {
-      margin-top: 4px;
-    }
-
-    .arena-container, .raid-container {
-      margin-top: 10px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      padding: 8px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    }
-    .arena-container button, .raid-container button {
-      margin: 4px; 
-      padding: 6px 10px; 
-      border: none; 
-      border-radius: 6px; 
-      background: #ff0088; 
-      color: #fff; 
-      cursor: pointer; 
-      transition: 0.2s; 
-      font-weight: bold;
-    }
-    .arena-container button:hover, .raid-container button:hover {
-      background: #cc0070;
-    }
-    .leaderboard {
-      margin-top: 8px; 
-      padding: 6px; 
-      background: #fafafa; 
-      border: 1px solid #eee; 
-      border-radius: 6px;
+    .farm-section button:hover {
+      background: #00994d;
     }
   </style>
 </head>
-
 <body>
-  <header>
-    <h1>Rost & Flame</h1>
-    <p>PvP & Boss Raid Extended</p>
-  </header>
-
-  <!-- NEW NAV with 3 main + "More" dropdown -->
   <nav>
-    <button class="nav-btn active-tab" id="btnHome" onclick="switchTab('home')">Home</button>
-    <button class="nav-btn" id="btnShop" onclick="switchTab('shop')">Shop</button>
-    <button class="nav-btn" id="btnWallet" onclick="switchTab('wallet')">Wallet</button>
-    
-    <!-- The "More" menu for extra tabs -->
-    <div class="dropdown">
-      <button class="nav-btn" onclick="toggleDropdown()">More ▼</button>
-      <div class="dropdown-content" id="moreMenu">
-        <button onclick="switchTab('hero'); hideDropdown()">Hero</button>
-        <button onclick="switchTab('arena'); hideDropdown()">Arena</button>
-        <button onclick="switchTab('guild'); hideDropdown()">Guild</button>
-        <button onclick="switchTab('house'); hideDropdown()">House</button>
-        <button onclick="switchTab('raid'); hideDropdown()">Raid</button>
-        <button onclick="switchTab('quest'); hideDropdown()">Quest</button>
-      </div>
-    </div>
+    <button class="active-tab" onclick="switchTab('home')">Home</button>
+    <button onclick="switchTab('shop')">Shop</button>
+    <button onclick="switchTab('heroes')">Heroes</button>
+    <button onclick="switchTab('wallet')">Wallet</button>
+    <button onclick="switchTab('more')">More</button>
   </nav>
 
-  <!-- HOME -->
   <main id="home" class="active">
-    <div class="info-box">
-      <h4>Welcome to Rost & Flame</h4>
-      <p>Now with Arena (PvP) & Boss Raid (PvE)!<br>Enjoy building your empire!</p>
-      <p id="player-info"></p>
-      <button class="btn" onclick="addTokens(50)">Get +50 tokens</button>
-    </div>
+    <h2>Welcome to COST & FLAME</h2>
   </main>
 
-  <!-- SHOP -->
   <main id="shop">
-    <h3>Shop</h3>
-    <div class="info-box">
-      <p>Each chest costs 10 tokens. Random hero from 50 heroes.<br>(Auto-merge duplicates)</p>
-      <button class="btn" onclick="buyChest(1)">Buy 1 Chest</button>
-      <button class="btn" onclick="buyChest(5)">Buy 5 Chest</button>
-      <button class="btn" onclick="buyChest(10)">Buy 10 Chest</button>
-      <p id="shop-message" style="margin-top:6px;color:#f33;font-size:13px;"></p>
-    </div>
+    <h2>Shop</h2>
+    <p>Buy hero packs to grow your collection.</p>
+    <button onclick="buyChest(1)">Buy 1 Pack</button>
+    <button onclick="buyChest(5)">Buy 5 Packs</button>
   </main>
 
-  <!-- HERO -->
-  <main id="hero">
-    <h3>Your Heroes</h3>
+  <main id="heroes">
+    <h2>Your Heroes</h2>
     <div class="hero-container" id="hero-list"></div>
   </main>
 
-  <!-- ARENA (PVP) -->
-  <main id="arena">
-    <h3>Arena - PvP</h3>
-    <div class="arena-container">
-      <p>Form a 3-hero Team => fight => if Win => +10 tokens, else 0.</p>
-      <button onclick="arenaFight()">Arena Fight</button>
-      <div class="leaderboard" id="arena-board">
-        <h4>Leaderboard</h4>
-        <p id="arena-rank"></p>
-      </div>
-    </div>
-  </main>
-
-  <!-- GUILD -->
-  <main id="guild">
-    <h3>Guild Section</h3>
-    <div class="guild-box" id="guild-info"></div>
-  </main>
-
-  <!-- HOUSE -->
-  <main id="house">
-    <h3>House Management</h3>
-    <div id="house-area"></div>
-  </main>
-
-  <!-- RAID (BOSS) -->
-  <main id="raid">
-    <h3>Boss Raid</h3>
-    <div class="raid-container">
-      <p>Pay 5 tokens => Attack Boss (HP 300). If HP<=0 => +50 tokens.</p>
-      <button onclick="doRaid()">Raid Boss</button>
-      <p id="raid-status" style="margin-top:6px;color:#f33;"></p>
-    </div>
-  </main>
-
-  <!-- QUEST -->
-  <main id="quest">
-    <h3>Quests</h3>
-    <div id="quest-list"></div>
-  </main>
-
-  <!-- WALLET -->
   <main id="wallet">
-    <h3>TON Wallet</h3>
-    <p>Address: <span id="wallet-address">-</span></p>
-    <p>Balance: <span id="wallet-balance">0</span> TON</p>
-    <button class="btn" onclick="connectTON()">Connect</button>
-    <button class="btn" onclick="disconnectTON()">Disconnect</button>
-    <hr>
-    <p>In-Game Tokens: <span id="game-tokens"></span></p>
-    <button class="btn" onclick="withdrawTokens()">Withdraw to TON</button>
+    <h2>Wallet</h2>
+    <div class="wallet">
+      <p><img src="https://cryptologos.cc/logos/ton-crystal-ton-logo.png" alt="TON" /> Tokens: <span id="wallet-tokens">100</span></p>
+      <button onclick="withdrawTokens()">Withdraw Tokens</button>
+    </div>
+    <div class="farm-section">
+      <h3>Farm TON</h3>
+      <p>Earn tokens by farming with your heroes.</p>
+      <button onclick="startFarming()">Start Farming</button>
+    </div>
   </main>
 
-  <!-- MODAL: hero info -->
-  <div id="modal-overlay">
-    <div id="modal-content">
-      <button id="modal-close" onclick="closeModal()">X</button>
-      <img id="modal-hero-img" src="" alt="Hero">
-      <p id="modal-hero-name" style="font-weight:bold;"></p>
-      <p id="modal-hero-rarity"></p>
-      <p id="modal-hero-attr"></p>
-      <p id="modal-hero-stats"></p>
-      <p id="modal-hero-level"></p>
-      <p id="modal-hero-skill"></p>
-    </div>
-  </div>
+  <main id="more">
+    <h2>More Options</h2>
+    <button onclick="switchTab('quests')">Quests</button>
+    <button onclick="switchTab('leaderboard')">Leaderboard</button>
+    <button onclick="switchTab('marketplace')">Marketplace</button>
+    <button onclick="switchTab('pvp')">PvP</button>
+  </main>
 
-  <footer>
-    &copy; 2023 Rost & Flame - PvP & Boss Raid Extended (Compact Nav)
-  </footer>
+  <script>
+    const player = {
+      tokens: 100,
+      heroes: [],
+    };
 
-<script>
-/************************************************************
- * Toggle "More" menu
- ************************************************************/
-function toggleDropdown(){
-  let menu=document.getElementById('moreMenu');
-  menu.style.display=(menu.style.display==='block'?'none':'block');
-}
-function hideDropdown(){
-  let menu=document.getElementById('moreMenu');
-  menu.style.display='none';
-}
+    const allHeroData = [
+      { name: "SlimeKid", rarity: "Common", img: "https://i.imgur.com/wY0nzE9.png", level: 1 },
+      { name: "FireCrab", rarity: "Rare", img: "https://i.imgur.com/3l9MKIl.png", level: 1 },
+      { name: "WaterShield", rarity: "Epic", img: "https://i.imgur.com/H65ycJW.png", level: 1 }
+    ];
 
-/************************************************************
- * 1. Player Data + Quests + Simple Guild + Houses + Arena
- ************************************************************/
-const player = {
-  tokens:100,
-  heroes:[],
-  guild:null,
-  houses:[],
-  quests:[
-    {id:1, name:"Reach 5 Heroes", completed:false, reward:20},
-    {id:2, name:"Merge 1 Hero to Lv2", completed:false, reward:30},
-  ],
-  arenaPoints:0, // for rank
-};
-
-let bossHP=300;
-
-/* House data, guild logic... (reuse from previous code) */
-const houseTypes=[
-  {type:"Tiny", cost:20, rent:3, level:1, maxLevel:3},
-  {type:"Pen", cost:50, rent:8, level:1, maxLevel:3},
-  {type:"Villa", cost:100, rent:15, level:1, maxLevel:3},
-];
-
-/************************************************************
- * 2. TABS
- ************************************************************/
-function switchTab(tabId){
-  document.querySelectorAll('main').forEach(m=>m.classList.remove('active'));
-  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active-tab'));
-  document.getElementById(tabId).classList.add('active');
-  // if user clicked "Home" => highlight #btnHome, etc., or if from "More"
-  if(tabId==='home') document.getElementById('btnHome').classList.add('active-tab');
-  if(tabId==='shop') document.getElementById('btnShop').classList.add('active-tab');
-  if(tabId==='wallet') document.getElementById('btnWallet').classList.add('active-tab');
-  
-  if(tabId==='home') updateHome();
-  if(tabId==='hero') renderHeroes();
-  if(tabId==='quest') renderQuests();
-  if(tabId==='wallet') updateWallet();
-  if(tabId==='guild') renderGuild();
-  if(tabId==='house') renderHouse();
-  if(tabId==='arena') renderArena();
-  hideDropdown();
-}
-
-/************************************************************
- * 3. HOME
- ************************************************************/
-function updateHome(){
-  document.getElementById('player-info').textContent=`Tokens: ${player.tokens}`;
-  document.getElementById('game-tokens').textContent= player.tokens;
-}
-
-/************************************************************
- * 4. WALLET - TON
- ************************************************************/
-let tonAddress=null;
-let tonBalance=3.0;
-function connectTON(){
-  tonAddress="EQ_pvpraid_ton_123";
-  alert("TON connected!");
-  updateWallet();
-}
-function disconnectTON(){
-  tonAddress=null;
-  alert("TON disconnected!");
-  updateWallet();
-}
-function updateWallet(){
-  document.getElementById('wallet-address').textContent= tonAddress? tonAddress : "-";
-  document.getElementById('wallet-balance').textContent= tonBalance.toFixed(2);
-  document.getElementById('game-tokens').textContent= player.tokens;
-}
-function withdrawTokens(){
-  if(!tonAddress){
-    alert("No TON wallet connected!");
-    return;
-  }
-  if(player.tokens<50){
-    alert("Need 50 tokens => +1 TON!");
-    return;
-  }
-  player.tokens-=50;
-  tonBalance+=1;
-  alert("Withdrew 50 tokens => +1 TON!");
-  updateHome();
-  updateWallet();
-}
-
-/************************************************************
- * 5. SHOP
- ************************************************************/
-const rarityChances=[
-  {rarity:"Common",    chance:40},
-  {rarity:"Rare",      chance:30},
-  {rarity:"Epic",      chance:15},
-  {rarity:"Legendary", chance:10},
-  {rarity:"Mythic",    chance:5},
-];
-function buyChest(count){
-  let cost= 10*count;
-  if(player.tokens<cost){
-    document.getElementById('shop-message').textContent="Not enough tokens!";
-    return;
-  }
-  player.tokens-=cost;
-  for(let i=0; i<count; i++){
-    let rar = getRandomRarity();
-    let pool = allHeroes.filter(h=>h.rarity===rar);
-    if(pool.length>0){
-      let idx=Math.floor(Math.random()*pool.length);
-      let newH={...pool[idx]};
-      player.heroes.push(newH);
+    function switchTab(tabId) {
+      document.querySelectorAll("main").forEach(tab => tab.classList.remove("active"));
+      document.querySelector(`#${tabId}`).classList.add("active");
     }
-  }
-  autoMerge();
-  updateHome();
-  renderHeroes();
-  document.getElementById('shop-message').textContent=`Bought ${count} chest(s). (Auto merged)`;
-}
-function getRandomRarity(){
-  let roll=Math.random()*100, accum=0;
-  for(let rc of rarityChances){
-    accum+=rc.chance;
-    if(roll<accum) return rc.rarity;
-  }
-  return "Common";
-}
 
-/************************************************************
- * 6. HEROES + auto-merge
- ************************************************************/
-/* This "allHeroes" array should contain the full 50 heroes 
-   you used earlier, with their 'rarity', 'img', 'damage', etc.
-   For brevity, let's place fewer here. You can expand. */
-const allHeroes = [
-  {name:"Crab Catcher",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",attribute:"Water",symbol:"💧",damage:50,speed:10,level:1},
-  {name:"Rookie Roy",rarity:"Common",img:"https://i.imgur.com/eVNSFSH.png",attribute:"Fire",symbol:"🔥",damage:55,speed:12,level:1},
-  {name:"Mermaid Mia",rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png",attribute:"Water",symbol:"💧",damage:60,speed:14,level:1},
-  {name:"River Ronin",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png",attribute:"Wind",symbol:"🍃",damage:65,speed:15,level:1},
-  {name:"Storm Summoner",rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png",attribute:"Earth",symbol:"🌎",damage:70,speed:17,level:1},
-  {name:"Poseidon’s Heir",rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png",attribute:"Water",symbol:"💧",damage:80,speed:18,level:1},
-  {name:"Eternal Eel",rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png",attribute:"Electric",symbol:"⚡",damage:100,speed:20,level:1},
-  // ... Bổ sung nốt 50 hero ...
-];
-
-function autoMerge(){
-  let map={};
-  player.heroes.forEach((h,i)=>{
-    let lv=h.level||1;
-    let key=`${h.name}_${h.rarity}_Lv${lv}`;
-    if(!map[key]) map[key]=[];
-    map[key].push(i);
-  });
-  for(let k in map){
-    let arr=map[k];
-    while(arr.length>=2){
-      let i1=arr.pop();
-      let i2=arr.pop();
-      let max=Math.max(i1,i2), min=Math.min(i1,i2);
-      let base=player.heroes[min];
-      player.heroes.splice(max,1);
-      player.heroes.splice(min,1);
-      let merged={...base};
-      merged.level=(merged.level||1)+1;
-      // +50% damage if <=5
-      if(merged.level<=5){
-        merged.damage=Math.floor(merged.damage * 1.5);
+    function buyChest(count) {
+      const cost = 10 * count;
+      if (player.tokens < cost) {
+        alert("Not enough tokens!");
+        return;
       }
-      player.heroes.push(merged);
+      player.tokens -= cost;
+      for (let i = 0; i < count; i++) {
+        const newHero = { ...allHeroData[Math.floor(Math.random() * allHeroData.length)] };
+        mergeHero(newHero);
+      }
+      updateHeroList();
+      updateWallet();
     }
-  }
-  // quest #2 => if have hero lv2
-  let haveLv2=player.heroes.some(h=> (h.level||1)>=2);
-  if(haveLv2){
-    let q=player.quests.find(x=>x.id===2);
-    if(q && !q.completed){
-      q.completed=true;
-      player.tokens+=q.reward;
-      updateHome();
-      alert(`Quest done: Merge hero to level 2 => +${q.reward} tokens!`);
+
+    function mergeHero(newHero) {
+      const existingHero = player.heroes.find(hero => hero.name === newHero.name && hero.level === newHero.level);
+      if (existingHero) {
+        existingHero.level += 1;
+      } else {
+        player.heroes.push(newHero);
+      }
     }
-  }
-}
-function renderHeroes(){
-  // quest #1 => if heroes >=5 => done
-  if(player.heroes.length>=5){
-    let q=player.quests.find(x=>x.id===1);
-    if(q && !q.completed){
-      q.completed=true;
-      player.tokens+=q.reward;
-      updateHome();
-      alert(`Quest done: 5 heroes => +${q.reward} tokens!`);
+
+    function updateHeroList() {
+      const heroList = document.getElementById("hero-list");
+      if (player.heroes.length === 0) {
+        heroList.innerHTML = "<p>No heroes yet. Buy packs to get heroes!</p>";
+        return;
+      }
+      heroList.innerHTML = player.heroes.map(hero => `
+        <div class="hero-card" onclick="showHeroDetails('${hero.name}')">
+          <img src="${hero.img}" alt="${hero.name}">
+          <p>${hero.name}</p>
+          <p>Lv${hero.level}</p>
+        </div>
+      `).join("");
     }
-  }
-  let c=document.getElementById('hero-list');
-  c.innerHTML= player.heroes.map((h,idx)=>{
-    let rarClass=`color-${h.rarity.toLowerCase()}`;
-    let lv=h.level||1;
-    return `
-      <div class="hero-card" onclick="showHeroModal(${idx})">
-        <img src="${h.img}" alt="${h.name}">
-        <p class="${rarClass}">${h.name}</p>
-        <p>Lv${lv}</p>
-      </div>
-    `;
-  }).join('');
-}
-function showHeroModal(idx){
-  let h=player.heroes[idx];
-  let lv=h.level||1;
-  let colorClass=`color-${h.rarity.toLowerCase()}`;
-  document.getElementById('modal-hero-img').src=h.img;
-  document.getElementById('modal-hero-name').textContent=h.name;
-  document.getElementById('modal-hero-rarity').innerHTML=`<span class="${colorClass}">${h.rarity}</span>`;
-  document.getElementById('modal-hero-attr').textContent=`${h.symbol||""} ${h.attribute||""}`;
-  document.getElementById('modal-hero-stats').textContent=`⚔${h.damage} | 🏃${h.speed}`;
-  document.getElementById('modal-hero-level').textContent=`Level: ${lv}`;
-  document.getElementById('modal-hero-skill').textContent=`Skill: ??? (demo)`;
-  document.getElementById('modal-overlay').style.display='flex';
-}
-function closeModal(){
-  document.getElementById('modal-overlay').style.display='none';
-}
 
-/************************************************************
- * 7. QUESTS
- ************************************************************/
-function renderQuests(){
-  let qList=document.getElementById('quest-list');
-  qList.innerHTML= player.quests.map(q=>{
-    return `
-      <div class="info-box" style="margin-bottom:6px;">
-        <h4>${q.name}</h4>
-        <p>Reward: ${q.reward} tokens</p>
-        <p>Status: ${q.completed ? '✅ Done' : 'In progress...'}</p>
-      </div>
-    `;
-  }).join('');
-}
+    function updateWallet() {
+      document.getElementById("wallet-tokens").textContent = player.tokens;
+    }
 
-/************************************************************
- * 8. GUILD
- ************************************************************/
-function renderGuild(){
-  let gDiv=document.getElementById('guild-info');
-  if(!player.guild){
-    gDiv.innerHTML=`
-      <h4>No Guild</h4>
-      <p>Create a guild for 20 tokens, or join existing (demo logic).</p>
-      <button class="btn" onclick="createGuild()">Create Guild</button>
-    `;
-  } else {
-    gDiv.innerHTML=`
-      <h4>Guild: ${player.guild.name}</h4>
-      <p>Members: ${player.guild.members?.length||1}</p>
-      <button class="btn" onclick="guildHireHero()">Hire Hero from Guild</button>
-      <button class="btn" onclick="guildQuest()">Guild Quest</button>
-    `;
-  }
-}
-function createGuild(){
-  if(player.tokens<20){
-    alert("Not enough tokens to create guild (need 20)!");
-    return;
-  }
-  player.tokens-=20;
-  player.guild={name:"MyGuild",members:[]}; 
-  alert("Guild created: MyGuild");
-  updateHome(); 
-  renderGuild();
-}
-function guildHireHero(){
-  alert("Demo => 'hire' hero from guild => cost tokens, etc.");
-}
-function guildQuest(){
-  alert("Demo => guild mission => get 30 tokens!");
-  player.tokens+=30;
-  updateHome();
-}
+    function withdrawTokens() {
+      alert("Withdraw feature coming soon!");
+    }
 
-/************************************************************
- * 9. HOUSE
- ************************************************************/
-function renderHouse(){
-  let hArea=document.getElementById('house-area');
-  let html= houseTypes.map((ht,idx)=>{
-    return `
-      <div class="house-box">
-        <h4>${ht.type} House</h4>
-        <p>Cost: ${ht.cost} | Rent: ${ht.rent} / day</p>
-        <button class="btn" onclick="buyHouse('${ht.type}')">Buy</button>
-      </div>
-    `;
-  }).join('');
-  let ownedHtml=player.houses.map((hs,i)=>{
-    return `
-      <div class="house-box">
-        <h4>${hs.type} House (Lv ${hs.level||1})</h4>
-        <p>Rent: ${hs.rent} / day</p>
-        <button class="btn" onclick="collectRent(${i})">Collect Rent</button>
-        <button class="btn" onclick="upgradeHouse(${i})">Upgrade</button>
-      </div>
-    `;
-  }).join('');
-  hArea.innerHTML=`
-    <div class="info-box">
-      <h4>Buy House</h4>
-      ${html}
-    </div>
-    <div class="info-box">
-      <h4>Your Houses</h4>
-      ${ownedHtml||"<p>No houses yet.</p>"}
-    </div>
-  `;
-}
-function buyHouse(type){
-  let ht=houseTypes.find(x=>x.type===type);
-  if(!ht) return;
-  if(player.tokens<ht.cost){
-    alert("Not enough tokens!");
-    return;
-  }
-  player.tokens-=ht.cost;
-  player.houses.push({...ht});
-  alert(`Bought ${type} House!`);
-  updateHome();
-  renderHouse();
-}
-function collectRent(i){
-  if(!player.houses[i])return;
-  player.tokens+=player.houses[i].rent;
-  alert(`Collected +${player.houses[i].rent} tokens from ${player.houses[i].type} House!`);
-  updateHome();
-}
-function upgradeHouse(i){
-  let hh=player.houses[i];
-  if(!hh)return;
-  let lv=hh.level||1;
-  if(lv>=hh.maxLevel){
-    alert("Already max level!");
-    return;
-  }
-  let costUp=Math.floor(hh.cost*(lv+1)/2);
-  if(player.tokens<costUp){
-    alert(`Need ${costUp} tokens to upgrade!`);
-    return;
-  }
-  player.tokens-=costUp;
-  lv++;
-  hh.level=lv;
-  hh.rent=Math.floor(hh.rent+ (hh.rent*0.5));
-  alert(`${hh.type} House => Lv${lv}, rent => ${hh.rent}`);
-  updateHome();
-  renderHouse();
-}
+    function startFarming() {
+      alert("Farming started! Feature under development.");
+    }
 
-/************************************************************
- * 10. ARENA (PvP)
- ************************************************************/
-function renderArena(){
-  let rankDiv=document.getElementById('arena-rank');
-  rankDiv.textContent=`Your Arena Points: ${player.arenaPoints}`;
-}
-function arenaFight(){
-  if(player.heroes.length<3){
-    alert("Need at least 3 heroes to form a team!");
-    return;
-  }
-  // Demo fight logic: random win 50%
-  let r=Math.random();
-  if(r<0.5){
-    alert("You Lost... 0 tokens");
-  } else {
-    alert("You Won! +10 tokens, +2 ArenaPoints");
-    player.tokens+=10;
-    player.arenaPoints+=2;
-    updateHome();
-    renderArena();
-  }
-}
-
-/************************************************************
- * 11. RAID (Boss)
- ************************************************************/
-function doRaid(){
-  if(player.tokens<5){
-    document.getElementById('raid-status').textContent="Not enough tokens (need 5)!";
-    return;
-  }
-  if(player.heroes.length<3){
-    document.getElementById('raid-status').textContent="Need at least 3 heroes to raid boss!";
-    return;
-  }
-  player.tokens-=5;
-  // random damage 50~120
-  let dmg=Math.floor(Math.random()*70+50);
-  bossHP-=dmg;
-  if(bossHP<=0){
-    bossHP=300;
-    player.tokens+=50;
-    document.getElementById('raid-status').textContent=`Boss defeated! +50 tokens. (reset HP=300)`;
-  } else {
-    document.getElementById('raid-status').textContent=`You dealt ${dmg} damage! Boss HP=${bossHP}`;
-  }
-  updateHome();
-}
-
-/************************************************************
- * 12. UTILS
- ************************************************************/
-function addTokens(n){
-  player.tokens+=n;
-  updateHome();
-  alert(`+${n} tokens`);
-}
-
-/************************************************************
- * INIT
- ************************************************************/
-document.addEventListener('DOMContentLoaded', ()=>{
-  updateHome();
-  updateWallet();
-  renderHeroes();
-  renderQuests();
-  renderGuild();
-  renderHouse();
-});
-
-/* DONE */
-</script>
+    document.addEventListener("DOMContentLoaded", () => {
+      updateHeroList();
+      updateWallet();
+    });
+  </script>
 </body>
 </html>
