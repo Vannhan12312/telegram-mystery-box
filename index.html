@@ -54,7 +54,7 @@
     }
 
     .hero-card {
-      width: 80px; /* Tăng kích thước thẻ */
+      width: 80px; 
       height: 120px;
       background: #fff;
       border: 1px solid #ddd;
@@ -151,7 +151,6 @@
   </footer>
 
   <script>
-    /* JavaScript không thay đổi từ bản gốc, giữ nguyên */
     const player = {
       tokens: 100,
       heroes: [],
@@ -161,7 +160,27 @@
     };
 
     const allHeroData = [
-      /* ... dữ liệu hero đã định nghĩa sẵn ... */
+      { name: "SlimeKid", rarity: "Common", img: "https://i.imgur.com/wY0nzE9.png", attribute: "Water", symbol: "💧", damage: 12, speed: 5, level: 1 },
+      { name: "ShellFish", rarity: "Common", img: "https://i.imgur.com/Iy1X8r1.png", attribute: "Water", symbol: "💧", damage: 14, speed: 6, level: 1 },
+      { name: "GreenFish", rarity: "Common", img: "https://i.imgur.com/81Ypu1S.png", attribute: "Earth", symbol: "🌱", damage: 10, speed: 5, level: 1 },
+      { name: "MudCrab", rarity: "Common", img: "https://i.imgur.com/XMUx21e.png", attribute: "Earth", symbol: "🌱", damage: 15, speed: 4, level: 1 },
+      { name: "RockyShell", rarity: "Common", img: "https://i.imgur.com/eVNSFSH.png", attribute: "Earth", symbol: "🌱", damage: 16, speed: 6, level: 1 },
+      { name: "JellyMold", rarity: "Common", img: "https://i.imgur.com/hjZPOpf.png", attribute: "Water", symbol: "💧", damage: 10, speed: 7, level: 1 },
+      { name: "TinyCrab", rarity: "Common", img: "https://i.imgur.com/TvssIKL.png", attribute: "Water", symbol: "💧", damage: 12, speed: 5, level: 1 },
+      { name: "BluishCrab", rarity: "Common", img: "https://i.imgur.com/9soOAZz.png", attribute: "Water", symbol: "💧", damage: 13, speed: 5, level: 1 },
+      { name: "PearlCrab", rarity: "Common", img: "https://i.imgur.com/ZRG9eiQ.png", attribute: "Water", symbol: "💧", damage: 11, speed: 6, level: 1 },
+      { name: "SlimyJr", rarity: "Common", img: "https://i.imgur.com/aOV5P1e.png", attribute: "Water", symbol: "💧", damage: 14, speed: 4, level: 1 },
+      { name: "FireCrab", rarity: "Rare", img: "https://i.imgur.com/3l9MKIl.png", attribute: "Fire", symbol: "🔥", damage: 22, speed: 8, level: 1 },
+      { name: "TurtleWar", rarity: "Rare", img: "https://i.imgur.com/cSy6okk.png", attribute: "Water", symbol: "💧", damage: 20, speed: 10, level: 1 },
+      { name: "SeaKnight", rarity: "Rare", img: "https://i.imgur.com/QRJyOyp.png", attribute: "Water", symbol: "💧", damage: 25, speed: 8, level: 1 },
+      { name: "DarkFrog", rarity: "Rare", img: "https://i.imgur.com/NK8EQm1.png", attribute: "Dark", symbol: "🌑", damage: 24, speed: 9, level: 1 },
+      { name: "CrabLord", rarity: "Rare", img: "https://i.imgur.com/Aa396uh.png", attribute: "Earth", symbol: "🌱", damage: 28, speed: 7, level: 1 },
+      { name: "ScorpionKid", rarity: "Rare", img: "https://i.imgur.com/aUTGKeg.png", attribute: "Earth", symbol: "🌱", damage: 27, speed: 9, level: 1 },
+      { name: "AquaShield", rarity: "Rare", img: "https://i.imgur.com/H65ycJW.png", attribute: "Water", symbol: "💧", damage: 22, speed: 10, level: 1 },
+      { name: "CoralWar", rarity: "Rare", img: "https://i.imgur.com/TcSRW3O.png", attribute: "Water", symbol: "💧", damage: 23, speed: 9, level: 1 },
+      { name: "ClamGuard", rarity: "Rare", img: "https://i.imgur.com/Juwfrcz.png", attribute: "Water", symbol: "💧", damage: 20, speed: 11, level: 1 },
+      { name: "AngryFish", rarity: "Rare", img: "https://i.imgur.com/8rZaJYc.png", attribute: "Water", symbol: "💧", damage: 26, speed: 8, level: 1 },
+      // Tiếp tục danh sách hero đầy đủ...
     ];
 
     const rarityChances = [
@@ -179,7 +198,6 @@
       document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
       if (tabId === 'home') updateHome();
       if (tabId === 'hero') updateHero();
-      if (tabId === 'quest') updateQuest();
     }
 
     function updateHome() {
@@ -200,18 +218,21 @@
         return;
       }
       player.tokens -= cost;
+
       for (let i = 0; i < count; i++) {
-        const rar = getRandomRarity();
-        const pool = allHeroData.filter(h => h.rarity === rar);
+        const rarity = getRandomRarity();
+        const pool = allHeroData.filter(h => h.rarity === rarity);
+
         if (pool.length > 0) {
-          const rIndex = Math.floor(Math.random() * pool.length);
-          const newHero = { ...pool[rIndex] };
+          const randomIndex = Math.floor(Math.random() * pool.length);
+          const newHero = { ...pool[randomIndex] };
           player.heroes.push(newHero);
         }
       }
+
       updateHome();
       updateHero();
-      document.getElementById('shop-message').textContent = `You bought ${count} chest(s).`;
+      alert(`You bought ${count} chest(s) and got new heroes!`);
     }
 
     function getRandomRarity() {
@@ -226,20 +247,20 @@
 
     function updateHero() {
       const container = document.getElementById('hero-list');
-      container.innerHTML = player.heroes.map((h, idx) => {
-        const rarClass = `color-${h.rarity.toLowerCase()}`;
+      if (!player.heroes || player.heroes.length === 0) {
+        container.innerHTML = `<p>No heroes yet. Buy chests to get heroes!</p>`;
+        return;
+      }
+
+      container.innerHTML = player.heroes.map((hero, idx) => {
+        const rarityClass = `color-${hero.rarity.toLowerCase()}`;
         return `
           <div class="hero-card" onclick="showHeroDetails(${idx})">
-            <img src="${h.img}" alt="${h.name}">
-            <p class="${rarClass}">${h.name}</p>
-            <p>Lv${h.level}</p>
+            <img src="${hero.img}" alt="${hero.name}">
+            <p class="${rarityClass}">${hero.name}</p>
+            <p>Lv${hero.level}</p>
           </div>`;
       }).join('');
-    }
-
-    function showHeroDetails(index) {
-      const h = player.heroes[index];
-      alert(`Hero: ${h.name}, Level: ${h.level}`);
     }
 
     document.addEventListener('DOMContentLoaded', () => {
