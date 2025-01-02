@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rost & Flame</title>
+    <title>Rost & Flame - Nested Buttons</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -61,12 +61,36 @@
             font-size: 16px;
             cursor: pointer;
             transition: background 0.3s;
+            position: relative;
         }
         .button:hover {
             background: #1d3557;
         }
-        .button.vip {
-            background: #e63946;
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 50px;
+            left: 0;
+            width: 100%;
+            background: #2a9d8f;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+        .dropdown button {
+            display: block;
+            margin: 5px 0;
+            background: #1d3557;
+            padding: 8px;
+            font-size: 14px;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        .dropdown button:hover {
+            background: #0d2538;
         }
     </style>
 </head>
@@ -82,113 +106,62 @@
         <!-- Stats Section -->
         <div class="stats">
             <p><strong>💰 Balance:</strong> <span id="tonBalance">100 TON</span></p>
-            <p><strong>🔥 Ice Phoenixes Trained Today:</strong> <span id="trainCount">0/10</span></p>
-            <p><strong>⭐ VIP Phoenixes Served Today:</strong> <span id="vipCount">0/2</span></p>
         </div>
 
         <!-- Actions Section -->
         <div class="actions">
-            <button class="button" onclick="trainPhoenix()">❄️ Train Phoenix (0.5 TON)</button>
-            <button class="button vip" onclick="serveVipPhoenix()">🌟 Serve VIP Phoenix (5 TON)</button>
-            <button class="button" onclick="openWithdrawForm()">💸 Withdraw Toncoin</button>
+            <div class="button" onclick="toggleDropdown(this)">
+                🐉 Train Phoenix
+                <div class="dropdown">
+                    <button onclick="trainQuick()">Quick Training</button>
+                    <button onclick="trainSpecial()">Special Training</button>
+                </div>
+            </div>
+            <div class="button" onclick="toggleDropdown(this)">
+                🌟 Special Actions
+                <div class="dropdown">
+                    <button onclick="serveVipPhoenix()">Serve VIP Phoenix</button>
+                    <button onclick="boostPhoenix()">Boost Phoenix Power</button>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Withdraw Form -->
-    <div class="container" id="withdrawContainer" style="display: none;">
-        <h2>Withdraw Toncoin</h2>
-        <form id="withdrawForm" onsubmit="handleWithdraw(event)">
-            <div>
-                <label for="walletAddress">Wallet Address:</label>
-                <input type="text" id="walletAddress" placeholder="Enter your TON wallet address" required>
-            </div>
-            <div>
-                <label for="amount">Amount to Withdraw:</label>
-                <input type="number" id="amount" placeholder="Enter amount" required>
-            </div>
-            <button class="button" type="submit">Confirm Withdraw</button>
-            <button class="button" type="button" onclick="closeWithdrawForm()">Cancel</button>
-        </form>
-    </div>
-
     <script>
-        const tg = window.Telegram.WebApp;
-        tg.expand();
-
         let user = {
             tonBalance: 100,
-            trainCount: 0,
-            vipCount: 0,
         };
 
-        function loadTelegramUserInfo() {
-            const userInfo = tg.initDataUnsafe.user;
-            const displayName = userInfo ? `${userInfo.first_name} ${userInfo.last_name || ''}` : "Ice Phoenix Keeper";
-            document.getElementById("userInfo").textContent = `Welcome, ${displayName}`;
+        function toggleDropdown(button) {
+            const dropdown = button.querySelector('.dropdown');
+            dropdown.style.display = dropdown.style.display === 'block' ? 'none' : 'block';
         }
 
-        function trainPhoenix() {
-            if (user.trainCount < 10) {
-                user.trainCount++;
-                user.tonBalance += 0.5;
-                alert("Ice Phoenix trained successfully! You earned 0.5 TON.");
-                updateStats();
-            } else {
-                alert("You have reached the daily training limit (10).");
-            }
+        function trainQuick() {
+            alert("Quick training complete! You earned 0.5 TON.");
+            user.tonBalance += 0.5;
+            updateStats();
+        }
+
+        function trainSpecial() {
+            alert("Special training complete! You earned 1 TON.");
+            user.tonBalance += 1;
+            updateStats();
         }
 
         function serveVipPhoenix() {
-            if (user.vipCount < 2) {
-                if (Math.random() > 0.7) {
-                    user.vipCount++;
-                    user.tonBalance += 5;
-                    alert("VIP Ice Phoenix served! You earned 5 TON.");
-                } else {
-                    alert("No VIP Phoenixes available right now.");
-                }
-                updateStats();
-            } else {
-                alert("You have reached the daily VIP serving limit (2).");
-            }
+            alert("VIP Phoenix served! You earned 5 TON.");
+            user.tonBalance += 5;
+            updateStats();
         }
 
-        function openWithdrawForm() {
-            document.getElementById("withdrawContainer").style.display = "block";
-        }
-
-        function closeWithdrawForm() {
-            document.getElementById("withdrawContainer").style.display = "none";
-        }
-
-        function handleWithdraw(event) {
-            event.preventDefault();
-            const walletAddress = document.getElementById("walletAddress").value;
-            const amount = parseFloat(document.getElementById("amount").value);
-            if (amount > user.tonBalance) {
-                alert("Insufficient balance.");
-                return;
-            }
-            if (amount <= 0) {
-                alert("Invalid amount.");
-                return;
-            }
-            const confirmWithdraw = confirm(`Withdraw ${amount} TON to ${walletAddress}?`);
-            if (confirmWithdraw) {
-                user.tonBalance -= amount;
-                alert(`Successfully withdrawn ${amount} TON to ${walletAddress}.`);
-                closeWithdrawForm();
-                updateStats();
-            }
+        function boostPhoenix() {
+            alert("Phoenix power boosted! Special abilities unlocked.");
         }
 
         function updateStats() {
             document.getElementById("tonBalance").textContent = `${user.tonBalance.toFixed(1)} TON`;
-            document.getElementById("trainCount").textContent = `${user.trainCount}/10`;
-            document.getElementById("vipCount").textContent = `${user.vipCount}/2`;
         }
-
-        loadTelegramUserInfo();
     </script>
 </body>
 </html>
