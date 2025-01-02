@@ -4,13 +4,18 @@
   <meta charset="UTF-8" />
   <title>Rost & Flame - Telegram Mini Game</title>
   <style>
-    * { box-sizing: border-box; font-family: sans-serif; }
+    * {
+      box-sizing: border-box; 
+      font-family: sans-serif;
+    }
     body {
-      margin: 0; padding: 0;
+      margin: 0; 
+      padding: 0;
       background: #fafafa;
     }
     header, nav, main, footer {
-      padding: 10px; margin: 10px;
+      padding: 10px; 
+      margin: 10px;
     }
     header {
       background: #f55742; 
@@ -25,7 +30,7 @@
     }
     nav button {
       margin: 5px;
-      padding: 10px 15px;
+      padding: 8px 12px;
       cursor: pointer;
       border-radius: 5px;
       border: none;
@@ -35,35 +40,47 @@
     .active-tab {
       background: #c3f0d1;
     }
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
 
-    /************************************
-     * Hero layout: 5 heroes mỗi dòng, hình nhỏ
-     ************************************/
+    /***********************************************
+     * Hero Layout: 5 heroes mỗi dòng, nhỏ gọn
+     ***********************************************/
     .hero-container {
       display: grid;
+      /* Mỗi hàng 5 hero, tổng chiều rộng ~400px  */
       grid-template-columns: repeat(5, 1fr);
       gap: 5px;
+      margin: 0 auto;       /* canh giữa */
+      max-width: 420px;     /* giới hạn bề rộng tổng */
     }
     .hero-card {
       border: 1px solid #ccc;
       border-radius: 5px;
       text-align: center;
       background: #fff;
-      padding: 5px;
+      padding: 3px;
       cursor: pointer; /* click => detail popup */
       position: relative;
+      min-height: 120px;  /* đảm bảo đủ chỗ hiển thị */
     }
     .hero-card img {
-      max-width: 70px;
-      max-height: 70px;
+      max-width: 50px;
+      max-height: 50px;
       border-radius: 5px;
       margin: 0 auto;
       display: block;
     }
-    .hero-card .rarity {
+    .hero-name {
+      font-size: 12px;
       font-weight: bold;
-      font-size: 13px;
+      margin: 2px 0;
+    }
+    .hero-rarity {
+      font-weight: bold;
+      font-size: 11px;
+      margin-bottom: 2px;
     }
     .btn-row {
       display: flex; 
@@ -73,13 +90,13 @@
     }
     .move-btn, .disassemble-btn {
       display: inline-block;
-      padding: 3px 6px;
+      padding: 2px 4px;
       background: #ffefef;
       border: 1px solid #ddd;
       color: #333;
       cursor: pointer;
       border-radius: 3px;
-      font-size: 11px;
+      font-size: 10px;
     }
     .move-btn:hover {
       background: #e0f6ff;
@@ -90,18 +107,18 @@
       border-color: #ff8888;
     }
 
-    /************************************
+    /***********************************************
      * Rarity colors
-     ************************************/
+     ***********************************************/
     .color-common    { color: #AAAAAA; }
     .color-rare      { color: #54FFFE; }
     .color-epic      { color: #C66CC5; }
     .color-legendary { color: #FFA800; }
     .color-mythic    { color: #FF0000; }
 
-    /************************************
+    /***********************************************
      * Home, Shop, Quest, Wallet Layout
-     ************************************/
+     ***********************************************/
     #home .summary {
       margin-top: 15px;
       font-size: 16px;
@@ -127,9 +144,9 @@
       cursor: pointer;
     }
 
-    /************************************
+    /***********************************************
      * Boat layout
-     ************************************/
+     ***********************************************/
     #boat-content {
       border: 1px solid #ccc; 
       background: #fff; 
@@ -157,9 +174,9 @@
       background: #ffbbbb;
     }
 
-    /************************************
+    /***********************************************
      * Modal popup để xem Hero detail
-     ************************************/
+     ***********************************************/
     #modal-overlay {
       position: fixed;
       inset: 0;
@@ -186,7 +203,7 @@
       background: #ddd;
     }
     #modal-hero-img {
-      max-width: 80px;
+      max-width: 60px;
       display: block;
       margin: 0 auto 10px;
       border-radius: 5px;
@@ -292,12 +309,13 @@
   <div id="modal-overlay">
     <div id="modal-content">
       <img id="modal-hero-img" src="" alt="Hero" 
-           onerror="this.src='https://via.placeholder.com/80/ddd/000?text=Image+not+found';" />
+           onerror="this.src='https://via.placeholder.com/60/ddd/000?text=Image+not+found';" />
       <p id="modal-hero-name" style="font-weight:bold;"></p>
       <p id="modal-hero-rarity"></p>
+      <p id="modal-hero-skill"></p>
       <p id="modal-hero-damage"></p>
-      <p id="modal-hero-defense"></p>
-      <p id="modal-hero-race"></p>
+      <p id="modal-hero-speed"></p>
+      <p id="modal-hero-pin"></p>
       <p id="modal-hero-attr"></p>
       <button id="modal-close" onclick="closeModal()">Close</button>
     </div>
@@ -311,6 +329,7 @@
   /************************************************************
    * ALL GAME LOGIC IN ONE HTML FILE
    ************************************************************/
+
   // Hardcode user ID for local test
   const LOCAL_USER_ID = 'demoUser_123'; 
   const LOCAL_USER_NAME = 'DemoPlayer';
@@ -331,7 +350,7 @@
   // Global user object
   let currentUser = null;
 
-  // Probability
+  // Probability for rarities
   const rarityRates = [
     { rarity: 'Common',    rate: 55 },
     { rarity: 'Rare',      rate: 25 },
@@ -352,8 +371,26 @@
     }
   }
 
-  // Thêm Race (Tộc)
-  const raceList = ["Marine", "Pirate", "Viking", "Shaman", "Engineer", "Samurai"];
+  // For attribute => symbol
+  const attributeSymbols = {
+    Fire: "🔥",
+    Water: "💧",
+    Wind: "🍃",
+    Earth: "🪨",
+    Electric: "⚡"
+  };
+  const attributeList = ["Fire","Water","Wind","Earth","Electric"];
+
+  // Skill list (để random)
+  const skillList = [
+    "🎯 Fire Blast",
+    "🎯 Water Surge",
+    "🎯 Wind Cutter",
+    "🎯 Earth Spike",
+    "🎯 Lightning Bolt",
+    "🎯 Flaming Arrow",
+    "🎯 Tsunami Wave"
+  ];
 
   // Hero data
   const allHeroesList = {
@@ -419,8 +456,6 @@
     ]
   };
 
-  const attributes = ['Fire','Water','Wind','Earth','Electric'];
-
   // Save/Load local
   function saveUserData() {
     localStorage.setItem('RostFlameUser', JSON.stringify(currentUser));
@@ -444,26 +479,29 @@
   function createRandomHero() {
     const rarity = getRandomRarity();
     const list = allHeroesList[rarity];
-    const base = list[Math.floor(Math.random()*list.length)];
+    const base = list[Math.floor(Math.random() * list.length)];
 
-    // Random damage 10..100
+    // Random skill
+    const skill = skillList[Math.floor(Math.random()*skillList.length)];
+    // Random damage (10..100)
     const dmg = Math.floor(Math.random()*91)+10; 
-    // Random defense 5..50
-    const def = Math.floor(Math.random()*46)+5;   
-    // Random attribute
-    const attr = attributes[Math.floor(Math.random()*attributes.length)];
-    // Random race
-    const rc = raceList[Math.floor(Math.random()*raceList.length)];
+    // Random speed (1..20)
+    const spd = Math.floor(Math.random()*20)+1;
+    // Random pin (50..200)
+    const pinVal = Math.floor(Math.random()*151)+50;
+    // Random attribute => symbol
+    const att = attributeList[Math.floor(Math.random()*attributeList.length)];
 
     return {
       id: 'hero_' + Math.random().toString(36).substring(2),
       name: base.name,
       image: base.image,
       rarity,
+      skill,
       damage: dmg,
-      defense: def,
-      attribute: attr,
-      race: rc
+      speed: spd,
+      pin: pinVal,
+      attribute: att
     };
   }
   function createRandomHeroes(count) {
@@ -556,13 +594,12 @@
       actionBtn = `<div class="move-btn" onclick="confirmEquip('${hero.id}'); event.stopPropagation();">Equip</div>`;
     }
     const disBtn = `<div class="disassemble-btn" onclick="confirmConvert('${hero.id}'); event.stopPropagation();">Convert</div>`;
-    // Thêm `onerror` để fallback ảnh
     return `
     <div class="hero-card" onclick="showHeroDetail('${hero.id}')">
       <img src="${hero.image}" alt="${hero.name}" 
-           onerror="this.src='https://via.placeholder.com/70/ddd/000?text=Image+not+found';"/>
-      <div class="rarity ${rc}">${hero.rarity}</div>
-      <div style="font-weight:bold; font-size:13px;">${hero.name}</div>
+           onerror="this.src='https://via.placeholder.com/50/ddd/000?text=Image+not+found';"/>
+      <div class="hero-rarity ${rc}">${hero.rarity}</div>
+      <div class="hero-name">${hero.name}</div>
       <div class="btn-row">
         ${actionBtn}
         ${disBtn}
@@ -589,18 +626,17 @@
   function showHeroDetail(heroId) {
     let hero = findHeroById(heroId);
     if(!hero) return;
-    document.getElementById('modal-hero-img').src = hero.image;
+    // Ảnh fallback
+    document.getElementById('modal-hero-img').src = hero.image || 'https://via.placeholder.com/60/ddd/000?text=Image+not+found';
     document.getElementById('modal-hero-name').innerText = hero.name;
     document.getElementById('modal-hero-rarity').innerHTML = 
       `<span class="${getRarityClass(hero.rarity)}">${hero.rarity}</span>`;
-    document.getElementById('modal-hero-damage').innerHTML = 
-      `Damage ⚔: <strong>${hero.damage}</strong>`;
-    document.getElementById('modal-hero-defense').innerHTML = 
-      `Defense 🛡: <strong>${hero.defense}</strong>`;
-    document.getElementById('modal-hero-race').innerHTML = 
-      `Race: <strong>${hero.race}</strong>`;
-    document.getElementById('modal-hero-attr').innerHTML = 
-      `Attribute: <strong>${hero.attribute}</strong>`;
+    document.getElementById('modal-hero-skill').innerText = hero.skill || '🎯 ???';
+    document.getElementById('modal-hero-damage').innerText = `Damage ⚔: ${hero.damage}`;
+    document.getElementById('modal-hero-speed').innerText = `Speed 💨: ${hero.speed}`;
+    document.getElementById('modal-hero-pin').innerText = `Pin 📌: ${hero.pin}`;
+    let attrSymbol = attributeSymbols[hero.attribute] || '';
+    document.getElementById('modal-hero-attr').innerText = `Attribute: ${attrSymbol} ${hero.attribute}`;
 
     document.getElementById('modal-overlay').style.display = 'flex';
   }
