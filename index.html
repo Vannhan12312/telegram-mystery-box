@@ -38,7 +38,7 @@
     .hidden { display: none; }
 
     /************************************
-     * Hero layout: 5 heroes mỗi dòng
+     * Hero layout: 5 heroes mỗi dòng, hình nhỏ
      ************************************/
     .hero-container {
       display: grid;
@@ -51,25 +51,25 @@
       text-align: center;
       background: #fff;
       padding: 5px;
-      cursor: pointer;    /* Để người dùng bấm vào card => xem detail */
+      cursor: pointer; /* click => detail popup */
       position: relative;
     }
     .hero-card img {
-      max-width: 80px;
-      max-height: 80px;
+      max-width: 70px;
+      max-height: 70px;
       border-radius: 5px;
       margin: 0 auto;
       display: block;
     }
     .hero-card .rarity {
       font-weight: bold;
-      font-size: 14px;
+      font-size: 13px;
     }
     .btn-row {
       display: flex; 
       justify-content: center; 
       gap: 3px; 
-      margin-top: 5px;
+      margin-top: 3px;
     }
     .move-btn, .disassemble-btn {
       display: inline-block;
@@ -173,7 +173,7 @@
       background: #fff;
       padding: 20px;
       border-radius: 5px;
-      width: 300px;
+      width: 280px;
       text-align: center;
       box-shadow: 0 2px 8px rgba(0,0,0,0.3);
     }
@@ -186,7 +186,7 @@
       background: #ddd;
     }
     #modal-hero-img {
-      max-width: 100px;
+      max-width: 80px;
       display: block;
       margin: 0 auto 10px;
       border-radius: 5px;
@@ -291,10 +291,13 @@
   <!-- MODAL POPUP FOR HERO DETAIL -->
   <div id="modal-overlay">
     <div id="modal-content">
-      <img id="modal-hero-img" src="" alt="Hero"/>
+      <img id="modal-hero-img" src="" alt="Hero" 
+           onerror="this.src='https://via.placeholder.com/80/ddd/000?text=Image+not+found';" />
       <p id="modal-hero-name" style="font-weight:bold;"></p>
       <p id="modal-hero-rarity"></p>
       <p id="modal-hero-damage"></p>
+      <p id="modal-hero-defense"></p>
+      <p id="modal-hero-race"></p>
       <p id="modal-hero-attr"></p>
       <button id="modal-close" onclick="closeModal()">Close</button>
     </div>
@@ -348,6 +351,9 @@
       default: return '';
     }
   }
+
+  // Thêm Race (Tộc)
+  const raceList = ["Marine", "Pirate", "Viking", "Shaman", "Engineer", "Samurai"];
 
   // Hero data
   const allHeroesList = {
@@ -439,8 +445,15 @@
     const rarity = getRandomRarity();
     const list = allHeroesList[rarity];
     const base = list[Math.floor(Math.random()*list.length)];
-    const dmg = Math.floor(Math.random()*91)+10; // 10..100
+
+    // Random damage 10..100
+    const dmg = Math.floor(Math.random()*91)+10; 
+    // Random defense 5..50
+    const def = Math.floor(Math.random()*46)+5;   
+    // Random attribute
     const attr = attributes[Math.floor(Math.random()*attributes.length)];
+    // Random race
+    const rc = raceList[Math.floor(Math.random()*raceList.length)];
 
     return {
       id: 'hero_' + Math.random().toString(36).substring(2),
@@ -448,7 +461,9 @@
       image: base.image,
       rarity,
       damage: dmg,
-      attribute: attr
+      defense: def,
+      attribute: attr,
+      race: rc
     };
   }
   function createRandomHeroes(count) {
@@ -536,17 +551,19 @@
     const rc = getRarityClass(hero.rarity);
     let actionBtn = '';
     if(location === 'equipment') {
-      actionBtn = `<div class="move-btn" onclick="moveHeroToWarehouse('${hero.id}')">Unequip</div>`;
+      actionBtn = `<div class="move-btn" onclick="confirmUnequip('${hero.id}'); event.stopPropagation();">Unequip</div>`;
     } else {
-      actionBtn = `<div class="move-btn" onclick="moveHeroToEquipment('${hero.id}')">Equip</div>`;
+      actionBtn = `<div class="move-btn" onclick="confirmEquip('${hero.id}'); event.stopPropagation();">Equip</div>`;
     }
-    const disBtn = `<div class="disassemble-btn" onclick="disassembleHero('${hero.id}')">Convert</div>`;
+    const disBtn = `<div class="disassemble-btn" onclick="confirmConvert('${hero.id}'); event.stopPropagation();">Convert</div>`;
+    // Thêm `onerror` để fallback ảnh
     return `
     <div class="hero-card" onclick="showHeroDetail('${hero.id}')">
-      <img src="${hero.image}" alt="${hero.name}" />
+      <img src="${hero.image}" alt="${hero.name}" 
+           onerror="this.src='https://via.placeholder.com/70/ddd/000?text=Image+not+found';"/>
       <div class="rarity ${rc}">${hero.rarity}</div>
-      <div style="font-weight:bold;">${hero.name}</div>
-      <div class="btn-row" style="margin-top:3px;">
+      <div style="font-weight:bold; font-size:13px;">${hero.name}</div>
+      <div class="btn-row">
         ${actionBtn}
         ${disBtn}
       </div>
@@ -554,17 +571,34 @@
     `;
   }
 
-  // Khi bấm hero => show popup detail
+  // Confirm equip/unequip/convert
+  function confirmUnequip(heroId) {
+    if(!confirm("Are you sure you want to unequip this hero?")) return;
+    moveHeroToWarehouse(heroId);
+  }
+  function confirmEquip(heroId) {
+    if(!confirm("Equip this hero to your Equipment?")) return;
+    moveHeroToEquipment(heroId);
+  }
+  function confirmConvert(heroId) {
+    if(!confirm("Are you sure to convert this hero into RFM?")) return;
+    disassembleHero(heroId);
+  }
+
+  // Chi tiết hero (popup)
   function showHeroDetail(heroId) {
     let hero = findHeroById(heroId);
     if(!hero) return;
-    // Đổ thông tin ra modal
     document.getElementById('modal-hero-img').src = hero.image;
     document.getElementById('modal-hero-name').innerText = hero.name;
     document.getElementById('modal-hero-rarity').innerHTML = 
       `<span class="${getRarityClass(hero.rarity)}">${hero.rarity}</span>`;
     document.getElementById('modal-hero-damage').innerHTML = 
       `Damage ⚔: <strong>${hero.damage}</strong>`;
+    document.getElementById('modal-hero-defense').innerHTML = 
+      `Defense 🛡: <strong>${hero.defense}</strong>`;
+    document.getElementById('modal-hero-race').innerHTML = 
+      `Race: <strong>${hero.race}</strong>`;
     document.getElementById('modal-hero-attr').innerHTML = 
       `Attribute: <strong>${hero.attribute}</strong>`;
 
@@ -579,9 +613,8 @@
     return currentUser.heroesWarehouse.find(x=>x.id===id);
   }
 
-  // Chuyển hero => warehouse
+  // Move hero
   function moveHeroToWarehouse(heroId) {
-    event.stopPropagation(); // Để không kích hoạt showHeroDetail
     const idx = currentUser.heroesEquipment.findIndex(h=>h.id===heroId);
     if(idx<0) return;
     let hero = currentUser.heroesEquipment[idx];
@@ -590,10 +623,8 @@
     saveUserData();
     refreshBoat();
   }
-  // Chuyển hero => equipment
   function moveHeroToEquipment(heroId) {
-    event.stopPropagation();
-    if(currentUser.heroesEquipment.length>=20) {
+    if(currentUser.heroesEquipment.length >= 20) {
       alert('Your Equipment is full (20/20).');
       return;
     }
@@ -605,9 +636,9 @@
     saveUserData();
     refreshBoat();
   }
-  // Convert 1 hero => RFM
+
+  // Convert hero => RFM
   function disassembleHero(heroId) {
-    event.stopPropagation();
     let found = null;
     let idx = currentUser.heroesEquipment.findIndex(x=>x.id===heroId);
     if(idx>=0) {
@@ -624,12 +655,13 @@
       alert('Hero not found');
       return;
     }
-    let reward = Math.floor(found.damage/2);
+    let reward = Math.floor(found.damage / 2);
     currentUser.rfmTokens += reward;
     saveUserData();
     alert(`Converted "${found.name}" => +${reward} RFM.`);
     refreshBoat();
   }
+
   // Quick convert all warehouse
   function quickConvert() {
     if(currentUser.heroesWarehouse.length===0) {
