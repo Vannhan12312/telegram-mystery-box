@@ -1,112 +1,126 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rost & Flame - Ice Phoenix</title>
-    <style>
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: linear-gradient(to bottom, #1e3c72, #2a5298);
-            color: white;
-            overflow: hidden;
-        }
-        .loading-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(to bottom, #1e3c72, #2a5298);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            flex-direction: column;
-            z-index: 999;
-        }
-        .loading-screen img {
-            width: 300px;
-            animation: float 3s infinite;
-        }
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(-10px);
-            }
-            50% {
-                transform: translateY(10px);
-            }
-        }
-        .loading-screen h1 {
-            font-size: 24px;
-            margin: 20px 0;
-        }
-        .loading-screen.fade-out {
-            animation: fadeOut 1s forwards;
-        }
-        @keyframes fadeOut {
-            to {
-                opacity: 0;
-                visibility: hidden;
-            }
-        }
-        header {
-            background: #ff6347;
-            padding: 15px;
-            font-size: 24px;
-            font-weight: bold;
-            text-align: center;
-        }
-        .container {
-            margin: 20px auto;
-            text-align: center;
-        }
-        button {
-            padding: 15px 25px;
-            margin: 10px;
-            font-size: 18px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            color: white;
-        }
-        .play-btn {
-            background: #ff4500;
-        }
-        .play-btn:hover {
-            background: #e63946;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Game Interface</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #def2f1;
+      color: #333;
+    }
+
+    /* Header */
+    header {
+      background: #0097e6;
+      color: white;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 16px;
+    }
+
+    /* Navigation Bar */
+    nav {
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      background: #f5f6fa;
+      display: flex;
+      justify-content: space-around;
+      padding: 10px 0;
+      border-top: 1px solid #dcdde1;
+    }
+
+    nav button {
+      background: none;
+      border: none;
+      font-size: 14px;
+      color: #2f3640;
+      text-align: center;
+    }
+
+    nav button img {
+      width: 32px;
+      height: 32px;
+      display: block;
+      margin: 0 auto 5px;
+    }
+
+    .content {
+      padding: 20px;
+      padding-bottom: 80px; /* Avoid overlap with navigation bar */
+    }
+
+    .section {
+      display: none;
+    }
+
+    .section.active {
+      display: block;
+    }
+  </style>
 </head>
 <body>
-    <div class="loading-screen" id="loading-screen">
-        <img src="https://via.placeholder.com/300/ffffff/000000?text=Ice+Phoenix" alt="Ice Phoenix">
-        <h1>The Ice Phoenix Awakens...</h1>
+  <header>
+    <div>Balance: <span id="balance">982,092</span></div>
+    <div>Speed: <span id="speed">810,133/day</span></div>
+  </header>
+
+  <main class="content">
+    <div id="home" class="section active">
+      <h2>Home</h2>
+      <p>Welcome to the game!</p>
     </div>
-    <header>🔥 Rost & Flame 🔥</header>
-    <div class="container" id="game" style="display: none;">
-        <h2>Welcome to Rost & Flame</h2>
-        <button class="play-btn" onclick="startGame()">Play Now</button>
+    <div id="wallet" class="section">
+      <h2>Wallet</h2>
+      <p>View your balance and transactions.</p>
     </div>
+    <div id="quest" class="section">
+      <h2>Quest</h2>
+      <p>Complete tasks to earn rewards.</p>
+    </div>
+    <div id="boat" class="section">
+      <h2>Boat</h2>
+      <p>Manage your boats and equipment.</p>
+    </div>
+    <div id="shop" class="section">
+      <h2>Shop</h2>
+      <p>Buy items and upgrades.</p>
+    </div>
+  </main>
 
-    <audio id="phoenix-sound" src="https://www.soundjay.com/nature/phoenix-cry.mp3"></audio>
+  <nav>
+    <button onclick="navigate('home')">
+      <img src="home-icon.png" alt="Home">
+      Home
+    </button>
+    <button onclick="navigate('wallet')">
+      <img src="wallet-icon.png" alt="Wallet">
+      Wallet
+    </button>
+    <button onclick="navigate('quest')">
+      <img src="quest-icon.png" alt="Quest">
+      Quest
+    </button>
+    <button onclick="navigate('boat')">
+      <img src="boat-icon.png" alt="Boat">
+      Boat
+    </button>
+    <button onclick="navigate('shop')">
+      <img src="shop-icon.png" alt="Shop">
+      Shop
+    </button>
+  </nav>
 
-    <script>
-        // Hiệu ứng màn hình loading
-        window.onload = () => {
-            const loadingScreen = document.getElementById('loading-screen');
-            const phoenixSound = document.getElementById('phoenix-sound');
-
-            phoenixSound.play(); // Phát âm thanh Phượng Hoàng
-            setTimeout(() => {
-                loadingScreen.classList.add('fade-out');
-                document.getElementById('game').style.display = 'block'; // Hiển thị game sau khi loading
-            }, 4000); // Hiển thị loading trong 4 giây
-        };
-
-        function startGame() {
-            alert("Game Started! Enjoy Rost & Flame!");
-        }
-    </script>
+  <script>
+    function navigate(section) {
+      document.querySelectorAll('.section').forEach((sec) => sec.classList.remove('active'));
+      document.getElementById(section).classList.add('active');
+    }
+  </script>
 </body>
 </html>
