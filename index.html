@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P2E Game - TON Blockchain</title>
+  <title>COST & FLAME - P2E Game</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,282 +13,504 @@
     }
 
     body {
-      background: linear-gradient(to bottom, #4a90e2, #f0f0f0);
-      color: #333;
+      background: #0e0e0e;
+      color: #f1f1f1;
       font-size: 14px;
-      overflow: hidden;
-      animation: backgroundScroll 10s linear infinite;
-    }
-
-    @keyframes backgroundScroll {
-      0% {
-        background-position: 0 0;
-      }
-      100% {
-        background-position: 0 100%;
-      }
+      overflow: auto;
+      padding: 10px;
     }
 
     header {
       text-align: center;
-      background: linear-gradient(135deg, #50c878, #4a90e2);
-      color: white;
+      background: #1f1f1f;
+      color: #f1f1f1;
       padding: 15px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+
+    header h1 {
+      font-size: 24px;
+      margin-bottom: 5px;
     }
 
     nav {
       display: flex;
       justify-content: space-around;
-      background: #efefef;
-      padding: 10px 0;
-      border-bottom: 2px solid #ddd;
+      margin-bottom: 15px;
     }
 
     nav button {
-      flex: 1;
       border: none;
-      background: white;
       padding: 10px;
+      background: #292929;
+      color: #f1f1f1;
       cursor: pointer;
+      border-radius: 5px;
       font-weight: bold;
-      transition: background 0.3s, transform 0.3s;
+      transition: background 0.3s;
     }
 
     nav button:hover {
-      background: #d4f4e7;
-      transform: scale(1.1);
+      background: #3e3e3e;
     }
 
-    .active-tab {
-      background: #c3f0d1;
-      transform: scale(1.1);
+    nav .active-tab {
+      background: #00cc66;
+      color: #fff;
     }
 
     main {
       display: none;
       padding: 15px;
-      animation: fadeIn 0.5s;
+      background: #1a1a1a;
+      border-radius: 10px;
     }
 
     main.active {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
+    .hero-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 10px;
     }
 
-    #loading-screen {
+    .hero-card {
+      background: #2a2a2a;
+      border: 2px solid #3e3e3e;
+      border-radius: 10px;
+      text-align: center;
+      padding: 10px;
+      cursor: pointer;
+      transition: transform 0.3s, border-color 0.3s;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-5px);
+      border-color: #00cc66;
+    }
+
+    .hero-card img {
+      width: 100%;
+      height: 120px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .hero-card p {
+      font-size: 14px;
+      margin: 5px 0;
+    }
+
+    .hero-card .rarity {
+      font-weight: bold;
+      font-size: 14px;
+      margin-top: 5px;
+    }
+
+    .rarity.common { color: #9e9e9e; }
+    .rarity.rare { color: #42a5f5; }
+    .rarity.epic { color: #ab47bc; }
+    .rarity.legendary { color: #ff7043; }
+    .rarity.mythic { color: #e53935; }
+
+    .wallet-section {
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .wallet-section button {
+      background: #00cc66;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .wallet-section button:hover {
+      background: #00994d;
+    }
+
+    .referral-section {
+      background: #292929;
+      border-radius: 10px;
+      padding: 15px;
+      margin-bottom: 20px;
+      text-align: center;
+    }
+
+    .referral-section input {
+      width: calc(100% - 30px);
+      padding: 10px;
+      margin-bottom: 10px;
+      border-radius: 5px;
+      border: 1px solid #3e3e3e;
+      background: #1a1a1a;
+      color: #f1f1f1;
+    }
+
+    .referral-section button {
+      background: #ff7043;
+      color: #fff;
+      border: none;
+      padding: 10px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .referral-section button:hover {
+      background: #ff5722;
+    }
+
+    #hero-modal {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #000;
-      color: #fff;
-      display: flex;
+      background: rgba(0, 0, 0, 0.8);
       justify-content: center;
       align-items: center;
+      z-index: 1000;
+    }
+
+    #hero-modal .modal-content {
+      background: #2a2a2a;
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      color: #fff;
+      max-width: 300px;
+      width: 90%;
+    }
+
+    #hero-modal img {
+      width: 150px;
+      height: 150px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    #hero-modal button {
+      background: #00cc66;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    #hero-modal button:hover {
+      background: #00994d;
+    }
+
+    .farm-section {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .farm-section button {
+      background: #ffcc00;
+      color: #000;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .farm-section button:hover {
+      background: #e6b800;
+    }
+
+    .settings-section {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .settings-section button {
+      background: #007bff;
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .settings-section button:hover {
+      background: #0056b3;
+    }
+
+    .loading-screen {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      color: #fff;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
       font-size: 24px;
-      z-index: 10000;
-    }
-
-    #leaderboard {
-      margin-top: 20px;
-    }
-
-    #leaderboard ul {
-      list-style: none;
-      padding: 0;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      overflow: hidden;
-    }
-
-    #leaderboard ul li {
-      padding: 10px;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      justify-content: space-between;
-    }
-
-    #leaderboard ul li:last-child {
-      border-bottom: none;
-    }
-
-    #daily-reward {
-      margin-top: 20px;
-      padding: 15px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
       text-align: center;
     }
 
-    #achievements {
-      margin-top: 20px;
-      background: #fff;
-      border: 1px solid #ddd;
-      border-radius: 5px;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-      padding: 15px;
-    }
-
-    #achievements ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    #achievements ul li {
+    .back-button {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: #292929;
+      color: #fff;
+      border: none;
       padding: 10px;
-      border-bottom: 1px solid #ddd;
-      display: flex;
-      justify-content: space-between;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.3s;
     }
 
-    #achievements ul li:last-child {
-      border-bottom: none;
+    .back-button:hover {
+      background: #3e3e3e;
     }
 
-    .dark-mode {
-      background: #1e1e1e;
-      color: #fff;
-    }
-
-    .dark-mode nav {
-      background: #333;
-    }
-
-    .dark-mode button {
-      background: #444;
-      color: #fff;
-    }
   </style>
 </head>
 <body>
-  <div id="loading-screen">Loading game assets...</div>
-
   <header>
-    <h1>P2E Game</h1>
-    <p>TON Blockchain Integration</p>
+    <h1>COST & FLAME</h1>
+    <p>The Ultimate P2E Game on TON Blockchain</p>
   </header>
 
   <nav>
     <button class="active-tab" onclick="switchTab('home')">Home</button>
     <button onclick="switchTab('shop')">Shop</button>
-    <button onclick="switchTab('hero')">Heroes</button>
-    <button onclick="switchTab('quest')">Quests</button>
-    <button onclick="switchTab('leaderboard')">Leaderboard</button>
-    <button onclick="switchTab('achievements')">Achievements</button>
+    <button onclick="switchTab('heroes')">Heroes</button>
+    <button onclick="switchTab('wallet')">Wallet</button>
     <button onclick="switchTab('settings')">Settings</button>
   </nav>
 
   <main id="home" class="active">
-    <p>Welcome to the P2E Game powered by TON Blockchain!</p>
-    <div id="player-summary"></div>
-    <button onclick="addTokens(100)">Get +100 Tokens</button>
-
-    <div id="daily-reward">
-      <h3>Daily Reward</h3>
-      <button onclick="claimDailyReward()">Claim +50 Tokens</button>
+    <h2>Welcome to COST & FLAME!</h2>
+    <p>Collect heroes, earn rewards, and dominate the leaderboard!</p>
+    <div class="referral-section">
+      <h3>Referral Program</h3>
+      <p>Invite your friends and earn 10% of their TON rewards!</p>
+      <input type="text" id="referral-code" value="https://t.me/yourbot?start=ref123" readonly>
+      <button onclick="copyReferralCode()">Copy Referral Link</button>
+      <button onclick="shareOnTelegram()">Share via Telegram</button>
     </div>
   </main>
 
-  <main id="leaderboard">
-    <h3>Leaderboard</h3>
-    <ul id="leaderboard-list">
-      <li><strong>Player 1</strong> <span>1000 Tokens</span></li>
-      <li><strong>Player 2</strong> <span>800 Tokens</span></li>
-      <li><strong>Player 3</strong> <span>500 Tokens</span></li>
-    </ul>
+  <main id="shop">
+    <h2>Shop</h2>
+    <p>Buy hero packs to grow your collection. Each pack costs 10 tokens.</p>
+    <button onclick="buyPack(1)">Buy 1 Pack</button>
+    <button onclick="buyPack(5)">Buy 5 Packs</button>
+    <button onclick="buyPack(10)">Buy 10 Packs</button>
   </main>
 
-  <main id="achievements">
-    <h3>Achievements</h3>
-    <ul id="achievements-list">
-      <li><span>Own 10 Heroes</span> <strong>Complete</strong></li>
-      <li><span>Earn 1000 Tokens</span> <strong>Incomplete</strong></li>
-      <li><span>Complete 5 Quests</span> <strong>Incomplete</strong></li>
-    </ul>
+  <main id="heroes">
+    <h2>Your Heroes</h2>
+    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
+    <div class="hero-container" id="hero-list"></div>
+    <div class="farm-section" id="farm-section" style="display: none;">
+      <h3>Farm TON Tokens</h3>
+      <p>Select heroes to start farming TON tokens:</p>
+      <button onclick="startFarming()">Start Farming</button>
+    </div>
+  </main>
+
+  <main id="wallet">
+    <h2>Wallet</h2>
+    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
+    <div class="wallet-section">
+      <p>Connect your TON wallet to start earning and withdrawing rewards.</p>
+      <button onclick="connectWallet()">Connect Wallet</button>
+      <p id="wallet-status">Status: Not Connected</p>
+    </div>
+    <div class="wallet-section">
+      <h3>Withdraw TON</h3>
+      <p>Withdraw your earnings directly to your wallet.</p>
+      <button onclick="withdrawTON()">Withdraw</button>
+    </div>
   </main>
 
   <main id="settings">
-    <h3>Settings</h3>
-    <label>
-      <input type="checkbox" id="toggle-sound" checked> Enable Sound
-    </label>
-    <br>
-    <label>
-      <input type="checkbox" id="toggle-dark-mode" onclick="toggleDarkMode()"> Dark Mode
-    </label>
+    <h2>Settings</h2>
+    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
+    <div class="settings-section">
+      <button onclick="toggleSound()">Toggle Sound</button>
+      <button onclick="changeTheme()">Change Theme</button>
+    </div>
   </main>
 
-  <footer>
-    &copy; 2023 P2E Game - Powered by TON Blockchain
-  </footer>
+  <div id="hero-modal">
+    <div class="modal-content">
+      <img id="modal-hero-img" src="" alt="Hero">
+      <h3 id="modal-hero-name"></h3>
+      <p id="modal-hero-rarity"></p>
+      <p id="modal-hero-stats"></p>
+      <button onclick="closeModal()">Close</button>
+    </div>
+  </div>
+
+  <div class="loading-screen" id="loading-screen">
+    <p>Loading, please wait...</p>
+  </div>
 
   <script>
     const player = {
       tokens: 100,
-      dailyRewardClaimed: false,
-      achievements: {
-        own10Heroes: false,
-        earn1000Tokens: false,
-        complete5Quests: false,
-      },
+      heroes: [],
+      walletConnected: false,
+      isFarming: false
     };
 
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('home').classList.add('active');
-      }, 2000);
-    });
+    const heroesData = [
+      { name: "SlimeKid", rarity: "Common", img: "https://i.imgur.com/wY0nzE9.png", damage: 10, skill: "💧", type: "Water", level: 1 },
+      { name: "FireCrab", rarity: "Rare", img: "https://i.imgur.com/3l9MKIl.png", damage: 20, skill: "🔥", type: "Fire", level: 1 },
+      { name: "SharkWar", rarity: "Epic", img: "https://i.imgur.com/02jTwGp.png", damage: 30, skill: "💧", type: "Water", level: 1 },
+      { name: "InfernoCrab", rarity: "Legendary", img: "https://i.imgur.com/23DhlYC.png", damage: 40, skill: "🔥", type: "Fire", level: 1 },
+      { name: "ElderDragon", rarity: "Mythic", img: "https://i.imgur.com/tFzK3iu.png", damage: 50, skill: "🌟", type: "Light", level: 1 }
+    ];
 
     function switchTab(tabId) {
-      document.querySelectorAll('main').forEach(main => main.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-tab'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
+      document.querySelectorAll("main").forEach(tab => tab.classList.remove("active"));
+      document.querySelector(`#${tabId}`).classList.add("active");
     }
 
-    function addTokens(amount) {
-      player.tokens += amount;
-      alert(`You received ${amount} tokens!`);
-      checkAchievements();
-    }
-
-    function claimDailyReward() {
-      if (player.dailyRewardClaimed) {
-        alert('You already claimed your daily reward!');
+    function buyPack(count) {
+      if (player.tokens < count * 10) {
+        alert("Not enough tokens!");
         return;
       }
-
-      player.tokens += 50;
-      player.dailyRewardClaimed = true;
-      alert('You claimed your daily reward of 50 tokens!');
-      checkAchievements();
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-
-    function checkAchievements() {
-      if (player.tokens >= 1000 && !player.achievements.earn1000Tokens) {
-        player.achievements.earn1000Tokens = true;
-        alert('Achievement Unlocked: Earn 1000 Tokens!');
+      player.tokens -= count * 10;
+      for (let i = 0; i < count; i++) {
+        const hero = { ...heroesData[Math.floor(Math.random() * heroesData.length)] };
+        player.heroes.push(hero);
       }
+      autoMergeHeroes();
+      updateHeroList();
     }
-  </script>
-</body>
-</html>
+
+    function autoMergeHeroes() {
+      const mergedHeroes = [];
+      const heroMap = {};
+
+      player.heroes.forEach(hero => {
+        const key = `${hero.name}_${hero.level}`;
+        if (heroMap[key]) {
+          heroMap[key].level += 1;
+          heroMap[key].damage = Math.floor(heroMap[key].damage * 1.5);
+        } else {
+          heroMap[key] = { ...hero };
+        }
+      });
+
+      for (const key in heroMap) {
+        mergedHeroes.push(heroMap[key]);
+      }
+
+      player.heroes = mergedHeroes;
+    }
+
+    function updateHeroList() {
+      const heroList = document.getElementById("hero-list");
+      heroList.innerHTML = player.heroes.map((hero, index) => `
+        <div class="hero-card" onclick="showHeroDetails(${index})">
+          <img src="${hero.img}" alt="${hero.name}">
+          <p>${hero.name} (Lv${hero.level})</p>
+          <p class="rarity ${hero.rarity.toLowerCase()}">${hero.rarity}</p>
+        </div>
+      `).join("");
+
+      const farmSection = document.getElementById("farm-section");
+      farmSection.style.display = player.heroes.length > 0 ? "block" : "none";
+    }
+
+    function showHeroDetails(index) {
+      const hero = player.heroes[index];
+      document.getElementById("modal-hero-img").src = hero.img;
+      document.getElementById("modal-hero-name").textContent = hero.name;
+      document.getElementById("modal-hero-rarity").textContent = `Rarity: ${hero.rarity}`;
+      document.getElementById("modal-hero-stats").textContent = `Damage: ${hero.damage}, Skill: ${hero.skill}, Type: ${hero.type}, Level: ${hero.level}`;
+      document.getElementById("hero-modal").style.display = "flex";
+    }
+
+    function closeModal() {
+      document.getElementById("hero-modal").style.display = "none";
+    }
+
+    function connectWallet() {
+      player.walletConnected = true;
+      document.getElementById("wallet-status").textContent = "Status: Connected";
+      alert("Wallet connected successfully!");
+    }
+
+    function withdrawTON() {
+      if (!player.walletConnected) {
+        alert("Please connect your wallet first!");
+        return;
+      }
+      alert("TON withdrawal successful! Check your wallet.");
+    }
+
+    function copyReferralCode() {
+      const referralCode = document.getElementById("referral-code");
+      navigator.clipboard.writeText(referral
+<script>
+  function copyReferralCode() {
+    const referralCode = document.getElementById("referral-code");
+    navigator.clipboard
+      .writeText(referralCode.value)
+      .then(() => alert("Referral code copied to clipboard!"))
+      .catch(() => alert("Failed to copy referral code."));
+  }
+
+  function shareOnTelegram() {
+    const referralLink = document.getElementById("referral-code").value;
+    const telegramUrl = `https://t.me/share/url?url=${encodeURIComponent(
+      referralLink
+    )}&text=Join%20COST%20%26%20FLAME%20and%20earn%20TON%20rewards!`;
+    window.open(telegramUrl, "_blank");
+  }
+
+  function switchTab(tabId) {
+    document.querySelectorAll("main").forEach((tab) => tab.classList.remove("active"));
+    document.querySelector(`#${tabId}`).classList.add("active");
+  }
+
+  function connectWallet() {
+    player.walletConnected = true;
+    document.getElementById("wallet-status").textContent = "Status: Connected";
+    alert("Wallet connected successfully!");
+  }
+
+  function withdrawTON() {
+    if (!player.walletConnected) {
+      alert("Please connect your wallet first!");
+      return;
+    }
+    alert("TON withdrawal successful! Check your wallet.");
+  }
+
+  document.addEventListener("DOMContentLoaded", () => {
+    updateHeroList();
+  });
+</script>
