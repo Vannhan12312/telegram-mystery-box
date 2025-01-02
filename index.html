@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P2E Blockchain Game</title>
+  <title>COST & FLAME - P2E Game</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,335 +13,298 @@
     }
 
     body {
-      background: linear-gradient(to bottom, #2a2a72, #009ffd);
-      color: #fff;
+      background: #0e0e0e;
+      color: #f1f1f1;
       font-size: 14px;
       overflow: hidden;
-      animation: backgroundScroll 10s linear infinite;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
-    @keyframes backgroundScroll {
-      0% {
-        background-position: 0 0;
-      }
-      100% {
-        background-position: 0 100%;
-      }
-    }
-
-    header {
+    #intro-screen {
+      display: flex;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.9);
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 3000;
       text-align: center;
-      background: #001f3f;
-      color: white;
-      padding: 20px;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+      color: #fff;
+    }
+
+    #intro-screen button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      background: #00cc66;
+      border: none;
+      border-radius: 5px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    #intro-screen button:hover {
+      background: #00994d;
     }
 
     nav {
       display: flex;
       justify-content: space-around;
-      background: #001233;
-      padding: 10px;
-      border-bottom: 2px solid #555;
+      background: #292929;
+      padding: 5px 0;
+      overflow-x: auto;
     }
 
     nav button {
-      flex: 1;
       border: none;
-      background: #00509e;
-      padding: 12px;
+      padding: 5px;
+      background: #1a1a1a;
+      color: #f1f1f1;
       cursor: pointer;
+      border-radius: 5px;
+      font-size: 12px;
       font-weight: bold;
-      color: white;
-      transition: background 0.3s, transform 0.3s;
+      transition: background 0.3s;
     }
 
     nav button:hover {
-      background: #1f78d1;
-      transform: scale(1.1);
+      background: #3e3e3e;
     }
 
-    .active-tab {
-      background: #00aaff;
-      transform: scale(1.1);
+    nav .active-tab {
+      background: #00cc66;
+      color: #fff;
     }
 
     main {
       display: none;
-      padding: 20px;
-      animation: fadeIn 0.5s;
+      flex-grow: 1;
+      padding: 10px;
+      background: #1a1a1a;
+      border-radius: 10px;
+      overflow-y: auto;
     }
 
     main.active {
       display: block;
     }
 
-    @keyframes fadeIn {
-      from {
-        opacity: 0;
-      }
-      to {
-        opacity: 1;
-      }
-    }
-
-    #loading-screen {
+    .loading-screen {
+      display: none;
       position: fixed;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      background: #000;
+      background: rgba(0, 0, 0, 0.9);
       color: #fff;
       display: flex;
       justify-content: center;
       align-items: center;
-      font-size: 24px;
-      z-index: 10000;
+      z-index: 2000;
+      font-size: 20px;
     }
 
-    #wallet {
-      margin-top: 20px;
-      padding: 20px;
-      background: #003459;
-      border-radius: 8px;
+    .hero-container {
+      display: flex;
+      overflow-x: auto;
+      gap: 8px;
+      padding: 10px 0;
+      scroll-snap-type: x mandatory;
+    }
+
+    .hero-card {
+      width: 100px;
+      height: 140px;
+      background: #292929;
+      border: 1px solid #444;
+      border-radius: 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 5px;
+      scroll-snap-align: start;
+      transition: transform 0.3s;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-5px);
+    }
+
+    .hero-card img {
+      width: 60px;
+      height: 60px;
+      border-radius: 50%;
+      margin-bottom: 5px;
+    }
+
+    .hero-card p {
+      font-size: 10px;
       text-align: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      margin: 0;
+      color: #fff;
     }
 
-    #wallet h3 {
-      margin-bottom: 15px;
+    .quest-list {
+      list-style: none;
+      padding: 0;
     }
 
-    #wallet button {
-      margin: 5px;
+    .quest-item {
+      background: #292929;
+      border-radius: 5px;
+      margin-bottom: 5px;
       padding: 10px;
-      background: #00509e;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .quest-item button {
+      padding: 5px 10px;
+      background: #00cc66;
       border: none;
-      color: white;
       border-radius: 5px;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    #wallet button:hover {
-      background: #1f78d1;
-    }
-
-    footer {
-      margin-top: 20px;
-      padding: 10px;
-      background: #001f3f;
-      color: white;
-      text-align: center;
-    }
-
-    #marketplace {
-      margin-top: 20px;
-      padding: 20px;
-      background: #003459;
-      border-radius: 8px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    #marketplace-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .marketplace-item {
-      background: #00509e;
-      padding: 15px;
-      border-radius: 5px;
-      text-align: center;
-      color: white;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s;
-    }
-
-    .marketplace-item:hover {
-      transform: scale(1.05);
-    }
-
-    #auction {
-      margin-top: 20px;
-      padding: 20px;
-      background: #003459;
-      border-radius: 8px;
-      text-align: center;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-    }
-
-    #auction-list {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 15px;
-      margin-top: 20px;
-    }
-
-    .auction-item {
-      background: #0073e6;
-      padding: 15px;
-      border-radius: 5px;
-      text-align: center;
-      color: white;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: transform 0.3s;
-    }
-
-    .auction-item:hover {
-      transform: scale(1.05);
-    }
-
-    .dark-mode {
-      background: linear-gradient(to bottom, #1a1a1a, #333);
-      color: #e0e0e0;
-    }
-
-    .dark-mode nav {
-      background: #222;
-    }
-
-    .dark-mode nav button {
-      background: #444;
-    }
-
-    .dark-mode nav button:hover {
-      background: #555;
+      color: #fff;
+      font-weight: bold;
     }
   </style>
 </head>
 <body>
-  <div id="loading-screen">Loading game assets...</div>
-
-  <header>
-    <h1>P2E Blockchain Game</h1>
-  </header>
+  <div id="intro-screen">
+    <h1>Welcome to COST & FLAME</h1>
+    <button onclick="startGame()">Start</button>
+  </div>
 
   <nav>
     <button class="active-tab" onclick="switchTab('home')">Home</button>
-    <button onclick="switchTab('wallet')">Wallet</button>
-    <button onclick="switchTab('marketplace')">Marketplace</button>
-    <button onclick="switchTab('leaderboard')">Leaderboard</button>
-    <button onclick="switchTab('auction')">Auction</button>
-    <button onclick="switchTab('profile')">Profile</button>
+    <button onclick="switchTab('shop')">Shop</button>
+    <button onclick="switchTab('heroes')">Heroes</button>
     <button onclick="switchTab('settings')">Settings</button>
+    <button onclick="switchTab('more')">More</button>
   </nav>
 
   <main id="home" class="active">
-    <h2>Welcome to the Blockchain P2E Game</h2>
-    <button onclick="claimDailyReward()">Claim Daily Reward</button>
-    <button onclick="enterPvPBattle()">Enter PvP Battle</button>
+    <h2>Welcome to the Game</h2>
+    <p>Manage your heroes, complete quests, and dominate the leaderboard.</p>
   </main>
 
-  <main id="wallet">
-    <h3>Your Wallet</h3>
-    <p id="wallet-balance">Balance: 0 TON</p>
-    <button onclick="depositTokens()">Deposit</button>
-    <button onclick="withdrawTokens()">Withdraw</button>
-    <button onclick="checkBlockchainBalance()">Check Blockchain Balance</button>
+  <main id="shop">
+    <h2>Shop</h2>
+    <p>Buy hero packs to grow your collection.</p>
+    <button onclick="buyChest(1)">Buy 1 Pack</button>
+    <button onclick="buyChest(5)">Buy 5 Packs</button>
   </main>
 
-  <main id="marketplace">
-    <h3>Marketplace</h3>
-    <div id="marketplace-list">
-      <div class="marketplace-item">Hero 1 - 10 TON</div>
-      <div class="marketplace-item">Hero 2 - 15 TON</div>
-      <div class="marketplace-item">Hero 3 - 20 TON</div>
-    </div>
-  </main>
-
-  <main id="auction">
-    <h3>Hero Auctions</h3>
-    <div id="auction-list">
-      <div class="auction-item">
-        <p>Hero: BlazeKnight</p>
-        <p>Starting Bid: 20 TON</p>
-        <button onclick="placeBid('BlazeKnight', 20)">Place Bid</button>
-      </div>
-      <div class="auction-item">
-        <p>Hero: AquaMage</p>
-        <p>Starting Bid: 25 TON</p>
-        <button onclick="placeBid('AquaMage', 25)">Place Bid</button>
-      </div>
-    </div>
-  </main>
-
-  <main id="leaderboard">
-    <h3>Leaderboard</h3>
-    <ul id="leaderboard-list">
-      <li><strong>Player 1</strong>: 1000 Tokens</li>
-      <li><strong>Player 2</strong>: 800 Tokens</li>
-      <li><strong>Player 3</strong>: 600 Tokens</li>
-    </ul>
-  </main>
-
-  <main id="profile">
-    <h3>Profile</h3>
-    <img src="https://via.placeholder.com/100" alt="Avatar">
-    <input type="text" id="display-name" placeholder="Enter your display name">
-    <button onclick="saveProfileSettings()">Save</button>
+  <main id="heroes">
+    <h2>Your Heroes</h2>
+    <div class="hero-container" id="hero-list"></div>
   </main>
 
   <main id="settings">
-    <h3>Settings</h3>
-    <label><input type="checkbox" id="sound-toggle"> Enable Sound</label><br>
-    <label><input type="checkbox" id="dark-mode-toggle" onclick="toggleDarkMode()"> Enable Dark Mode</label>
+    <h2>Settings</h2>
+    <button onclick="toggleSound()">Toggle Sound</button>
+    <button onclick="changeTheme()">Change Theme</button>
   </main>
 
-  <footer>
-    &copy; 2023 P2E Blockchain Game - Powered by TON
-  </footer>
+  <main id="more">
+    <h2>More Options</h2>
+    <button onclick="switchTab('quests')">Quests</button>
+    <button onclick="switchTab('leaderboard')">Leaderboard</button>
+    <button onclick="switchTab('marketplace')">Marketplace</button>
+    <button onclick="switchTab('pvp')">PvP</button>
+  </main>
+
+  <main id="quests">
+    <h2>Daily Quests</h2>
+    <ul class="quest-list" id="quest-list">
+      <!-- Quests will be dynamically loaded here -->
+    </ul>
+  </main>
+
+  <main id="leaderboard">
+    <h2>Leaderboard</h2>
+    <p>Top players in the game</p>
+    <ul id="leaderboard-list">
+      <!-- Leaderboard entries will be dynamically loaded here -->
+    </ul>
+  </main>
+
+  <main id="marketplace">
+    <h2>Marketplace</h2>
+    <div id="marketplace-items">
+      <!-- Marketplace items will be dynamically loaded here -->
+    </div>
+  </main>
+
+  <main id="pvp">
+    <h2>Player vs Player</h2>
+    <p>Choose your best heroes to battle others.</p>
+    <button onclick="startPvP()">Start PvP Battle</button>
+  </main>
+
+  <div class="loading-screen" id="loading-screen">
+    Loading, please wait...
+  </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', () => {
-      setTimeout(() => {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('home').classList.add('active');
-      }, 2000);
-    });
+    const player = {
+      tokens: 100,
+      heroes: [],
+      quests: [
+        { id: 1, description: "Buy 1 hero pack", completed: false, reward: 10 },
+        { id: 2, description: "Win 3 PvP battles", completed: false, reward: 20 }
+      ]
+    };
+
+    function startGame() {
+      document.getElementById("intro-screen").style.display = "none";
+    }
 
     function switchTab(tabId) {
-      document.querySelectorAll('main').forEach(main => main.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-tab'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
+      document.querySelectorAll("main").forEach(tab => tab.classList.remove("active"));
+      document.querySelector(`#${tabId}`).classList.add("active");
     }
 
-    function claimDailyReward() {
-      alert('You claimed your daily reward!');
+    function buyChest(count) {
+      alert(`Bought ${count} hero pack(s)`);
     }
 
-    function enterPvPBattle() {
-      alert('Entering PvP Battle... Feature coming soon!');
+    function toggleSound() {
+      alert("Sound toggled!");
     }
 
-    function depositTokens() {
-      alert('Deposit feature coming soon!');
+    function changeTheme() {
+      alert("Theme changed!");
     }
 
-    function withdrawTokens() {
-      alert('Withdraw feature coming soon!');
+    function startPvP() {
+      alert("PvP Battle started! Feature under development.");
     }
 
-    function checkBlockchainBalance() {
-      alert('Checking blockchain balance...');
-    }
+    document.addEventListener("DOMContentLoaded", () => {
+      const questList = document.getElementById("quest-list");
+      questList.innerHTML = player.quests.map(quest => `
+        <li class="quest-item">
+          <span>${quest.description}</span>
+          <button onclick="completeQuest(${quest.id})">Complete</button>
+        </li>
+      `).join("");
+    });
 
-    function saveProfileSettings() {
-      const displayName = document.getElementById('display-name').value;
-      alert(`Profile updated! Display name: ${displayName}`);
-    }
-
-    function toggleDarkMode() {
-      document.body.classList.toggle('dark-mode');
-    }
-
-    function placeBid(heroName, bidAmount) {
-      alert(`Bid placed on ${heroName} for ${bidAmount} TON!`);
+    function completeQuest(questId) {
+      const quest = player.quests.find(q => q.id === questId);
+      if (quest) {
+        quest.completed = true;
+        alert(`Quest completed! You earned ${quest.reward} tokens.`);
+      }
     }
   </script>
 </body>
