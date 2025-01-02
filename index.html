@@ -47,7 +47,7 @@
     }
     .hero-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(60px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
       gap: 10px;
     }
     .hero-card {
@@ -57,10 +57,17 @@
       border-radius: 5px;
       background: #fff;
       cursor: pointer;
+      overflow: hidden;
     }
     .hero-card img {
       max-width: 50px;
       margin: 5px auto;
+    }
+    .hero-card p {
+      margin: 5px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
     footer {
       text-align: center;
@@ -174,21 +181,18 @@
   <script>
     const player = {
       tokens: 100,
-      heroes: [],
+      heroes: Array(25).fill().map((_, i) => ({
+        name: `Hero ${i + 1}`,
+        rarity: ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'][i % 5],
+        img: `https://i.imgur.com/placeholder-${i + 1}.png`,
+        attribute: ['Fire', 'Water', 'Earth', 'Wind', 'Electric'][i % 5],
+        symbol: ['🔥', '💧', '🌎', '🍃', '⚡'][i % 5],
+        earnRate: Math.floor(Math.random() * 10 + 5),
+        level: 1
+      })),
       quests: [
         { id: 1, name: "Complete Tutorial", completed: false, reward: 10 },
       ]
-    };
-
-    const heroData = {
-      Common: [
-        { name: 'Fisher Bob', img: 'https://i.imgur.com/wY0nzE9.png', attribute: 'Water', symbol: '💧', earnRate: 5 },
-        { name: 'Crab Catcher', img: 'https://i.imgur.com/Iy1X8r1.png', attribute: 'Water', symbol: '💧', earnRate: 6 },
-        { name: 'Net Master', img: 'https://i.imgur.com/81Ypu1S.png', attribute: 'Water', symbol: '💧', earnRate: 7 },
-        { name: 'Old Man Jang', img: 'https://i.imgur.com/XMUx21e.png', attribute: 'Earth', symbol: '🌎', earnRate: 4 },
-        { name: 'Rookie Roy', img: 'https://i.imgur.com/eVNSFSH.png', attribute: 'Fire', symbol: '🔥', earnRate: 8 }
-      ],
-      // Add other rarities here if necessary.
     };
 
     function switchTab(tabId) {
@@ -212,60 +216,13 @@
           <p class="color-${hero.rarity.toLowerCase()}">${hero.name} (${hero.rarity})</p>
           <p>${hero.symbol} ${hero.attribute}</p>
         </div>`).join('');
-      autoUpgradeHeroes();
-    }
-
-    function buyChest(count) {
-      if (player.tokens >= count * 10) {
-        player.tokens -= count * 10;
-        for (let i = 0; i < count; i++) {
-          const rarities = ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'];
-          const rarity = rarities[Math.floor(Math.random() * rarities.length)];
-          const hero = { ...heroData.Common[Math.floor(Math.random() * heroData.Common.length)], rarity: rarity, level: 1, damage: Math.floor(Math.random() * 100) + 50 };
-          player.heroes.push(hero);
-        }
-        updateHome();
-        updateBoat();
-      } else {
-        alert("Not enough tokens!");
-      }
-    }
-
-    function autoUpgradeHeroes() {
-      const grouped = {};
-      player.heroes.forEach((hero, index) => {
-        const key = `${hero.name}-lv${hero.level}`;
-        if (!grouped[key]) grouped[key] = [];
-        grouped[key].push(index);
-      });
-
-      for (const key in grouped) {
-        const indices = grouped[key];
-        while (indices.length >= 2) {
-          const index1 = indices.pop();
-          const index2 = indices.pop();
-
-          const hero1 = player.heroes[index1];
-          const hero2 = player.heroes[index2];
-
-          const upgradedHero = {
-            ...hero1,
-            level: hero1.level + 1,
-            damage: Math.floor(hero1.damage * (hero1.level < 5 ? 1.5 : 2)),
-          };
-
-          player.heroes.splice(index1, 1);
-          player.heroes.splice(index2, 1);
-          player.heroes.push(upgradedHero);
-        }
-      }
     }
 
     function showHeroDetails(index) {
       const hero = player.heroes[index];
       document.getElementById('modal-hero-img').src = hero.img;
       document.getElementById('modal-hero-name').textContent = `${hero.name} (${hero.symbol} ${hero.attribute})`;
-      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${hero.damage}`;
+      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${Math.floor(Math.random() * 100) + 50}`;
       document.getElementById('modal-hero-skill').textContent = `Skill: Special Move`;
       document.getElementById('modal-hero-earn').textContent = `Farm Rate: ${hero.earnRate} tokens/day`;
       document.getElementById('modal-overlay').style.display = 'flex';
@@ -275,17 +232,9 @@
       document.getElementById('modal-overlay').style.display = 'none';
     }
 
-    function startAutoFarm() {
-      setInterval(() => {
-        const dailyEarn = player.heroes.reduce((sum, hero) => sum + hero.earnRate, 0);
-        player.tokens += dailyEarn;
-        updateHome();
-      }, 86400000); // 1 day in milliseconds
-    }
-
     document.addEventListener('DOMContentLoaded', () => {
       updateHome();
-      startAutoFarm();
+      updateBoat();
     });
   </script>
 </body>
