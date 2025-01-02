@@ -189,6 +189,34 @@
       ]
     };
 
+    const heroData = {
+      Common: [
+        { name: 'Crab Catcher', img: 'https://i.imgur.com/wY0nzE9.png', attribute: 'Water', symbol: '💧', earnRate: 5, level: 1, damage: 50, speed: 10 },
+        { name: 'Rookie Roy', img: 'https://i.imgur.com/eVNSFSH.png', attribute: 'Fire', symbol: '🔥', earnRate: 6, level: 1, damage: 55, speed: 12 }
+      ],
+      Rare: [
+        { name: 'Mermaid Mia', img: 'https://i.imgur.com/cSy6okk.png', attribute: 'Water', symbol: '💧', earnRate: 7, level: 1, damage: 60, speed: 14 },
+        { name: 'River Ronin', img: 'https://i.imgur.com/3l9MKIl.png', attribute: 'Wind', symbol: '🍃', earnRate: 8, level: 1, damage: 65, speed: 15 }
+      ],
+      Epic: [
+        { name: 'Storm Summoner', img: 'https://i.imgur.com/JOCwUzy.png', attribute: 'Earth', symbol: '🌎', earnRate: 9, level: 1, damage: 70, speed: 17 }
+      ],
+      Legendary: [
+        { name: 'Poseidon’s Heir', img: 'https://i.imgur.com/23DhlYC.png', attribute: 'Water', symbol: '💧', earnRate: 10, level: 1, damage: 80, speed: 18 }
+      ],
+      Mythic: [
+        { name: 'Eternal Eel', img: 'https://i.imgur.com/tFzK3iu.png', attribute: 'Electric', symbol: '⚡', earnRate: 15, level: 1, damage: 100, speed: 20 }
+      ]
+    };
+
+    const rarityChances = [
+      { rarity: 'Common', chance: 50 },
+      { rarity: 'Rare', chance: 30 },
+      { rarity: 'Epic', chance: 15 },
+      { rarity: 'Legendary', chance: 4 },
+      { rarity: 'Mythic', chance: 1 }
+    ];
+
     function switchTab(tabId) {
       document.querySelectorAll('main').forEach(tab => tab.classList.remove('active'));
       document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-tab'));
@@ -226,16 +254,9 @@
       if (player.tokens >= count * 10) {
         player.tokens -= count * 10;
         for (let i = 0; i < count; i++) {
-          const hero = {
-            name: `Random Hero`,
-            rarity: `Common`,
-            img: `https://via.placeholder.com/50`,
-            attribute: `Water`,
-            symbol: `💧`,
-            level: 1,
-            earnRate: Math.floor(Math.random() * 10 + 5)
-          };
-          player.heroes.push(hero);
+          const rarity = getRandomRarity();
+          const hero = heroData[rarity][Math.floor(Math.random() * heroData[rarity].length)];
+          player.heroes.push({ ...hero });
         }
         updateHome();
         updateHero();
@@ -244,11 +265,52 @@
       }
     }
 
+    function getRandomRarity() {
+      const roll = Math.random() * 100;
+      let cumulativeChance = 0;
+      for (const rarityChance of rarityChances) {
+        cumulativeChance += rarityChance.chance;
+        if (roll < cumulativeChance) return rarityChance.rarity;
+      }
+      return 'Common';
+    }
+
+    function autoUpgradeHeroes() {
+      const grouped = {};
+      player.heroes.forEach((hero, index) => {
+        const key = `${hero.name}-lv${hero.level}`;
+        if (!grouped[key]) grouped[key] = [];
+        grouped[key].push(index);
+      });
+
+      for (const key in grouped) {
+        const indices = grouped[key];
+        while (indices.length >= 2) {
+          const index1 = indices.pop();
+          const index2 = indices.pop();
+
+          const hero1 = player.heroes[index1];
+          const hero2 = player.heroes[index2];
+
+          const upgradedHero = {
+            ...hero1,
+            level: hero1.level + 1,
+            damage: Math.floor(hero1.damage * (hero1.level === 1 ? 1.5 : hero1.level === 2 ? 1.75 : 2)),
+            speed: Math.floor(hero1.speed * 1.2)
+          };
+
+          player.heroes.splice(index1, 1);
+          player.heroes.splice(index2, 1);
+          player.heroes.push(upgradedHero);
+        }
+      }
+    }
+
     function showHeroDetails(index) {
       const hero = player.heroes[index];
       document.getElementById('modal-hero-img').src = hero.img;
       document.getElementById('modal-hero-name').textContent = `${hero.name} (${hero.symbol} ${hero.attribute})`;
-      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${Math.floor(Math.random() * 100) + 50}`;
+      document.getElementById('modal-hero-damage').textContent = `Damage: ⚔ ${hero.damage}`;
       document.getElementById('modal-hero-speed').textContent = `Speed: 💨 ${hero.speed}`;
       document.getElementById('modal-hero-element').textContent = `Element: ${hero.symbol} ${hero.attribute}`;
       document.getElementById('modal-hero-level').textContent = `Level: ${hero.level}`;
