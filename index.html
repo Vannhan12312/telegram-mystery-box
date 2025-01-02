@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>COST & FLAME - P2E Game</title>
+  <title>P2E Game - TON Blockchain</title>
   <style>
     * {
       box-sizing: border-box;
@@ -13,465 +13,355 @@
     }
 
     body {
-      background: #0e0e0e;
-      color: #f1f1f1;
+      background: #f0f0f0;
+      color: #333;
       font-size: 14px;
-      overflow: auto;
-      padding: 10px;
+      overflow: hidden;
     }
 
     header {
       text-align: center;
-      background: #1f1f1f;
-      color: #f1f1f1;
+      background: linear-gradient(135deg, #4a90e2, #50c878);
+      color: white;
       padding: 15px;
-      border-radius: 10px;
-      margin-bottom: 15px;
-    }
-
-    header h1 {
-      font-size: 24px;
-      margin-bottom: 5px;
     }
 
     nav {
       display: flex;
       justify-content: space-around;
-      margin-bottom: 15px;
+      background: #efefef;
+      padding: 10px 0;
     }
 
     nav button {
+      flex: 1;
       border: none;
+      background: white;
       padding: 10px;
-      background: #292929;
-      color: #f1f1f1;
       cursor: pointer;
-      border-radius: 5px;
       font-weight: bold;
       transition: background 0.3s;
     }
 
     nav button:hover {
-      background: #3e3e3e;
+      background: #d4f4e7;
     }
 
-    nav .active-tab {
-      background: #00cc66;
-      color: #fff;
+    .active-tab {
+      background: #c3f0d1;
     }
 
     main {
       display: none;
       padding: 15px;
-      background: #1a1a1a;
-      border-radius: 10px;
+      animation: fadeIn 0.5s;
     }
 
     main.active {
       display: block;
     }
 
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
     .hero-container {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      grid-template-columns: repeat(5, 1fr);
       gap: 10px;
+      justify-items: center;
     }
 
     .hero-card {
-      background: #2a2a2a;
-      border: 2px solid #3e3e3e;
-      border-radius: 10px;
-      text-align: center;
-      padding: 10px;
+      width: 70px;
+      height: 100px;
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
       cursor: pointer;
-      transition: transform 0.3s, border-color 0.3s;
+      overflow: hidden;
+      padding: 5px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: transform 0.3s, box-shadow 0.3s;
     }
 
     .hero-card:hover {
-      transform: translateY(-5px);
-      border-color: #00cc66;
+      transform: scale(1.05);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
     .hero-card img {
-      width: 100%;
-      height: 120px;
+      width: 50px;
+      height: 50px;
       object-fit: cover;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      border-radius: 50%;
+      margin-bottom: 5px;
     }
 
     .hero-card p {
-      font-size: 14px;
-      margin: 5px 0;
-    }
-
-    .hero-card .rarity {
-      font-weight: bold;
-      font-size: 14px;
-      margin-top: 5px;
-    }
-
-    .rarity.common { color: #9e9e9e; }
-    .rarity.rare { color: #42a5f5; }
-    .rarity.epic { color: #ab47bc; }
-    .rarity.legendary { color: #ff7043; }
-    .rarity.mythic { color: #e53935; }
-
-    .wallet-section {
+      font-size: 12px;
+      line-height: 1.2;
       text-align: center;
-      margin-bottom: 20px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
-    .wallet-section button {
-      background: #00cc66;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .wallet-section button:hover {
-      background: #00994d;
-    }
-
-    .referral-section {
-      background: #292929;
-      border-radius: 10px;
+    footer {
+      text-align: center;
       padding: 15px;
-      margin-bottom: 20px;
-      text-align: center;
+      background: #f4f4f4;
+      border-top: 1px solid #ddd;
     }
 
-    .referral-section input {
-      width: calc(100% - 30px);
-      padding: 10px;
-      margin-bottom: 10px;
-      border-radius: 5px;
-      border: 1px solid #3e3e3e;
-      background: #1a1a1a;
-      color: #f1f1f1;
-    }
-
-    .referral-section button {
-      background: #ff7043;
-      color: #fff;
-      border: none;
-      padding: 10px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .referral-section button:hover {
-      background: #ff5722;
-    }
-
-    #hero-modal {
-      display: none;
+    #modal-overlay {
       position: fixed;
       top: 0;
       left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.8);
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: none;
       justify-content: center;
       align-items: center;
-      z-index: 1000;
+      z-index: 9999;
     }
 
-    #hero-modal .modal-content {
-      background: #2a2a2a;
+    #modal-content {
+      background: white;
       padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      color: #fff;
-      max-width: 300px;
-      width: 90%;
-    }
-
-    #hero-modal img {
-      width: 150px;
-      height: 150px;
-      object-fit: cover;
       border-radius: 8px;
-      margin-bottom: 10px;
-    }
-
-    #hero-modal button {
-      background: #00cc66;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    #hero-modal button:hover {
-      background: #00994d;
-    }
-
-    .farm-section {
+      width: 300px;
       text-align: center;
-      margin-top: 20px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .farm-section button {
-      background: #ffcc00;
-      color: #000;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .farm-section button:hover {
-      background: #e6b800;
-    }
-
-    .settings-section {
-      text-align: center;
-      margin-top: 20px;
-    }
-
-    .settings-section button {
-      background: #007bff;
-      color: #fff;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 5px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-
-    .settings-section button:hover {
-      background: #0056b3;
-    }
-
-    .loading-screen {
-      display: none;
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.9);
-      color: #fff;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-      font-size: 24px;
-      text-align: center;
-    }
-
-    .back-button {
+    #modal-close {
       position: absolute;
       top: 10px;
-      left: 10px;
-      background: #292929;
-      color: #fff;
+      right: 10px;
+      background: #ddd;
       border: none;
-      padding: 10px;
-      border-radius: 5px;
       cursor: pointer;
-      font-weight: bold;
+      border-radius: 4px;
+      padding: 5px 10px;
       transition: background 0.3s;
     }
 
-    .back-button:hover {
-      background: #3e3e3e;
+    #modal-close:hover {
+      background: #bbb;
     }
 
+    #modal-hero-img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 6px;
+      margin-bottom: 10px;
+    }
+
+    .color-common {
+      color: #999;
+    }
+
+    .color-rare {
+      color: #54FFFE;
+    }
+
+    .color-epic {
+      color: #C66CC5;
+    }
+
+    .color-legendary {
+      color: #FFA800;
+    }
+
+    .color-mythic {
+      color: #FF0000;
+    }
   </style>
 </head>
 <body>
   <header>
-    <h1>COST & FLAME</h1>
-    <p>The Ultimate P2E Game on TON Blockchain</p>
+    <h1>P2E Game</h1>
+    <p>TON Blockchain Integration</p>
   </header>
 
   <nav>
     <button class="active-tab" onclick="switchTab('home')">Home</button>
     <button onclick="switchTab('shop')">Shop</button>
-    <button onclick="switchTab('heroes')">Heroes</button>
+    <button onclick="switchTab('hero')">Heroes</button>
+    <button onclick="switchTab('quest')">Quests</button>
     <button onclick="switchTab('wallet')">Wallet</button>
-    <button onclick="switchTab('settings')">Settings</button>
   </nav>
 
   <main id="home" class="active">
-    <h2>Welcome to COST & FLAME!</h2>
-    <p>Collect heroes, earn rewards, and dominate the leaderboard!</p>
-    <div class="referral-section">
-      <h3>Referral Program</h3>
-      <p>Invite your friends and earn 10% of their TON rewards!</p>
-      <input type="text" id="referral-code" value="https://t.me/yourbot?start=ref123" readonly>
-      <button onclick="copyReferralCode()">Copy Referral Link</button>
-      <button onclick="shareOnTelegram()">Share via Telegram</button>
-    </div>
+    <p>Welcome to the P2E Game powered by TON Blockchain!</p>
+    <div id="player-summary"></div>
+    <button onclick="addTokens(100)">Get +100 Tokens</button>
   </main>
 
   <main id="shop">
-    <h2>Shop</h2>
-    <p>Buy hero packs to grow your collection. Each pack costs 10 tokens.</p>
-    <button onclick="buyPack(1)">Buy 1 Pack</button>
-    <button onclick="buyPack(5)">Buy 5 Packs</button>
-    <button onclick="buyPack(10)">Buy 10 Packs</button>
+    <h3>Shop</h3>
+    <p>Buy chests and expand your hero collection:</p>
+    <button onclick="buyChest(1)">Buy 1 Chest</button>
+    <button onclick="buyChest(5)">Buy 5 Chests</button>
+    <button onclick="buyChest(10)">Buy 10 Chests</button>
+    <p id="shop-message"></p>
   </main>
 
-  <main id="heroes">
-    <h2>Your Heroes</h2>
-    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
+  <main id="hero">
+    <h3>Your Heroes</h3>
     <div class="hero-container" id="hero-list"></div>
-    <div class="farm-section" id="farm-section" style="display: none;">
-      <h3>Farm TON Tokens</h3>
-      <p>Select heroes to start farming TON tokens:</p>
-      <button onclick="startFarming()">Start Farming</button>
-    </div>
+  </main>
+
+  <main id="quest">
+    <h3>Quests</h3>
+    <div id="quest-list"></div>
   </main>
 
   <main id="wallet">
-    <h2>Wallet</h2>
-    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
-    <div class="wallet-section">
-      <p>Connect your TON wallet to start earning and withdrawing rewards.</p>
-      <button onclick="connectWallet()">Connect Wallet</button>
-      <p id="wallet-status">Status: Not Connected</p>
-    </div>
-    <div class="wallet-section">
-      <h3>Withdraw TON</h3>
-      <p>Withdraw your earnings directly to your wallet.</p>
-      <button onclick="withdrawTON()">Withdraw</button>
-    </div>
+    <h3>Wallet</h3>
+    <p>Token Balance: <span id="wallet-tokens"></span></p>
   </main>
 
-  <main id="settings">
-    <h2>Settings</h2>
-    <button class="back-button" onclick="switchTab('home')">&lt; Back</button>
-    <div class="settings-section">
-      <button onclick="toggleSound()">Toggle Sound</button>
-      <button onclick="changeTheme()">Change Theme</button>
-    </div>
-  </main>
-
-  <div id="hero-modal">
-    <div class="modal-content">
-      <img id="modal-hero-img" src="" alt="Hero">
-      <h3 id="modal-hero-name"></h3>
+  <div id="modal-overlay">
+    <div id="modal-content">
+      <button id="modal-close" onclick="closeModal()">X</button>
+      <img id="modal-hero-img" src="" alt="Hero" />
+      <p id="modal-hero-name" style="font-weight:bold;"></p>
       <p id="modal-hero-rarity"></p>
+      <p id="modal-hero-attr"></p>
       <p id="modal-hero-stats"></p>
-      <button onclick="closeModal()">Close</button>
+      <p id="modal-hero-level"></p>
     </div>
   </div>
 
-  <div class="loading-screen" id="loading-screen">
-    <p>Loading, please wait...</p>
-  </div>
+  <footer>
+    &copy; 2023 P2E Game - Powered by TON Blockchain
+  </footer>
 
   <script>
+    // Core game logic and blockchain integration will go here
+
     const player = {
       tokens: 100,
       heroes: [],
-      walletConnected: false,
-      isFarming: false
+      quests: [
+        { id: 1, name: 'Complete Tutorial', reward: 50, completed: false },
+        { id: 2, name: 'Win 3 Battles', reward: 100, completed: false },
+      ],
     };
 
-    const heroesData = [
-      { name: "SlimeKid", rarity: "Common", img: "https://i.imgur.com/wY0nzE9.png", damage: 10, skill: "💧", type: "Water", level: 1 },
-      { name: "FireCrab", rarity: "Rare", img: "https://i.imgur.com/3l9MKIl.png", damage: 20, skill: "🔥", type: "Fire", level: 1 },
-      { name: "SharkWar", rarity: "Epic", img: "https://i.imgur.com/02jTwGp.png", damage: 30, skill: "💧", type: "Water", level: 1 },
-      { name: "InfernoCrab", rarity: "Legendary", img: "https://i.imgur.com/23DhlYC.png", damage: 40, skill: "🔥", type: "Fire", level: 1 },
-      { name: "ElderDragon", rarity: "Mythic", img: "https://i.imgur.com/tFzK3iu.png", damage: 50, skill: "🌟", type: "Light", level: 1 }
-    ];
-
     function switchTab(tabId) {
-      document.querySelectorAll("main").forEach(tab => tab.classList.remove("active"));
-      document.querySelector(`#${tabId}`).classList.add("active");
+      document.querySelectorAll('main').forEach(main => main.classList.remove('active'));
+      document.querySelectorAll('nav button').forEach(btn => btn.classList.remove('active-tab'));
+      document.getElementById(tabId).classList.add('active');
+      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
     }
 
-    function buyPack(count) {
-      if (player.tokens < count * 10) {
-        alert("Not enough tokens!");
+    function addTokens(amount) {
+      player.tokens += amount;
+      document.getElementById('wallet-tokens').textContent = player.tokens;
+      alert(`You received ${amount} tokens!`);
+    }
+
+    function buyChest(count) {
+      const cost = count * 10;
+      if (player.tokens < cost) {
+        alert('Not enough tokens!');
         return;
       }
-      player.tokens -= count * 10;
+
+      player.tokens -= cost;
+      document.getElementById('wallet-tokens').textContent = player.tokens;
+
       for (let i = 0; i < count; i++) {
-        const hero = { ...heroesData[Math.floor(Math.random() * heroesData.length)] };
+        const hero = {
+          name: `Hero ${Math.random().toString(36).substring(7)}`,
+          rarity: ['Common', 'Rare', 'Epic', 'Legendary', 'Mythic'][Math.floor(Math.random() * 5)],
+          attribute: ['Water', 'Fire', 'Earth', 'Air'][Math.floor(Math.random() * 4)],
+          damage: Math.floor(Math.random() * 50) + 10,
+          level: 1,
+        };
         player.heroes.push(hero);
       }
-      autoMergeHeroes();
+
       updateHeroList();
     }
 
-    function autoMergeHeroes() {
-      const mergedHeroes = [];
-      const heroMap = {};
-
-      player.heroes.forEach(hero => {
-        const key = `${hero.name}_${hero.level}`;
-        if (heroMap[key]) {
-          heroMap[key].level += 1;
-          heroMap[key].damage = Math.floor(heroMap[key].damage * 1.5);
-        } else {
-          heroMap[key] = { ...hero };
-        }
-      });
-
-      for (const key in heroMap) {
-        mergedHeroes.push(heroMap[key]);
-      }
-
-      player.heroes = mergedHeroes;
-    }
-
     function updateHeroList() {
-      const heroList = document.getElementById("hero-list");
-      heroList.innerHTML = player.heroes.map((hero, index) => `
-        <div class="hero-card" onclick="showHeroDetails(${index})">
-          <img src="${hero.img}" alt="${hero.name}">
-          <p>${hero.name} (Lv${hero.level})</p>
-          <p class="rarity ${hero.rarity.toLowerCase()}">${hero.rarity}</p>
-        </div>
-      `).join("");
-
-      const farmSection = document.getElementById("farm-section");
-      farmSection.style.display = player.heroes.length > 0 ? "block" : "none";
+      const heroContainer = document.getElementById('hero-list');
+      heroContainer.innerHTML = player.heroes
+        .map(
+          hero => `
+        <div class="hero-card" onclick="showHeroDetails('${hero.name}')">
+          <p class="color-${hero.rarity.toLowerCase()}">${hero.name}</p>
+          <p>${hero.attribute} | Lv ${hero.level}</p>
+        </div>`
+        )
+        .join('');
     }
 
-    function showHeroDetails(index) {
-      const hero = player.heroes[index];
-      document.getElementById("modal-hero-img").src = hero.img;
-      document.getElementById("modal-hero-name").textContent = hero.name;
-      document.getElementById("modal-hero-rarity").textContent = `Rarity: ${hero.rarity}`;
-      document.getElementById("modal-hero-stats").textContent = `Damage: ${hero.damage}, Skill: ${hero.skill}, Type: ${hero.type}, Level: ${hero.level}`;
-      document.getElementById("hero-modal").style.display = "flex";
+    function showHeroDetails(name) {
+      const hero = player.heroes.find(h => h.name === name);
+      if (!hero) return;
+
+      document.getElementById('modal-hero-name').textContent = hero.name;
+      document.getElementById('modal-hero-rarity').textContent = hero.rarity;
+      document.getElementById('modal-hero-attr').textContent = hero.attribute;
+      document.getElementById('modal-hero-stats').textContent = `Damage: ${hero.damage}`;
+      document.getElementById('modal-hero-level').textContent = `Level: ${hero.level}`;
+
+      document.getElementById('modal-overlay').style.display = 'flex';
     }
 
     function closeModal() {
-      document.getElementById("hero-modal").style.display = "none";
+      document.getElementById('modal-overlay').style.display = 'none';
     }
 
-    function connectWallet() {
-      player.walletConnected = true;
-      document.getElementById("wallet-status").textContent = "Status: Connected";
-      alert("Wallet connected successfully!");
+    function updateQuestList() {
+      const questContainer = document.getElementById('quest-list');
+      questContainer.innerHTML = player.quests
+        .map(
+          quest => `
+        <div style="border: 1px solid #ddd; padding: 10px; margin: 5px; border-radius: 4px;">
+          <p><strong>${quest.name}</strong></p>
+          <p>Reward: ${quest.reward} tokens</p>
+          <p>Status: ${quest.completed ? 'Completed' : 'Incomplete'}</p>
+          ${
+            !quest.completed
+              ? `<button onclick="completeQuest(${quest.id})">Complete Quest</button>`
+              : ''
+          }
+        </div>`
+        )
+        .join('');
     }
 
-    function withdrawTON() {
-      if (!player.walletConnected) {
-        alert("Please connect your wallet first!");
-        return;
-      }
-      alert("TON withdrawal successful! Check your wallet.");
+    function completeQuest(id) {
+      const quest = player.quests.find(q => q.id === id);
+      if (!quest || quest.completed) return;
+
+      quest.completed = true;
+      addTokens(quest.reward);
+      updateQuestList();
     }
 
-    function copyReferralCode() {
-      const referralCode = document.getElementById("referral-code");
-      referralCode.select();
-     
+    document.addEventListener('DOMContentLoaded', () => {
+      document.getElementById('wallet-tokens').textContent = player.tokens;
+      updateHeroList();
+      updateQuestList();
+    });
+  </script>
+</body>
+</html>
