@@ -2,95 +2,95 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>R & F Mini Merge</title>
+  <title>R & F - Merge MiniApp (Telegram)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     * { box-sizing:border-box; margin:0; padding:0; font-family:sans-serif; }
-    body, html { width:100%; height:100%; background:#f2f2f2; }
+    html, body { width:100%; height:100%; background:#f2f2f2; }
     header {
-      text-align:center; padding:8px; color:#fff; 
+      text-align:center; padding:8px; color:#fff;
       background: linear-gradient(90deg, #fa7b58, #ffbe70);
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     nav {
-      display:flex; justify-content:center; gap:4px; background:#fff; padding:5px; 
-      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display:flex; justify-content:center; gap:4px; background:#fff; padding:6px;
+      box-shadow:0 1px 3px rgba(0,0,0,0.1);
     }
     nav button {
-      border:none; background:#eee; padding:6px 10px; cursor:pointer; border-radius:4px;
-      font-weight:bold; font-size:13px;
+      border:none; background:#eee; padding:6px 10px;
+      border-radius:4px; cursor:pointer; font-weight:bold; font-size:13px;
     }
     .active-tab { background:#c5ffe2; }
-    main { display:none; padding:6px; }
+    main {
+      display:none; padding:6px;
+    }
     main.active { display:block; }
 
-    /* Common button style */
+    /* Nút chung */
     .btn {
       background:#fd7c38; color:#fff; border:none; cursor:pointer;
       padding:5px 8px; border-radius:4px; margin:2px; font-size:12px; font-weight:bold;
     }
 
-    /* Hero grid: 5 columns */
+    /* Hero grid (5 cột) */
     .hero-grid {
-      display:grid; 
+      display:grid;
       grid-template-columns: repeat(5, 1fr);
-      gap:4px; margin-top:6px;
+      gap:6px;  /* tăng gap chút để tránh dính nhau */
     }
     .hero-card {
-      width:55px; height:75px; 
-      background:#fff; border:1px solid #ccc; border-radius:5px; 
+      width:60px; height:85px;
+      background:#fff; border:1px solid #ccc; border-radius:5px;
       display:flex; flex-direction:column; align-items:center; justify-content:center;
-      text-align:center; font-size:10px; cursor:pointer; overflow:hidden;
+      text-align:center; font-size:9px; cursor:pointer; overflow:hidden;
     }
     .hero-card img {
       width:28px; height:28px; object-fit:cover; border-radius:4px;
     }
-    .hero-card .hero-name {
-      white-space:nowrap; overflow:hidden; text-overflow:ellipsis; 
-      display:inline-block; max-width:52px;
+    .hero-info {
+      margin-top:3px; font-weight:bold; line-height:1.2;
+      /* cỡ chữ đủ gọn trên Telegram mini app */
     }
 
-    /* Rarity color */
-    .color-common    { color:#777; }
-    .color-rare      { color:#54fffe; }
+    /* Màu chữ theo độ hiếm */
+    .color-common    { color:#888; }
+    .color-rare      { color:#54ffff; }
     .color-epic      { color:#c66cc5; }
     .color-legendary { color:#ffa800; }
     .color-mythic    { color:#ff4444; }
 
-    /* Modal */
+    /* Modal overlay */
     .modal-overlay {
       position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.5); display:none; 
+      background:rgba(0,0,0,0.5); display:none;
       justify-content:center; align-items:center; z-index:9999;
     }
     .modal-content {
-      width:180px; background:#fff; border-radius:6px; padding:10px; position:relative;
-      text-align:center;
+      width:200px; background:#fff; border-radius:6px; padding:10px; position:relative;
+      text-align:center; font-size:12px;
     }
     .modal-content button {
-      position:absolute; top:4px; right:4px; background:#eee; border:none; 
+      position:absolute; top:4px; right:4px; background:#eee; border:none;
       border-radius:4px; padding:2px 6px; cursor:pointer; font-size:12px;
     }
     .modal-content img {
       width:50px; height:50px; object-fit:cover; border-radius:4px; margin-bottom:4px;
     }
-    .stat-line { font-size:12px; margin:2px 0; }
 
-    /* House list in Shop */
+    /* House */
     .house-card {
-      border:1px solid #ccc; border-radius:4px; padding:4px; margin:4px 0; background:#fff;
-      font-size:12px;
+      border:1px solid #ccc; border-radius:4px; background:#fff;
+      padding:4px; margin:4px 0; font-size:12px;
     }
+    .house-card strong { font-size:12px; }
 
-    /* Footer */
-    footer {
-      text-align:center; padding:8px; font-size:12px; color:#444; margin-top:8px;
-    }
+    /* Shop message */
+    #shopMsg { font-size:12px; color:#d33; margin-left:4px; }
   </style>
 </head>
 <body>
 
-<header><h4>R & F - Mini Merge</h4></header>
+<header><h4>R & F - Merge MiniApp</h4></header>
 
 <nav>
   <button id="homeBtn"  class="active-tab" onclick="switchTab('home')">Home</button>
@@ -100,89 +100,96 @@
   <button id="setBtn"   onclick="openSettings()">Settings</button>
 </nav>
 
+<!-- HOME -->
 <main id="home" class="active">
-  <p id="homeInfo" style="margin-bottom:6px;"></p>
-  <button class="btn" onclick="earnDaily()">Daily +5</button>
-  <button class="btn" onclick="addTokens(10)">+10 tokens</button>
+  <p id="homeInfo" style="font-size:13px;"></p>
+  <div style="margin:6px 0;">
+    <button class="btn" onclick="earnDaily()">Daily +5</button>
+    <button class="btn" onclick="addTokens(10)">+10 tokens</button>
+  </div>
 </main>
 
-<!-- HERO TAB -->
+<!-- HERO -->
 <main id="hero">
   <div class="hero-grid" id="heroGrid"></div>
 </main>
 
-<!-- SHOP TAB -->
+<!-- SHOP -->
 <main id="shop">
+  <p style="font-size:13px; font-weight:bold;">Buy Chest (10 tokens each)</p>
   <div style="margin-bottom:4px;">
-    <p style="font-size:13px;">Buy Chest (10 tokens) => random hero (50 total), auto-merge duplicates.</p>
     <button class="btn" onclick="buyChest(1)">x1</button>
     <button class="btn" onclick="buyChest(5)">x5</button>
     <button class="btn" onclick="buyChest(10)">x10</button>
-    <span id="shopMsg" style="margin-left:4px; font-size:12px; color:#d33;"></span>
+    <span id="shopMsg"></span>
   </div>
   <hr>
-  <p style="font-size:13px;">Houses</p>
+  <p style="font-size:13px; font-weight:bold;">Houses</p>
   <div id="houseList"></div>
 </main>
 
-<!-- WALLET TAB -->
+<!-- WALLET -->
 <main id="wallet">
-  <p style="margin-bottom:4px;">TON Address: <span id="tonAddr">-</span></p>
-  <p style="margin-bottom:4px;">TON Balance: <span id="tonBal">3.00</span></p>
-  <button class="btn" onclick="connectTon()">Connect</button>
-  <button class="btn" onclick="disconnectTon()">Disconnect</button>
+  <p style="font-size:13px;">TON Address: <span id="tonAddr">-</span></p>
+  <p style="font-size:13px;">TON Balance: <span id="tonBal">3.00</span></p>
+  <div style="margin-bottom:6px;">
+    <button class="btn" onclick="connectTon()">Connect</button>
+    <button class="btn" onclick="disconnectTon()">Disconnect</button>
+    <button class="btn" onclick="swapForTon()">Swap 50 => 1 TON</button>
+  </div>
+  <p style="font-size:13px;">Game Tokens: <span id="walletTokens"></span></p>
   <hr>
-  <p>Game Tokens: <span id="walletTokens"></span></p>
-  <button class="btn" onclick="withdraw50()">Withdraw 50 => +1 TON</button>
-  <hr>
-  <p style="font-weight:bold;">Referral</p>
-  <p>Total invited: <span id="refCount">0</span></p>
-  <p>Ref Bonus: <span id="refBonus">0</span> TON</p>
+  <p style="font-weight:bold; font-size:13px;">Referral</p>
+  <p style="font-size:13px;">Total invited: <span id="refCount">0</span></p>
+  <p style="font-size:13px;">Ref Bonus: <span id="refBonus">0</span> TON</p>
+  <div style="margin-bottom:4px;">
+    <button class="btn" onclick="copyRef()">Copy Link</button>
+    <button class="btn" onclick="shareRef()">Share Link</button>
+  </div>
   <button class="btn" onclick="withdrawRef()">Withdraw Reff</button>
 </main>
 
-<!-- SETTINGS MODAL -->
+<!-- SETTINGS (MODAL) -->
 <div class="modal-overlay" id="settingsOverlay">
   <div class="modal-content" style="width:220px;">
     <button onclick="closeSettings()">X</button>
     <h4>Settings</h4>
-    <p>
-      Sound: 
+    <p>Sound:
       <input type="checkbox" id="soundChk" checked onclick="toggleSound()">
     </p>
   </div>
 </div>
 
-<!-- HERO DETAIL MODAL -->
+<!-- HERO DETAIL (MODAL) -->
 <div class="modal-overlay" id="heroModal">
   <div class="modal-content">
     <button onclick="closeHeroModal()">X</button>
     <img id="modalImg" src="" alt="Hero">
     <p id="modalName" style="font-weight:bold;"></p>
-    <p id="modalRarity"></p>
-    <p class="stat-line" id="modalStats"></p>
-    <p class="stat-line" id="modalLv"></p>
+    <p id="modalRarity" style="font-weight:bold;"></p>
+    <p id="modalStats" style="font-weight:bold;"></p>
+    <p id="modalLv" style="font-weight:bold;"></p>
   </div>
 </div>
 
-<footer>© 2023 R&F - Merge Demo</footer>
-
 <script>
-/* ============ GLOBAL ============ */
+/* ========== GLOBAL ========== */
 let player={
   tokens:100,
   dailyUsed:false,
   heroes:[],
   houses:[],
   refCount:0,
-  refBonus:0, // TON
+  refBonus:0, // TON from referral
 };
 let soundOn=true;
-let tonConnected=false; let tonAddress=""; let tonBal=3.0;
+let tonConnected=false;
+let tonAddress="";
+let tonBal=3.0;
 
-/* ============ HERO POOL (50 items) ============ */
-const allHeroPool=[
-  // Common (10)
+/* 50 heroes pool (like your final list) */
+const allHeroPool=[ 
+  /* Common (10) */
   {name:"CrabKid",    rarity:"Common",    img:"https://i.imgur.com/wY0nzE9.png", dmg:18, spd:12, hp:30, mana:8,  lv:1, elem:"🐟"},
   {name:"SlimeBaby",  rarity:"Common",    img:"https://i.imgur.com/Iy1X8r1.png", dmg:22, spd: 9, hp:35, mana:10, lv:1, elem:"🍀"},
   {name:"TinyFrog",   rarity:"Common",    img:"https://i.imgur.com/81Ypu1S.png", dmg:20, spd:11, hp:32, mana:11, lv:1, elem:"🌱"},
@@ -193,7 +200,8 @@ const allHeroPool=[
   {name:"PearlTiny",  rarity:"Common",    img:"https://i.imgur.com/TCszIj0.png", dmg:23, spd:10, hp:38, mana:11, lv:1, elem:"🍀"},
   {name:"ShellMin",   rarity:"Common",    img:"https://i.imgur.com/tq1KRm5.png", dmg:20, spd:11, hp:35, mana: 8, lv:1, elem:"🍀"},
   {name:"SlimyJr",    rarity:"Common",    img:"https://i.imgur.com/zaWeuIb.png", dmg:24, spd:11, hp:33, mana:10, lv:1, elem:"🐟"},
-  // Rare (10)
+
+  /* Rare (10) */
   {name:"MermaidMia", rarity:"Rare",      img:"https://i.imgur.com/3l9MKIl.png", dmg:30, spd:14, hp:45, mana:15, lv:1, elem:"🐚"},
   {name:"CoralWar",   rarity:"Rare",      img:"https://i.imgur.com/cSy6okk.png", dmg:34, spd:13, hp:48, mana:16, lv:1, elem:"🌊"},
   {name:"FireCrab",   rarity:"Rare",      img:"https://i.imgur.com/QRJyOyp.png", dmg:38, spd:14, hp:44, mana:14, lv:1, elem:"🔥"},
@@ -204,7 +212,8 @@ const allHeroPool=[
   {name:"ClamGuard",  rarity:"Rare",      img:"https://i.imgur.com/TcSRW3O.png", dmg:39, spd:14, hp:44, mana:17, lv:1, elem:"🛡"},
   {name:"AngryFish",  rarity:"Rare",      img:"https://i.imgur.com/8rZaJYc.png", dmg:37, spd:13, hp:49, mana:16, lv:1, elem:"🐠"},
   {name:"ScorpionKid",rarity:"Rare",      img:"https://i.imgur.com/H65ycJW.png", dmg:41, spd:13, hp:46, mana:14, lv:1, elem:"🦂"},
-  // Epic (10)
+
+  /* Epic (10) */
   {name:"StormSummoner",rarity:"Epic",    img:"https://i.imgur.com/02jTwGp.png", dmg:50, spd:17, hp:60, mana:20, lv:1, elem:"⛈"},
   {name:"PearlMage",    rarity:"Epic",    img:"https://i.imgur.com/JOCwUzy.png", dmg:54, spd:18, hp:58, mana:22, lv:1, elem:"💎"},
   {name:"EpicFrog",     rarity:"Epic",    img:"https://i.imgur.com/wr71ePx.png", dmg:52, spd:16, hp:62, mana:19, lv:1, elem:"🍃"},
@@ -215,7 +224,8 @@ const allHeroPool=[
   {name:"StormFish",    rarity:"Epic",    img:"https://i.imgur.com/EmWFXPq.png", dmg:53, spd:17, hp:61, mana:21, lv:1, elem:"⚡"},
   {name:"KrakenKid",    rarity:"Epic",    img:"https://i.imgur.com/mnMCDvt.png", dmg:57, spd:16, hp:65, mana:24, lv:1, elem:"🐙"},
   {name:"AbyssCrab",    rarity:"Epic",    img:"https://i.imgur.com/QkkGPnK.png", dmg:60, spd:17, hp:63, mana:20, lv:1, elem:"🌑"},
-  // Legendary (10)
+
+  /* Legendary (10) */
   {name:"InfernoCrab",  rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png", dmg:70, spd:20, hp:80, mana:30, lv:1, elem:"🔥"},
   {name:"AbyssDragon",  rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png", dmg:74, spd:19, hp:82, mana:28, lv:1, elem:"🐉"},
   {name:"MegaShark",    rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png", dmg:72, spd:18, hp:84, mana:29, lv:1, elem:"🦈"},
@@ -226,7 +236,8 @@ const allHeroPool=[
   {name:"MudGolem",     rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png", dmg:77, spd:18, hp:86, mana:28, lv:1, elem:"🌱"},
   {name:"AngelCrab",    rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png", dmg:80, spd:20, hp:80, mana:29, lv:1, elem:"🌟"},
   {name:"AquaDino",     rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png", dmg:74, spd:19, hp:85, mana:30, lv:1, elem:"💧"},
-  // Mythic (10)
+
+  /* Mythic (10) */
   {name:"ElderDragon",  rarity:"Mythic",   img:"https://i.imgur.com/tFzK3iu.png", dmg:90, spd:25, hp:100,mana:40, lv:1, elem:"🐉"},
   {name:"AquaGod",      rarity:"Mythic",   img:"https://i.imgur.com/ujlhSVK.png", dmg:94, spd:24, hp:102,mana:42, lv:1, elem:"💧"},
   {name:"ArcAngel",     rarity:"Mythic",   img:"https://i.imgur.com/1K8xEcc.png", dmg:92, spd:23, hp:105,mana:39, lv:1, elem:"👼"},
@@ -239,7 +250,7 @@ const allHeroPool=[
   {name:"AncientGolem", rarity:"Mythic",   img:"https://i.imgur.com/WWF50XS.png", dmg:93, spd:22, hp:106,mana:42,lv:1, elem:"🗿"},
 ];
 
-/* RARITY CHANCE: 40% C, 30% R, 15% E, 10% L, 5% M. */
+/* Tỉ lệ ra rarity */
 const rarityChance=[
   {rar:"Common", chance:40},
   {rar:"Rare", chance:30},
@@ -248,8 +259,8 @@ const rarityChance=[
   {rar:"Mythic", chance:5}
 ];
 
-/* HOUSE Data */
-const houseData=[
+/* House data */
+const baseHouseData=[
   {type:"Tiny",  cost:20, rent:5,  lv:1},
   {type:"Pen",   cost:50, rent:12, lv:1},
   {type:"Villa", cost:100,rent:25, lv:1},
@@ -263,13 +274,13 @@ window.onload=function(){
   renderWallet();
 };
 
-/* SWITCH TAB */
+/* Switch tab */
 function switchTab(tabId){
   document.querySelectorAll('main').forEach(m=>m.classList.remove('active'));
   document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active-tab'));
   document.getElementById(tabId).classList.add('active');
-  let b=document.getElementById(tabId+"Btn");
-  if(b) b.classList.add('active-tab');
+  let btn=document.getElementById(tabId+"Btn");
+  if(btn) btn.classList.add('active-tab');
 
   if(tabId==="home")  updateHome();
   if(tabId==="hero")  renderHero();
@@ -279,33 +290,56 @@ function switchTab(tabId){
 
 /* HOME */
 function updateHome(){
-  document.getElementById('homeInfo').textContent=`Tokens: ${player.tokens} - DailyUsed? ${player.dailyUsed?'Yes':'No'}`;
+  let msg=`Tokens: ${player.tokens}, DailyUsed: ${player.dailyUsed?"Yes":"No"}`;
+  document.getElementById('homeInfo').textContent= msg;
 }
 function earnDaily(){
-  if(player.dailyUsed){alert("Daily used!");return;}
+  if(player.dailyUsed){ alert("Already claimed!"); return; }
   player.dailyUsed=true;
   player.tokens+=5;
   updateHome();
 }
-function addTokens(n){
-  player.tokens+=n; 
-  updateHome();
-}
+function addTokens(n){ player.tokens+=n; updateHome(); }
 
-/* HERO */
+/* HERO RENDER */
 function renderHero(){
-  let hG=document.getElementById('heroGrid');
-  hG.innerHTML= player.heroes.map((h,i)=>{
-    let rc=h.rarity.toLowerCase();
-    return `
-    <div class="hero-card" onclick="openHeroModal(${i})">
-      <img src="${h.img}">
-      <div class="hero-name color-${rc}">${h.name}</div>
+  let g=document.getElementById('heroGrid');
+  g.innerHTML= player.heroes.map((h,i)=>{
+    let rar=h.rarity.toLowerCase();
+    return `<div class="hero-card" onclick="openHeroModal(${i})">
+      <img src="${h.img}" alt="${h.name}">
+      <div class="hero-info color-${rar}">${h.name}</div>
     </div>`;
   }).join('');
 }
 
 /* SHOP */
+function renderShop(){
+  document.getElementById('shopMsg').textContent="";
+  // houses
+  let ownedHtml= player.houses.map((ho,idx)=>{
+    return `<div class="house-card">
+      <strong>${ho.type} (Lv${ho.lv})</strong> &nbsp; Rent:${ho.rent}
+      <br>
+      <button class="btn" onclick="collectRent(${idx})">Collect</button>
+      <button class="btn" onclick="upgradeHouse(${idx})">Upgrade</button>
+    </div>`;
+  }).join('');
+  let saleHtml= baseHouseData.map((hd,idx)=>{
+    return `<div class="house-card">
+      <strong>${hd.type}</strong>
+      <br>Cost:${hd.cost} Rent:${hd.rent}
+      <button class="btn" onclick="buyHouse(${idx})">Buy</button>
+    </div>`;
+  }).join('');
+  document.getElementById('houseList').innerHTML=`
+    <p style="font-size:12px;font-weight:bold;">Owned:</p>
+    ${ownedHtml || '<p style="font-size:12px;">(none)</p>'}
+    <hr>
+    <p style="font-size:12px;font-weight:bold;">Buy new:</p>
+    ${saleHtml}
+  `;
+}
 function buyChest(n){
   let cost=n*10;
   if(player.tokens<cost){
@@ -314,30 +348,29 @@ function buyChest(n){
   }
   player.tokens-=cost;
   for(let i=0;i<n;i++){
-    let rar= randomRarity();
+    let rar=randomRarity();
     let pool= allHeroPool.filter(x=>x.rarity===rar);
     if(pool.length>0){
-      let picked= pool[Math.floor(Math.random()*pool.length)];
-      player.heroes.push(JSON.parse(JSON.stringify(picked)));
+      let picked=pool[Math.floor(Math.random()*pool.length)];
+      player.heroes.push({...picked});
     }
   }
   autoMerge();
-  document.getElementById('shopMsg').textContent=`Bought x${n}, merged if duplicates.`;
-  updateHome();
-  renderHero();
+  document.getElementById('shopMsg').textContent=`Bought x${n}, auto-merge done.`;
+  updateHome(); renderHero();
 }
 function randomRarity(){
-  let roll=Math.random()*100, sum=0;
-  for(let r of rarityChance){
-    sum+=r.chance;
-    if(roll<sum)return r.rar;
+  let roll=Math.random()*100, s=0;
+  for(let rc of rarityChance){
+    s+=rc.chance;
+    if(roll<s) return rc.rar;
   }
   return "Common";
 }
 function autoMerge(){
   let map={};
   player.heroes.forEach((h,i)=>{
-    let key=h.name+"_lv"+(h.lv||1);
+    let key=h.name+"|lv"+h.lv;
     if(!map[key]) map[key]=[];
     map[key].push(i);
   });
@@ -345,17 +378,19 @@ function autoMerge(){
     let arr=map[k];
     while(arr.length>=2){
       let i1=arr.pop(), i2=arr.pop();
-      if(i1>i2) [i1,i2]=[i2,i1];
+      if(i1>i2){ let tmp=i1; i1=i2; i2=tmp; }
       let base= player.heroes[i1];
-      // remove from array
+      // remove second
       player.heroes.splice(i2,1);
+      // remove first
       player.heroes.splice(i1,1);
+
       let merged={...base};
-      merged.lv++;
-      if(merged.lv<=5){
-        merged.dmg= Math.floor(merged.dmg*1.5);
-        merged.spd= Math.floor(merged.spd*1.5);
-        merged.hp=  Math.floor(merged.hp*1.5);
+      if(merged.lv<5){
+        merged.lv++;
+        merged.dmg=Math.floor(merged.dmg*1.5);
+        merged.spd=Math.floor(merged.spd*1.5);
+        merged.hp= Math.floor(merged.hp*1.5);
         merged.mana=Math.floor(merged.mana*1.5);
       }
       player.heroes.push(merged);
@@ -363,72 +398,45 @@ function autoMerge(){
   }
 }
 
-/* HOUSE (in shop) */
-function renderShop(){
-  document.getElementById('shopMsg').textContent="";
-  // House Owned
-  let hDiv=document.getElementById('houseList');
-  let ownedHtml= player.houses.map((ho,idx)=>{
-    return `<div class="house-card">
-      <strong>${ho.type} (Lv${ho.lv})</strong> rent:${ho.rent}
-      <br>
-      <button class="btn" onclick="collectRent(${idx})">Collect</button>
-      <button class="btn" onclick="upgradeHouse(${idx})">Upgrade</button>
-    </div>`;
-  }).join('');
-  // House for sale
-  let saleHtml= houseData.map((hd,idx)=>{
-    return `<div class="house-card">
-      <strong>${hd.type}</strong> cost:${hd.cost} rent:${hd.rent}
-      <button class="btn" onclick="buyHouse(${idx})">Buy</button>
-    </div>`;
-  }).join('');
-  hDiv.innerHTML=`
-    <p style="font-size:12px;"><b>Owned:</b></p>
-    ${ownedHtml||'<p style="font-size:12px;">None</p>'}
-    <hr>
-    <p style="font-size:12px;"><b>Buy new:</b></p>
-    ${saleHtml}
-  `;
-}
+/* HOUSES */
 function buyHouse(i){
-  let h=houseData[i];
-  if(player.tokens<h.cost){alert("Not enough tokens!");return;}
-  player.tokens-=h.cost;
-  player.houses.push(JSON.parse(JSON.stringify(h)));
-  alert(`Bought ${h.type} House`);
-  updateHome(); renderShop();
+  let base=baseHouseData[i];
+  if(player.tokens<base.cost){alert("Not enough tokens!");return;}
+  player.tokens-=base.cost;
+  player.houses.push(JSON.parse(JSON.stringify(base)));
+  alert(`Bought ${base.type} house`);
+  renderShop(); updateHome();
 }
 function collectRent(i){
-  let ho=player.houses[i];
+  let ho= player.houses[i];
   player.tokens+=ho.rent;
-  alert(`+${ho.rent} from ${ho.type}`);
+  alert(`Collected +${ho.rent} tokens from ${ho.type}`);
   renderShop(); updateHome();
 }
 function upgradeHouse(i){
-  let ho=player.houses[i];
-  if(ho.lv>=5){alert("Max lv5");return;}
-  let upCost=Math.floor(ho.cost*(ho.lv+1)/2);
-  if(player.tokens<upCost){alert("Need more tokens!");return;}
+  let ho= player.houses[i];
+  if(ho.lv>=5){ alert("Max lv 5!"); return;}
+  let upCost=Math.floor( ho.cost*(ho.lv+1)/2 );
+  if(player.tokens<upCost){alert("Not enough tokens!");return;}
   player.tokens-=upCost;
   ho.lv++;
-  ho.rent=Math.floor(ho.rent*1.6);
+  ho.rent=Math.floor( ho.rent*1.6 );
   alert(`${ho.type} => Lv${ho.lv}, rent=>${ho.rent}`);
   renderShop(); updateHome();
 }
 
-/* WALLET & REF */
+/* WALLET */
 function renderWallet(){
-  document.getElementById('walletTokens').textContent=player.tokens;
-  document.getElementById('tonAddr').textContent= tonConnected ? tonAddress : "-";
+  document.getElementById('tonAddr').textContent= tonConnected?tonAddress:"-";
   document.getElementById('tonBal').textContent= tonBal.toFixed(2);
+  document.getElementById('walletTokens').textContent= player.tokens;
   document.getElementById('refCount').textContent= player.refCount;
   document.getElementById('refBonus').textContent= player.refBonus.toFixed(2);
 }
 function connectTon(){
-  if(tonConnected){alert("Already connected");return;}
+  if(tonConnected){alert("Already connected!");return;}
   tonConnected=true;
-  tonAddress="EQ_rnf_merge123";
+  tonAddress="EQ_rnF_merge_demo";
   alert("TON connected!");
   renderWallet();
 }
@@ -437,43 +445,60 @@ function disconnectTon(){
   tonAddress="";
   renderWallet();
 }
-function withdraw50(){
+function swapForTon(){
   if(!tonConnected){alert("Connect TON first!");return;}
-  if(player.tokens<50){alert("Need 50 tokens!");return;}
+  if(player.tokens<50){alert("Need 50 tokens to swap => 1 TON");return;}
   player.tokens-=50;
   tonBal+=1;
-  alert("Exchanged 50 => +1 TON");
-  renderWallet(); updateHome();
+  alert("Swapped 50 tokens => +1 TON");
+  updateHome(); renderWallet();
 }
-/* Referral => Suppose user invited 3 => 0.3 TON => withdraw => refBonus=0. */
+
+/* REF */
+function copyRef(){
+  navigator.clipboard.writeText("https://t.me/RFMiniApp?start=123").then(()=>{
+    alert("Referral link copied!");
+  });
+}
+function shareRef(){
+  if(navigator.share){
+    navigator.share({
+      title:"RF Merge",
+      text:"Join via my referral link",
+      url:"https://t.me/RFMiniApp?start=123"
+    }).catch(()=>{});
+  } else {
+    alert("Browser not support share API");
+  }
+}
 function withdrawRef(){
   if(!tonConnected){alert("Connect TON first!");return;}
-  if(player.refBonus<=0){alert("No ref bonus!");return;}
+  if(player.refBonus<=0){alert("No referral bonus!");return;}
   tonBal+=player.refBonus;
   alert(`Withdrew ${player.refBonus.toFixed(2)} TON from referral`);
   player.refBonus=0;
   renderWallet();
 }
 
-/* HERO detail modal */
+/* HERO MODAL */
 function openHeroModal(i){
-  let h=player.heroes[i];
-  let rc=h.rarity.toLowerCase();
-  document.getElementById('modalImg').src=h.img;
-  document.getElementById('modalName').textContent=h.name;
-  document.getElementById('modalRarity').innerHTML=`
-    <span class="color-${rc}">${h.rarity}</span> (Lv${h.lv}) ${h.elem}
-  `;
-  document.getElementById('modalStats').textContent=`⚔${h.dmg} 🏃${h.spd} ♥${h.hp} ✨${h.mana}`;
+  let h= player.heroes[i];
+  document.getElementById('modalImg').src = h.img;
+  let rc= h.rarity.toLowerCase();
+  let rarHtml=`<span class="color-${rc}">${h.rarity} LV${h.lv}</span>`;
+  let stats=`DMG:${h.dmg} SPD:${h.spd} HP:${h.hp} MP:${h.mana}`;
   let total= h.dmg+h.spd+h.hp+h.mana;
-  document.getElementById('modalLv').textContent=`Power: ${total}`;
+  document.getElementById('modalName').textContent= h.name;
+  document.getElementById('modalRarity').innerHTML= rarHtml+" "+h.elem;
+  document.getElementById('modalStats').textContent= stats;
+  document.getElementById('modalLv').textContent= `Power: ${total}`;
   document.getElementById('heroModal').style.display='flex';
 }
 function closeHeroModal(){
   document.getElementById('heroModal').style.display='none';
 }
 
-/* SETTINGS */
+/* SETTINGS (MODAL) */
 function openSettings(){
   document.getElementById('settingsOverlay').style.display='flex';
   document.getElementById('soundChk').checked=soundOn;
