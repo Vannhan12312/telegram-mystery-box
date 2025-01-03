@@ -2,30 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Telegram Mystery Box</title>
+  <title>Telegram Mystery Box - Connect Wallet In Tab</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- TonConnect SDK (CDN) -->
+  <!-- TonConnect SDK từ CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
+
   <style>
-    /* =============== CSS RESET + STYLES =============== */
+    /* RESET & STYLES */
     * {
       box-sizing: border-box;
-      margin: 0;
-      padding: 0;
+      margin: 0; 
+      padding: 0; 
       font-family: sans-serif;
     }
     html, body {
-      width: 100%;
-      height: 100%;
-      background: #000; /* Nền đen */
+      width: 100%; 
+      height: 100%; 
+      background: #000; 
       overflow: hidden;
     }
 
     /* LOADING SCREEN */
     #loadingScreen {
       position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      top: 0; 
+      left: 0;
+      width: 100vw; 
+      height: 100vh;
       background: url('https://i.imgur.com/gguz2yw.png') center/cover no-repeat;
       display: flex;
       flex-direction: column;
@@ -59,16 +62,16 @@
     #app {
       display: none;
       position: relative;
-      width: 100vw;
+      width: 100vw; 
       height: 100vh;
-      background: #f5f5f5;
+      background: #f5f5f5; 
       overflow: hidden;
     }
 
-    /* TOP NAV */
+    /* TOP NAV (5 nút) – đã bỏ nút connect ở đây */
     #topBar {
-      height: 50px;
-      background: #222;
+      height: 50px; 
+      background: #222; 
       color: #fff;
       display: flex;
       align-items: center;
@@ -104,14 +107,14 @@
       background: #fff;
     }
     .tabPage {
-      display: none;
+      display: none; 
       padding: 10px;
     }
     .tabPage.show {
       display: block;
     }
 
-    /* HERO GRID */
+    /* HERO GRID (4 columns) */
     #heroGrid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -130,7 +133,7 @@
       cursor: pointer;
     }
     .heroCard img {
-      width: 50px;
+      width: 50px; 
       height: 50px;
       object-fit: cover;
       border-radius: 4px;
@@ -159,7 +162,7 @@
     #heroModalOverlay {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw;
+      width: 100vw; 
       height: 100vh;
       background: rgba(0,0,0,0.5);
       display: none;
@@ -168,23 +171,23 @@
       z-index: 999999;
     }
     #heroModal {
-      background: #fff;
-      border-radius: 6px;
+      background: #fff; 
+      border-radius: 6px; 
       padding: 10px;
-      width: 240px;
+      width: 240px; 
       text-align: center;
       position: relative;
     }
     #heroModal img {
-      width: 80px;
-      height: 80px;
+      width: 80px; 
+      height: 80px; 
       object-fit: cover;
       border-radius: 4px;
       margin-bottom: 8px;
     }
     #heroModalClose {
-      position: absolute;
-      top: 5px;
+      position: absolute; 
+      top: 5px; 
       right: 5px;
       cursor: pointer;
       background: #ddd;
@@ -208,11 +211,11 @@
     }
     .houseItem button {
       background: #f57c00;
-      color:#fff;
-      border:none;
-      border-radius:4px;
-      padding:4px 8px;
-      cursor:pointer;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      padding: 4px 8px;
+      cursor: pointer;
     }
 
     /* FARM SECTION */
@@ -223,20 +226,20 @@
       align-items: start;
     }
     .farmInfo {
-      border:1px solid #ccc;
-      padding:8px;
-      border-radius:4px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 4px;
       width: 100%;
       max-width: 300px;
     }
     #farmSection button {
-      background:#4CAF50;
-      color:#fff;
-      border:none;
-      padding:6px 12px;
-      border-radius:4px;
-      margin-top:6px;
-      cursor:pointer;
+      background: #4CAF50; 
+      color: #fff; 
+      border: none;
+      padding: 6px 12px; 
+      border-radius: 4px;
+      margin-top: 6px; 
+      cursor: pointer;
     }
     .farmLabel {
       font-weight: bold;
@@ -245,40 +248,30 @@
 
     /* WALLET, REF, SETTINGS */
     #walletSection {
-      display: flex;
-      flex-direction: column;
+      display: flex; 
+      flex-direction: column; 
       gap: 10px;
     }
     .refBox, .settingsBox {
-      border:1px solid #ccc;
-      padding:8px;
-      border-radius:4px;
+      border: 1px solid #ccc;
+      padding: 8px;
+      border-radius: 4px;
     }
     .refBox button, .settingsBox button {
-      background:#f57c00;
-      color:#fff;
-      border:none;
-      padding:4px 8px;
-      border-radius:4px;
-      margin:4px;
-      cursor:pointer;
+      background: #f57c00; 
+      color: #fff; 
+      border: none;
+      padding: 4px 8px; 
+      border-radius: 4px;
+      margin: 4px; 
+      cursor: pointer;
     }
 
-    /* BANNER HOẶC ẢNH TỪ IMGUR (Đặt ở đâu tuỳ bạn) */
-    .banner {
-      margin: 10px 0;
-      text-align: center;
-    }
-    .banner img {
-      max-width: 100%;
-      height: auto;
-      border: 2px solid #ccc;
-      border-radius: 8px;
-    }
   </style>
 </head>
 
 <body>
+
 <!-- LOADING SCREEN -->
 <div id="loadingScreen">
   <div id="loadingLogo"></div>
@@ -289,31 +282,24 @@
 
 <!-- MAIN APP -->
 <div id="app">
-  <!-- NAVIGATION BAR -->
+  <!-- TOP BAR (ĐÃ BỎ NÚT CONNECT Ở ĐÂY) -->
   <div id="topBar">
     <div class="navBtn active" data-tab="tabHome">🏠 Home</div>
     <div class="navBtn" data-tab="tabHero">⚔ Hero</div>
     <div class="navBtn" data-tab="tabFarm">🚜 Farm</div>
     <div class="navBtn" data-tab="tabShop">🏷 Shop</div>
     <div class="navBtn" data-tab="tabWallet">💰 Wallet</div>
-    <!-- Nút Connect Wallet -->
-    <div class="navBtn" id="btnConnectWallet">🔗 Connect Wallet</div>
   </div>
 
-  <!-- CONTENT AREA -->
+  <!-- CONTENT -->
   <div id="contentArea">
     <!-- HOME -->
     <div id="tabHome" class="tabPage show">
-      <h2>Telegram Mystery Box</h2>
-      <p>Trang demo thanh toán TON qua TonConnect.</p>
-
-      <!-- CHÈN ẢNH IMGUR (BANNER) NẾU MUỐN -->
-      <div class="banner">
-        <img src="https://i.imgur.com/XXXXXX.jpg" alt="Banner from Imgur">
-        <!-- Thay link trên bằng link direct .jpg/.png từ Imgur -->
-      </div>
-
-      <p id="tokenDisplay" style="font-size:18px; font-weight:bold; margin-top:10px;">🪙 0</p>
+      <h2>Home</h2>
+      <p>Trang demo. Bạn có thể tuỳ chỉnh nội dung trang chủ</p>
+      <p id="tokenDisplay" style="font-size:18px; font-weight:bold; margin-top:10px;">
+        🪙 0
+      </p>
       <hr>
       <p>Farm Level: <span id="farmLevelHome">1</span></p>
       <p>Số Hero hiện có: <span id="heroCount">0</span></p>
@@ -323,7 +309,6 @@
     <div id="tabHero" class="tabPage">
       <h3>Hero Collection</h3>
       <div style="margin-bottom:8px;">
-        <!-- Mua Box (giá: 1 box = 2 TON, 5 box = 8 TON, 10 box = 15 TON) -->
         <button onclick="buyChest(1)" style="font-weight:bold;">Mua 1 Box (2 TON)</button>
         <button onclick="buyChest(5)" style="font-weight:bold;">Mua 5 Box (8 TON)</button>
         <button onclick="buyChest(10)" style="font-weight:bold;">Mua 10 Box (15 TON)</button>
@@ -356,26 +341,35 @@
     <!-- SHOP -->
     <div id="tabShop" class="tabPage">
       <h3>Shop - Buy House</h3>
-      <!-- Giữ nguyên giá nhà: 20, 50, 100 TON -->
       <div class="houseList">
         <div class="houseItem">
           <span><b>Tiny House</b> (20 TON)</span>
-          <button onclick="buyHouse('Tiny', 20)">Buy</button>
+          <button onclick="buyHouse('Tiny',20)">Buy</button>
         </div>
         <div class="houseItem">
           <span><b>Pen House</b> (50 TON)</span>
-          <button onclick="buyHouse('Pen', 50)">Buy</button>
+          <button onclick="buyHouse('Pen',50)">Buy</button>
         </div>
         <div class="houseItem">
           <span><b>Villa</b> (100 TON)</span>
-          <button onclick="buyHouse('Villa', 100)">Buy</button>
+          <button onclick="buyHouse('Villa',100)">Buy</button>
         </div>
       </div>
     </div>
 
-    <!-- WALLET & REFERRAL -->
+    <!-- WALLET (ĐÃ THÊM NÚT CONNECT Ở ĐÂY) -->
     <div id="tabWallet" class="tabPage">
       <div id="walletSection">
+        
+        <!-- MỚI THÊM: CONNECT WALLET TRONG MỤC WALLET -->
+        <div class="refBox">
+          <h4>Kết Nối Ví TON</h4>
+          <p>Nhấn nút bên dưới để kết nối ví TON.</p>
+          <button id="btnConnectWallet" style="font-weight:bold;">
+            Connect Wallet
+          </button>
+        </div>
+
         <!-- REFERRAL -->
         <div class="refBox">
           <h4>Referral</h4>
@@ -386,12 +380,14 @@
           <hr>
           <button onclick="withdrawRef()">Withdraw REF</button>
         </div>
+
         <!-- WALLET MAIN -->
         <div class="refBox">
           <h4>Wallet</h4>
           <button onclick="withdrawMain()">Withdraw</button>
           <button onclick="swapMain()">Swap</button>
         </div>
+
         <!-- SETTINGS -->
         <div class="settingsBox">
           <h4>Settings</h4>
@@ -403,6 +399,7 @@
             </select>
           </label>
         </div>
+
       </div>
     </div>
   </div>
@@ -421,24 +418,22 @@
 </div>
 
 <script>
-/* =========================
-   1) TÍCH HỢP TONCONNECT
-   ========================= */
-
-// Thay link dưới bằng link thật của file tonconnect-manifest.json 
-// mà bạn đã tạo trong repo "telegram-mystery-box"!
-const TONCONNECT_MANIFEST = "https://vannhan12312.github.io/telegram-mystery-box/tonconnect-manifest.json";
+/* 
+  ================================
+  1) KHAI BÁO TONCONNECT 
+  ================================
+*/
+const TONCONNECT_MANIFEST = "https://vannhan12312.github.io/telegram-mystery-box/tonconnect-manifest.json"; 
+// Thay link trên bằng link tới tonconnect-manifest.json của bạn
 
 let tonConnect;
 let tonWalletInfo = null;
 
 document.addEventListener("DOMContentLoaded", () => {
-  // Khởi tạo TonConnect với manifest
   tonConnect = new TonConnectSDK.TonConnect({
     manifestUrl: TONCONNECT_MANIFEST
   });
 
-  // Lắng nghe thay đổi (đã kết nối ví hoặc chưa)
   tonConnect.onStatusChange((wallet) => {
     if (wallet) {
       tonWalletInfo = wallet;
@@ -450,56 +445,23 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Nút Connect Wallet
+  // Nút Connect Wallet - nay nằm trong tabWallet
   const btnConnect = document.getElementById('btnConnectWallet');
   btnConnect.addEventListener('click', async () => {
     try {
       await tonConnect.connect();
     } catch (err) {
-      console.error("Lỗi khi connect ví:", err);
+      console.error("Lỗi connect ví:", err);
       alert("Kết nối ví bị huỷ hoặc lỗi!");
     }
   });
 });
 
-// Hàm gửi transaction
-async function payWithTon(amountTon, onSuccess) {
-  if (!tonWalletInfo) {
-    alert("Bạn cần kết nối ví TON trước!");
-    return;
-  }
-  try {
-    const nanoTonAmount = Math.floor(amountTon * 1e9);
-    // Địa chỉ ví nhận TON
-    const toAddress = "UQBzUchMP1OWSQUD4_pvKk7pA10wcEA_zf--e6EIVlnwdKeq";
-
-    const tx = {
-      validUntil: Date.now() + 5 * 60 * 1000,
-      messages: [
-        {
-          address: toAddress,
-          amount: nanoTonAmount.toString(),
-          payload: ""
-        }
-      ]
-    };
-
-    const result = await tonConnect.sendTransaction(tx);
-    console.log("Transaction sent:", result);
-    // Giả sử thành công => onSuccess
-    onSuccess && onSuccess();
-
-  } catch (e) {
-    console.error("Thanh toán lỗi:", e);
-    alert("Thanh toán thất bại hoặc bị huỷ.");
-  }
-}
-
-/* =========================
-   2) LOADING & GAME LOGIC 
-   ========================= */
-
-// Loading bar
+/*
+  ================================
+  2) LOGIC GAME & LOADING BAR
+  ================================
+*/
 let loadPct = 0;
 const loadInterval = setInterval(() => {
   loadPct += 5;
@@ -513,7 +475,7 @@ setTimeout(() => {
   document.getElementById('app').style.display = 'block';
 }, 3000);
 
-// BASIC DATA
+/* BASIC DATA */
 let token = 100;
 document.getElementById('tokenDisplay').innerText = "🪙 " + token;
 let heroList = [];
@@ -554,7 +516,7 @@ function upgradeFarm(){
   farm.level += 1;
   farm.lastHarvest = Date.now();
   document.getElementById('tokenDisplay').innerText = "🪙 " + token;
-  alert(`Farm lên level ${farm.level}! (+ Tăng sản lượng)`);
+  alert(`Farm lên level ${farm.level}! (Tăng sản lượng)`);
   updateFarmUI();
   updateHomeInfo();
 }
@@ -571,34 +533,31 @@ function updateHomeInfo(){
   document.getElementById('tokenDisplay').innerText = "🪙 " + token;
 }
 
-// NAV switch
+/* NAV switch */
 document.querySelectorAll('#topBar .navBtn').forEach(btn => {
   btn.addEventListener('click', () => {
     let tab = btn.getAttribute('data-tab');
-    // Ẩn tất cả
     document.querySelectorAll('.tabPage').forEach(pg=>pg.classList.remove('show'));
     document.querySelectorAll('.navBtn').forEach(x=>x.classList.remove('active'));
-    // Hiện tab
     document.getElementById(tab).classList.add('show');
     btn.classList.add('active');
-
-    // Cập nhật
+    
     if(tab === 'tabHero') renderHeroes();
     if(tab === 'tabFarm') updateFarmUI();
     if(tab === 'tabHome') updateHomeInfo();
   });
 });
 
-/* Hero Data (50 Hero) */
+/* DANH SÁCH 50 HERO (rút gọn) */
 const heroPool = {
   Common:[
     {name:"SlimeBaby",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",dmg:18,spd:8,hp:25,mp:4,element:"💧"},
-    /* ... (Bỏ bớt cho ngắn, bạn copy đủ 50 hero cũ vào) ... */
+    /* ... Tương tự cho 50 hero ... */
   ],
-  Rare:[ /* ... */ ],
-  Epic:[ /* ... */ ],
-  Legendary:[ /* ... */ ],
-  Mythic:[ /* ... */ ]
+  Rare:[/* ... */],
+  Epic:[/* ... */],
+  Legendary:[/* ... */],
+  Mythic:[/* ... */]
 };
 const chances = [
   {rar:"Common",pct:40},
@@ -608,31 +567,7 @@ const chances = [
   {rar:"Mythic",pct:5},
 ];
 
-/* Chi phí Box */
-const chestCosts = {
-  1: 2,  // 1 box = 2 TON
-  5: 8,  // 5 box = 8 TON
-  10: 15 // 10 box = 15 TON
-};
-
-/* BUY CHEST => random hero => autoMerge => render */
-function buyChest(qty){
-  const cost = chestCosts[qty] || 2;
-  // Gọi payWithTon => OnSuccess => logic
-  payWithTon(cost, () => {
-    token -= cost;
-    for(let i = 0; i < qty; i++){
-      let h = randomHero();
-      heroList.push({...h, lv:1});
-      autoMergeHeroes();
-    }
-    renderHeroes();
-    updateHomeInfo();
-    alert(`Mua thành công: ${qty} box! Trừ ${cost} TON (demo).`);
-  });
-}
-
-/* randomHero */
+/* randomHero, autoMerge, renderHeroes => y như trước */
 function randomHero(){
   let roll = Math.random() * 100;
   let sum = 0;
@@ -644,11 +579,8 @@ function randomHero(){
       return JSON.parse(JSON.stringify(arr[i]));
     }
   }
-  // fallback
   return JSON.parse(JSON.stringify(heroPool.Common[0]));
 }
-
-/* autoMerge if same name+lv */
 function autoMergeHeroes(){
   let map = {};
   heroList.forEach((h,i)=>{
@@ -672,8 +604,6 @@ function autoMergeHeroes(){
     }
   }
 }
-
-/* Render Heroes */
 function renderHeroes(){
   let g = document.getElementById('heroGrid');
   g.innerHTML = "";
@@ -700,7 +630,7 @@ function renderHeroes(){
   });
 }
 
-/* Hero Modal */
+/* HERO MODAL */
 function openHeroModal(i){
   let h = heroList[i];
   document.getElementById('heroModalOverlay').style.display = 'flex';
@@ -712,11 +642,11 @@ function openHeroModal(i){
   if(h.rarity === "Legendary") rc = "rarity-legendary";
   if(h.rarity === "Mythic") rc = "rarity-mythic";
 
-  document.getElementById('heroModalName').innerHTML =
+  document.getElementById('heroModalName').innerHTML = 
     `<span class="${rc}"><b>${h.name}</b></span>`;
-  document.getElementById('heroModalLv').innerHTML =
+  document.getElementById('heroModalLv').innerHTML = 
     `<span class="${rc}"><b>Lv${h.lv} [${h.rarity}]</b></span>`;
-  document.getElementById('heroModalStats').innerHTML =
+  document.getElementById('heroModalStats').innerHTML = 
     `⚔${h.dmg} ✨${h.spd} ♥${h.hp} 🔮${h.mp}`;
   document.getElementById('heroModalElement').innerHTML = `<b>${h.element || ""}</b>`;
 }
@@ -724,11 +654,63 @@ function closeHeroModal(){
   document.getElementById('heroModalOverlay').style.display = 'none';
 }
 
-/* BUY HOUSE (20, 50, 100 TON) -> payWithTon */
+/* payWithTon => Mua Box, Mua House */
+async function payWithTon(amountTon, onSuccess) {
+  if (!tonWalletInfo) {
+    alert("Bạn cần kết nối ví TON trước!");
+    return;
+  }
+  try {
+    const nanoTonAmount = Math.floor(amountTon * 1e9);
+    const toAddress = "UQBzUchMP1OWSQUD4_pvKk7pA10wcEA_zf--e6EIVlnwdKeq";
+
+    const tx = {
+      validUntil: Date.now() + 5 * 60 * 1000,
+      messages: [
+        {
+          address: toAddress,
+          amount: nanoTonAmount.toString(),
+          payload: ""
+        }
+      ]
+    };
+
+    const result = await tonConnect.sendTransaction(tx);
+    console.log("Transaction gửi xong:", result);
+    onSuccess && onSuccess();
+
+  } catch (e) {
+    console.error("Thanh toán lỗi:", e);
+    alert("Thanh toán thất bại hoặc bị huỷ.");
+  }
+}
+
+/* Mua Box (giá 2,8,15 TON) */
+const chestCosts = {
+  1: 2,
+  5: 8,
+  10: 15
+};
+function buyChest(qty){
+  const cost = chestCosts[qty] || 2;
+  payWithTon(cost, () => {
+    token -= cost;
+    for(let i = 0; i < qty; i++){
+      let h = randomHero();
+      heroList.push({...h, lv:1});
+      autoMergeHeroes();
+    }
+    renderHeroes();
+    updateHomeInfo();
+    alert(`Mua thành công: ${qty} box (trừ ${cost} TON).`);
+  });
+}
+
+/* Mua Nhà (20,50,100 TON) */
 function buyHouse(name, cost){
   payWithTon(cost, () => {
     token -= cost;
-    alert("Bạn vừa mua " + name + " với " + cost + " TON (demo).");
+    alert("Bạn vừa mua " + name + " với " + cost + " TON.");
     updateHomeInfo();
   });
 }
@@ -768,5 +750,6 @@ function toggleSound(){
   alert("Sound is now " + (isSoundOn ? "ON" : "OFF"));
 }
 </script>
+
 </body>
 </html>
