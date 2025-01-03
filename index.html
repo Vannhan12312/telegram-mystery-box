@@ -206,6 +206,28 @@
       padding:4px 8px; 
       cursor:pointer;
     }
+
+    /* WALLET: REF, SETTINGS inside, per request */
+    #walletSection {
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px;
+    }
+    .refBox, .settingsBox {
+      border:1px solid #ccc; 
+      padding:8px; 
+      border-radius:4px;
+    }
+    .refBox button, .settingsBox button {
+      background:#f57c00; 
+      color:#fff; 
+      border:none; 
+      padding:4px 8px; 
+      border-radius:4px; 
+      margin:4px;
+      cursor:pointer;
+    }
+
   </style>
 </head>
 
@@ -233,21 +255,17 @@
   <div id="contentArea">
     <!-- HOME -->
     <div id="tabHome" class="tabPage show">
-      <!-- Xóa mọi text demo, chỉ để trống hay vài icon tùy thích -->
-      <h3 style="display:none;"></h3>
       <p style="display:none;"></p>
       <p id="tokenDisplay" style="display:none;"></p>
     </div>
 
     <!-- HERO -->
     <div id="tabHero" class="tabPage">
-      <!-- Xóa text cũ, chỉ hiển thị grid -->
       <div id="heroGrid"></div>
     </div>
 
     <!-- SHOP -->
     <div id="tabShop" class="tabPage">
-      <!-- Ẩn text cũ, thêm nút buy chest -->
       <div style="display:flex;gap:8px;">
         <button onclick="buyChest(1)" style="font-weight:bold;">⏳ x1</button>
         <button onclick="buyChest(5)" style="font-weight:bold;">⏳ x5</button>
@@ -272,7 +290,37 @@
 
     <!-- WALLET -->
     <div id="tabWallet" class="tabPage">
-      <p style="display:none;"></p>
+      <div id="walletSection">
+        <!-- REF (copy/share, 10%, withdraw) -->
+        <div class="refBox">
+          <h4>Referral</h4>
+          <p>Get 10% in TON from each invited friend.</p>
+          <p>Ref link: <span id="refLink">https://t.me/RFMergeBot?start=777</span></p>
+          <button onclick="copyRef()">Copy</button>
+          <button onclick="shareRef()">Share</button>
+          <hr>
+          <button onclick="withdrawRef()">Withdraw REF</button>
+        </div>
+
+        <!-- WALLET main (Withdraw, Swap) -->
+        <div class="refBox">
+          <h4>Wallet</h4>
+          <button onclick="withdrawMain()">Withdraw</button>
+          <button onclick="swapMain()">Swap</button>
+        </div>
+
+        <!-- SETTINGS (sound on/off) -->
+        <div class="settingsBox">
+          <h4>Settings</h4>
+          <label style="margin-right:8px;">
+            Sound:
+            <select id="soundToggle" onchange="toggleSound()">
+              <option value="on">On</option>
+              <option value="off">Off</option>
+            </select>
+          </label>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -308,10 +356,17 @@ setTimeout(()=>{
 let token=100; 
 document.getElementById('tokenDisplay').innerText="🪙 "+token;
 let heroList=[];
+let isSoundOn=true;
 
 /* House buy example */
 function buyHouse(name,cost){
-  alert("You bought "+name+" with "+cost+" TON (demo).");
+  if(token<cost){
+    alert("Not enough TON!");
+    return;
+  }
+  token-=cost;
+  document.getElementById('tokenDisplay').innerText="🪙 "+token;
+  alert("You bought "+name+" with "+cost+" TON.");
 }
 
 /* NAV switch */
@@ -326,29 +381,67 @@ document.querySelectorAll('#topBar .navBtn').forEach(btn=>{
   });
 });
 
-/* Hero pool (demo 50) + chance */
+/* 50 hero data */
 const heroPool = {
   Common:[
     {name:"SlimeBaby",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",dmg:18,spd:8,hp:25,mp:4,element:"💧"},
     {name:"ShellMin",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",dmg:20,spd:10,hp:30,mp:5,element:"🌱"},
-    // (Thêm ... cho đủ 10)
+    {name:"TinyFrog",rarity:"Common",img:"https://i.imgur.com/eVNSFSH.png",dmg:22,spd:9,hp:28,mp:6,element:"🐸"},
+    {name:"BlueKid",rarity:"Common",img:"https://i.imgur.com/hjZPOpf.png",dmg:24,spd:11,hp:32,mp:7,element:"💠"},
+    {name:"CrabKid",rarity:"Common",img:"https://i.imgur.com/TvssIKL.png",dmg:25,spd:12,hp:34,mp:8,element:"🦀"},
+    {name:"MudCrab",rarity:"Common",img:"https://i.imgur.com/9soOAZz.png",dmg:26,spd:10,hp:30,mp:6,element:"🌱"},
+    {name:"JellyBoy",rarity:"Common",img:"https://i.imgur.com/ZRG9eiQ.png",dmg:19,spd:11,hp:27,mp:5,element:"🪸"},
+    {name:"CrabEdge",rarity:"Common",img:"https://i.imgur.com/aOV5P1e.png",dmg:23,spd:9,hp:29,mp:6,element:"🦀"},
+    {name:"LavaMini",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",dmg:27,spd:13,hp:32,mp:9,element:"🔥"},
+    {name:"SlimyJr",rarity:"Common",img:"https://i.imgur.com/tq1KRm5.png",dmg:28,spd:14,hp:34,mp:10,element:"💧"},
   ],
   Rare:[
     {name:"CoralWar",rarity:"Rare",img:"https://i.imgur.com/Iy1X8r1.png",dmg:35,spd:14,hp:50,mp:8,element:"💧"},
     {name:"KrakenKid",rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png",dmg:36,spd:15,hp:52,mp:9,element:"🦑"},
-    // ...
+    {name:"ScorpionKid",rarity:"Rare",img:"https://i.imgur.com/aUTGKeg.png",dmg:38,spd:15,hp:54,mp:9,element:"🦂"},
+    {name:"AquaShield",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png",dmg:34,spd:16,hp:52,mp:10,element:"💧"},
+    {name:"ClamGuard",rarity:"Rare",img:"https://i.imgur.com/8rZaJYc.png",dmg:37,spd:14,hp:51,mp:9,element:"🐚"},
+    {name:"MermaidMia",rarity:"Rare",img:"https://i.imgur.com/QRJyOyp.png",dmg:36,spd:15,hp:53,mp:8,element:"🧜"},
+    {name:"RiverRonin",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png",dmg:40,spd:16,hp:55,mp:10,element:"🌊"},
+    {name:"AngryFish",rarity:"Rare",img:"https://i.imgur.com/8nR0o5k.png",dmg:39,spd:15,hp:52,mp:9,element:"🐟"},
+    {name:"ShellFish",rarity:"Rare",img:"https://i.imgur.com/zaWeuIb.png",dmg:35,spd:14,hp:50,mp:8,element:"💠"},
+    {name:"DarkFrog",rarity:"Rare",img:"https://i.imgur.com/NK8EQm1.png",dmg:40,spd:17,hp:54,mp:10,element:"🌑"},
   ],
   Epic:[
     {name:"ShellBuster",rarity:"Epic",img:"https://i.imgur.com/02jTwGp.png",dmg:50,spd:17,hp:60,mp:12,element:"🐚"},
-    // ...
+    {name:"StormSummoner",rarity:"Epic",img:"https://i.imgur.com/wr71ePx.png",dmg:55,spd:18,hp:62,mp:13,element:"🌩"},
+    {name:"OceanLancer",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",dmg:51,spd:17,hp:60,mp:12,element:"🌊"},
+    {name:"PearlMage",rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png",dmg:54,spd:19,hp:63,mp:14,element:"🔮"},
+    {name:"ReefDragon",rarity:"Epic",img:"https://i.imgur.com/EB7WHnW.png",dmg:52,spd:18,hp:61,mp:13,element:"🐉"},
+    {name:"SeaKnight",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",dmg:53,spd:17,hp:65,mp:15,element:"⚔"},
+    {name:"ShellMin2",rarity:"Epic",img:"https://i.imgur.com/PqCgXay.png",dmg:56,spd:20,hp:64,mp:14,element:"🪨"},
+    {name:"JellyMage",rarity:"Epic",img:"https://i.imgur.com/EmWFXPq.png",dmg:50,spd:17,hp:60,mp:13,element:"🪸"},
+    {name:"CrabEdgeX",rarity:"Epic",img:"https://i.imgur.com/mnMCDvt.png",dmg:57,spd:20,hp:66,mp:16,element:"🦀"},
+    {name:"LavaClam",rarity:"Epic",img:"https://i.imgur.com/QkkGPnK.png",dmg:58,spd:21,hp:68,mp:17,element:"🔥"},
   ],
   Legendary:[
     {name:"InfernoCrab",rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png",dmg:60,spd:20,hp:80,mp:15,element:"🔥"},
-    // ...
+    {name:"AbyssDragon",rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png",dmg:65,spd:22,hp:85,mp:18,element:"🌑"},
+    {name:"MegaShark",rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png",dmg:68,spd:23,hp:88,mp:19,element:"🦈"},
+    {name:"PearlDragon",rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png",dmg:66,spd:21,hp:86,mp:18,element:"🔮"},
+    {name:"LavaClamX",rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png",dmg:70,spd:24,hp:90,mp:19,element:"🔥"},
+    {name:"CoralKnight",rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png",dmg:67,spd:22,hp:85,mp:18,element:"💧"},
+    {name:"StoneWar",rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png",dmg:72,spd:23,hp:90,mp:20,element:"🪨"},
+    {name:"MudGolem",rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png",dmg:73,spd:22,hp:92,mp:21,element:"🌱"},
+    {name:"AngelCrab",rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png",dmg:75,spd:25,hp:95,mp:22,element:"🌟"},
+    {name:"AquaDino",rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png",dmg:74,spd:24,hp:93,mp:21,element:"💧"},
   ],
   Mythic:[
     {name:"ElderDragon",rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png",dmg:80,spd:25,hp:100,mp:20,element:"🐉"},
-    // ...
+    {name:"AquaGod",rarity:"Mythic",img:"https://i.imgur.com/ujlhSVK.png",dmg:82,spd:26,hp:105,mp:22,element:"💧"},
+    {name:"ArcAngel",rarity:"Mythic",img:"https://i.imgur.com/1K8xEcc.png",dmg:85,spd:27,hp:108,mp:23,element:"🌟"},
+    {name:"CyberDino",rarity:"Mythic",img:"https://i.imgur.com/EokU1JU.png",dmg:88,spd:28,hp:110,mp:25,element:"🤖"},
+    {name:"PhoenixKing",rarity:"Mythic",img:"https://i.imgur.com/Qg9MLyO.png",dmg:90,spd:30,hp:115,mp:26,element:"🔥"},
+    {name:"TimeSerpent",rarity:"Mythic",img:"https://i.imgur.com/Xsqp1Zl.png",dmg:92,spd:29,hp:112,mp:25,element:"⏳"},
+    {name:"GalaxyWolf",rarity:"Mythic",img:"https://i.imgur.com/YeDYlBO.png",dmg:95,spd:31,hp:118,mp:27,element:"🌌"},
+    {name:"AuraKnight",rarity:"Mythic",img:"https://i.imgur.com/h8LyWQG.png",dmg:94,spd:29,hp:114,mp:26,element:"🌟"},
+    {name:"BlazeGod",rarity:"Mythic",img:"https://i.imgur.com/u2hcKvV.png",dmg:97,spd:32,hp:120,mp:28,element:"🔥"},
+    {name:"AncientGolem",rarity:"Mythic",img:"https://i.imgur.com/WWF50XS.png",dmg:99,spd:33,hp:125,mp:30,element:"⛰"},
   ]
 };
 const chances = [
@@ -407,6 +500,7 @@ function autoMergeHeroes(){
       h1.mp=Math.floor(h1.mp*1.5);
       // remove i2
       heroList.splice(i2,1);
+      // adjust indexes
       arr=arr.map(x=> x>i2? x-1:x);
     }
   }
@@ -464,6 +558,39 @@ function openHeroModal(i){
 }
 function closeHeroModal(){
   document.getElementById('heroModalOverlay').style.display='none';
+}
+
+/* REF */
+function copyRef(){
+  let text=document.getElementById('refLink').innerText;
+  navigator.clipboard.writeText(text).then(()=>{ alert("Copied link!"); });
+}
+function shareRef(){
+  let text=document.getElementById('refLink').innerText;
+  if(navigator.share){
+    navigator.share({title:"R&F Game",text:"Join me!",url:text});
+  } else {
+    alert("Browser not supported to share. Link copied!");
+    navigator.clipboard.writeText(text);
+  }
+}
+function withdrawRef(){
+  alert("Ref reward withdrawn (demo).");
+}
+
+/* WALLET MAIN */
+function withdrawMain(){
+  alert("Withdraw main tokens (demo).");
+}
+function swapMain(){
+  alert("Swap tokens (demo).");
+}
+
+/* SOUND SETTINGS */
+function toggleSound(){
+  let val=document.getElementById('soundToggle').value;
+  isSoundOn=(val==="on");
+  alert("Sound is now "+(isSoundOn?"ON":"OFF"));
 }
 </script>
 
