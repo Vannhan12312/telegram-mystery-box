@@ -1,17 +1,17 @@
 <!DOCTYPE html>
-<html lang="vi">
+<html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Telegram Mystery Box - Giao diện nút mới</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <title>Telegram Mystery Box - Final Code with Video</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <!-- TonConnect SDK -->
+  <!-- TonConnect SDK from CDN -->
   <script src="https://cdn.jsdelivr.net/npm/@tonconnect/sdk@latest/dist/tonconnect-sdk.min.js"></script>
 
   <style>
-    /* =========================
-       1) RESET & CƠ BẢN
-    ========================== */
+    /******************************************************
+     * 1) BASIC RESET AND GLOBAL STYLES
+     ******************************************************/
     * {
       box-sizing: border-box;
       margin: 0;
@@ -21,17 +21,19 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #000; 
+      background: #000; /* black background */
       overflow: hidden;
     }
 
-    /* =========================
-       2) MÀN HÌNH LOADING
-    ========================== */
+    /******************************************************
+     * 2) LOADING SCREEN
+     * (You can change images if desired)
+     ******************************************************/
     #loadingScreen {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; height: 100vh;
+      width: 100vw;
+      height: 100vh;
       background: url('https://i.imgur.com/gguz2yw.png') center/cover no-repeat;
       display: flex;
       flex-direction: column;
@@ -61,9 +63,9 @@
       transition: width 0.2s;
     }
 
-    /* =========================
-       3) ỨNG DỤNG CHÍNH
-    ========================== */
+    /******************************************************
+     * 3) MAIN APP WRAPPER
+     ******************************************************/
     #app {
       display: none;
       position: relative;
@@ -73,9 +75,9 @@
       overflow: hidden;
     }
 
-    /* =========================
-       4) THANH NAV
-    ========================== */
+    /******************************************************
+     * 4) TOP NAVIGATION BAR (5 buttons)
+     ******************************************************/
     #topBar {
       height: 50px;
       background: #222;
@@ -103,9 +105,9 @@
       background: #ff7a00;
     }
 
-    /* =========================
-       5) KHU VỰC NỘI DUNG
-    ========================== */
+    /******************************************************
+     * 5) CONTENT AREA - TABS
+     ******************************************************/
     #contentArea {
       position: absolute;
       top: 50px;
@@ -123,9 +125,9 @@
       display: block;
     }
 
-    /* =========================
-       6) HERO GRID
-    ========================== */
+    /******************************************************
+     * 6) HERO GRID
+     ******************************************************/
     #heroGrid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
@@ -161,20 +163,20 @@
       font-size: 10px;
       line-height: 1.2;
     }
-    /* Rarity color */
+    /* Rarity color classes */
     .rarity-common { color: #999; font-weight: bold; }
     .rarity-rare { color: #0ff; font-weight: bold; }
     .rarity-epic { color: #c66cc5; font-weight: bold; }
     .rarity-legendary { color: #ffa600; font-weight: bold; }
     .rarity-mythic { color: #f00; font-weight: bold; }
 
-    /* =========================
-       7) HERO MODAL
-    ========================== */
+    /******************************************************
+     * 7) HERO MODAL
+     ******************************************************/
     #heroModalOverlay {
       position: fixed;
       top: 0; left: 0;
-      width: 100vw; 
+      width: 100vw;
       height: 100vh;
       background: rgba(0,0,0,0.5);
       display: none;
@@ -199,7 +201,7 @@
     }
     #heroModalClose {
       position: absolute;
-      top: 5px; 
+      top: 5px;
       right: 5px;
       cursor: pointer;
       background: #ddd;
@@ -208,9 +210,9 @@
       padding: 2px 6px;
     }
 
-    /* =========================
-       8) SHOP (House)
-    ========================== */
+    /******************************************************
+     * 8) SHOP (House)
+     ******************************************************/
     .houseList {
       display: flex;
       flex-direction: column;
@@ -224,9 +226,9 @@
       justify-content: space-between;
     }
 
-    /* =========================
-       9) FARM SECTION
-    ========================== */
+    /******************************************************
+     * 9) FARM SECTION
+     ******************************************************/
     #farmSection {
       display: flex;
       flex-direction: column;
@@ -245,9 +247,9 @@
       margin-right: 6px;
     }
 
-    /* =========================
-       10) WALLET, REF, SETTINGS
-    ========================== */
+    /******************************************************
+     * 10) WALLET, REFERRAL, SETTINGS
+     ******************************************************/
     #walletSection {
       display: flex;
       flex-direction: column;
@@ -259,10 +261,9 @@
       border-radius: 4px;
     }
 
-    /* =========================
-       NÚT THỐNG NHẤT PHONG CÁCH
-       (theo ảnh https://i.imgur.com/mMOtGsS.png)
-    ========================== */
+    /******************************************************
+     * EXTRA: Button Style to Match Screenshot
+     ******************************************************/
     .gameBtn {
       background: #333;
       color: #fff;
@@ -276,7 +277,6 @@
     .gameBtn:hover {
       background: #444;
     }
-
     .orangeBtn {
       background: #f57c00;
       color: #fff;
@@ -305,7 +305,7 @@
 
 <!-- MAIN APP -->
 <div id="app">
-  <!-- TOP NAV -->
+  <!-- TOP BAR -->
   <div id="topBar">
     <div class="navBtn active" data-tab="tabHome">🏠 Home</div>
     <div class="navBtn" data-tab="tabHero">⚔ Hero</div>
@@ -316,89 +316,141 @@
 
   <!-- CONTENT AREA -->
   <div id="contentArea">
-    <!-- HOME -->
+    <!-- HOME TAB -->
     <div id="tabHome" class="tabPage show">
       <h2>Home</h2>
-      <p>Trang tổng quan, hiển thị thông tin hero, sự kiện...</p>
+
+      <!-- Insert video from i.imgur.com/TK6fjwG.mp4 -->
+      <div style="text-align:center; margin:10px 0;">
+        <video 
+          src="https://i.imgur.com/TK6fjwG.mp4"
+          autoplay
+          muted
+          loop
+          playsinline
+          style="max-width:80%; border-radius:8px;">
+        </video>
+      </div>
+
+      <p>This is the main overview. You can display hero info, events, announcements, etc.</p>
+      <!-- Show tokens with TON icon -->
       <p id="tokenDisplay" style="font-size:18px; font-weight:bold; margin-top:10px;">
-        <!-- Thay chữ “🪙” bằng icon TON -->
-        <img src="https://i.imgur.com/RtFyZfT.png" alt="TON" style="width:16px; vertical-align:middle;">
+        <img src="https://i.imgur.com/RtFyZfT.png"
+             alt="TON Icon"
+             style="width:16px; vertical-align:middle;">
         0
       </p>
       <hr>
       <p>Farm Level: <span id="farmLevelHome">1</span></p>
-      <p>Số Hero hiện có: <span id="heroCount">0</span></p>
+      <p>Total Heroes: <span id="heroCount">0</span></p>
     </div>
 
-    <!-- HERO -->
+    <!-- HERO TAB -->
     <div id="tabHero" class="tabPage">
       <h3>Hero Collection</h3>
       <div style="margin-bottom:8px;">
-        <!-- Thay chữ TON bằng icon -->
-        <button onclick="buyChest(1)" class="gameBtn">Mua 1 Box (2 <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;">)</button>
-        <button onclick="buyChest(5)" class="gameBtn">Mua 5 Box (8 <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;">)</button>
-        <button onclick="buyChest(10)" class="gameBtn">Mua 10 Box (15 <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;">)</button>
+        <button onclick="buyChest(1)" class="gameBtn">
+          Buy 1 Box (2 
+          <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON">
+          )
+        </button>
+        <button onclick="buyChest(5)" class="gameBtn">
+          Buy 5 Boxes (8 
+          <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON">
+          )
+        </button>
+        <button onclick="buyChest(10)" class="gameBtn">
+          Buy 10 Boxes (15 
+          <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON">
+          )
+        </button>
       </div>
       <div id="heroGrid"></div>
     </div>
 
-    <!-- FARM -->
+    <!-- FARM TAB -->
     <div id="tabFarm" class="tabPage">
       <h3>My Farm</h3>
       <div id="farmSection">
         <div class="farmInfo">
-          <div><span class="farmLabel">Level:</span><span id="farmLevel">1</span></div>
-          <div><span class="farmLabel">Production:</span><span id="farmProduction">0</span> <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;"> / sec</div>
-          <div><span class="farmLabel">Last Harvest:</span><span id="farmLastHarvest">N/A</span></div>
+          <div>
+            <span class="farmLabel">Level:</span>
+            <span id="farmLevel">1</span>
+          </div>
+          <div>
+            <span class="farmLabel">Production:</span>
+            <span id="farmProduction">0</span>
+            <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON"> / sec
+          </div>
+          <div>
+            <span class="farmLabel">Last Harvest:</span>
+            <span id="farmLastHarvest">N/A</span>
+          </div>
           <button onclick="harvestFarm()" class="orangeBtn">Harvest</button>
         </div>
         <div class="farmInfo">
           <h4>Upgrade Farm</h4>
-          <p>Nâng cấp sẽ tăng sản lượng theo cấp độ.</p>
+          <p>Upgrading increases production based on the level.</p>
           <div>
             <span class="farmLabel">Cost:</span>
-            <span id="farmUpgradeCost">?</span> 
-            <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;">
+            <span id="farmUpgradeCost">?</span>
+            <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON">
           </div>
           <button onclick="upgradeFarm()" class="orangeBtn">Upgrade</button>
         </div>
       </div>
     </div>
 
-    <!-- SHOP -->
+    <!-- SHOP TAB -->
     <div id="tabShop" class="tabPage">
-      <h3>Shop - Buy House</h3>
+      <h3>Shop - Buy Houses</h3>
       <div class="houseList">
         <div class="houseItem">
-          <span><b>Tiny House</b> (20 <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;">)</span>
-          <button onclick="buyHouse('Tiny',20)" class="orangeBtn">Buy</button>
+          <span>
+            <b>Tiny House</b>
+            (20 
+            <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON">
+            )
+          </span>
+          <button onclick="buyHouse('Tiny', 20)" class="orangeBtn">Buy</button>
         </div>
         <div class="houseItem">
-          <span><b>Pen House</b> (50 <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;">)</span>
-          <button onclick="buyHouse('Pen',50)" class="orangeBtn">Buy</button>
+          <span>
+            <b>Pen House</b>
+            (50 
+            <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON">
+            )
+          </span>
+          <button onclick="buyHouse('Pen', 50)" class="orangeBtn">Buy</button>
         </div>
         <div class="houseItem">
-          <span><b>Villa</b> (100 <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;">)</span>
-          <button onclick="buyHouse('Villa',100)" class="orangeBtn">Buy</button>
+          <span>
+            <b>Villa</b>
+            (100 
+            <img src="https://i.imgur.com/RtFyZfT.png" style="width:14px; vertical-align:middle;" alt="TON">
+            )
+          </span>
+          <button onclick="buyHouse('Villa', 100)" class="orangeBtn">Buy</button>
         </div>
       </div>
     </div>
 
-    <!-- WALLET -->
+    <!-- WALLET TAB -->
     <div id="tabWallet" class="tabPage">
       <div id="walletSection">
-        <!-- Connect Wallet -->
+        
+        <!-- CONNECT TON WALLET -->
         <div class="refBox">
-          <h4>Kết Nối Ví TON</h4>
-          <p>Nhấn nút để kết nối ví TON.</p>
+          <h4>Connect TON Wallet</h4>
+          <p>Click the button below to connect your TON wallet.</p>
           <button id="btnConnectWallet" class="gameBtn">Connect Wallet</button>
         </div>
 
         <!-- REFERRAL -->
         <div class="refBox">
           <h4>Referral</h4>
-          <p>Nhận 10% TON từ mỗi người bạn mời.</p>
-          <p>Ref link: <span id="refLink">https://t.me/RFMergeBot?start=777</span></p>
+          <p>Earn 10% from every friend you invite.</p>
+          <p>Referral Link: <span id="refLink">https://t.me/RFMergeBot?start=777</span></p>
           <button onclick="copyRef()" class="orangeBtn">Copy</button>
           <button onclick="shareRef()" class="orangeBtn">Share</button>
           <hr>
@@ -432,7 +484,7 @@
 <div id="heroModalOverlay">
   <div id="heroModal">
     <button id="heroModalClose" onclick="closeHeroModal()">X</button>
-    <img id="heroModalImg" src="" alt="hero">
+    <img id="heroModalImg" src="" alt="Hero">
     <h4 id="heroModalName" style="margin:4px 0;"></h4>
     <p id="heroModalLv" style="margin:4px 0;"></p>
     <p id="heroModalStats" style="margin:4px 0;"></p>
@@ -441,10 +493,12 @@
 </div>
 
 <script>
-/* 
-  1) KHAI BÁO TONCONNECT
+/*
+  1) TONCONNECT INITIALIZATION
 */
-const TONCONNECT_MANIFEST = "https://your-domain.com/tonconnect-manifest.json";
+const TONCONNECT_MANIFEST = "https://your-domain.com/tonconnect-manifest.json"; 
+// Replace with your real link, for example:
+// "https://vannhan12312.github.io/telegram-mystery-box/tonconnect-manifest.json"
 
 let tonConnect;
 let tonWalletInfo = null;
@@ -457,11 +511,11 @@ document.addEventListener("DOMContentLoaded", () => {
   tonConnect.onStatusChange((wallet) => {
     if (wallet) {
       tonWalletInfo = wallet;
-      console.log("Đã kết nối ví:", wallet);
-      alert("Đã kết nối ví: " + wallet.account.address);
+      console.log("Wallet connected:", wallet);
+      alert("Wallet connected: " + wallet.account.address);
     } else {
       tonWalletInfo = null;
-      console.log("Ví chưa kết nối hoặc bị ngắt.");
+      console.log("Wallet not connected or disconnected.");
     }
   });
 
@@ -470,19 +524,19 @@ document.addEventListener("DOMContentLoaded", () => {
     try {
       await tonConnect.connect();
     } catch (err) {
-      console.error("Lỗi connect ví:", err);
-      alert("Kết nối bị hủy hoặc lỗi!");
+      console.error("Error connecting wallet:", err);
+      alert("Wallet connection canceled or error!");
     }
   });
 });
 
 /*
-  2) LOADING BAR
+  2) LOADING BAR SIMULATION
 */
 let loadPct = 0;
 const loadInterval = setInterval(() => {
   loadPct += 5;
-  if(loadPct > 100) loadPct = 100;
+  if (loadPct > 100) loadPct = 100;
   document.getElementById('loadingBarInner').style.width = loadPct + '%';
 }, 200);
 
@@ -493,13 +547,20 @@ setTimeout(() => {
 }, 3000);
 
 /*
-  3) BIẾN GAME CƠ BẢN
+  3) BASIC GAME VARIABLES
 */
 let token = 100;
-// Vì ta dùng icon thay “🪙”, set text = rỗng -> code reset below
+
+/** 
+ * We'll update the token display with the TON icon 
+ * and the numeric value.
+ */
 function refreshTokenDisplay() {
-  document.getElementById('tokenDisplay').innerHTML = 
-    `<img src="https://i.imgur.com/RtFyZfT.png" style="width:16px;vertical-align:middle;"> ` + token;
+  document.getElementById('tokenDisplay').innerHTML =
+    `<img src="https://i.imgur.com/RtFyZfT.png" 
+          alt="TON Icon" 
+          style="width:16px; vertical-align:middle;"> 
+     ${token}`;
 }
 refreshTokenDisplay();
 
@@ -512,13 +573,18 @@ let farm = {
   lastHarvest: Date.now(),
   baseProduction: 2
 };
+
 function getFarmProduction() {
   return farm.level * farm.baseProduction;
 }
 function getFarmUpgradeCost() {
-  return farm.level * farm.level * 50;
+  return farm.level * farm.level * 50; 
 }
-function harvestFarm(){
+
+/**
+ * Harvest Farm
+ */
+function harvestFarm() {
   const now = Date.now();
   const diffSec = (now - farm.lastHarvest) / 1000;
   const productionPerSec = getFarmProduction();
@@ -526,40 +592,53 @@ function harvestFarm(){
   token += earned;
   refreshTokenDisplay();
   farm.lastHarvest = now;
-  alert(`Bạn vừa thu hoạch được ${earned} TON!`);
+  alert(`You just harvested ${earned} TON!`);
   updateFarmUI();
   updateHomeInfo();
 }
-function upgradeFarm(){
+
+/**
+ * Upgrade Farm
+ */
+function upgradeFarm() {
   const cost = getFarmUpgradeCost();
-  if(token < cost){
-    alert("Không đủ TON để nâng cấp!");
+  if (token < cost) {
+    alert("Not enough TON to upgrade!");
     return;
   }
+  // Harvest first
   harvestFarm();
   token -= cost;
   refreshTokenDisplay();
   farm.level += 1;
   farm.lastHarvest = Date.now();
-  alert(`Farm lên level ${farm.level}! (Tăng sản lượng)`);
+  alert(`Farm upgraded to level ${farm.level}! Production increased.`);
   updateFarmUI();
   updateHomeInfo();
 }
-function updateFarmUI(){
+
+/**
+ * Update Farm UI
+ */
+function updateFarmUI() {
   document.getElementById('farmLevel').innerText = farm.level;
   document.getElementById('farmProduction').innerText = getFarmProduction();
-  let last = new Date(farm.lastHarvest).toLocaleTimeString();
-  document.getElementById('farmLastHarvest').innerText = last;
+  let lastTime = new Date(farm.lastHarvest).toLocaleTimeString();
+  document.getElementById('farmLastHarvest').innerText = lastTime;
   document.getElementById('farmUpgradeCost').innerText = getFarmUpgradeCost();
 }
-function updateHomeInfo(){
+
+/**
+ * Update Home Info
+ */
+function updateHomeInfo() {
   document.getElementById('farmLevelHome').innerText = farm.level;
   document.getElementById('heroCount').innerText = heroList.length;
   refreshTokenDisplay();
 }
 
 /*
-  4) CHUYỂN TAB
+  4) TAB SWITCH LOGIC
 */
 document.querySelectorAll('#topBar .navBtn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -569,181 +648,193 @@ document.querySelectorAll('#topBar .navBtn').forEach(btn => {
     document.getElementById(tab).classList.add('show');
     btn.classList.add('active');
 
-    if(tab === 'tabHero') renderHeroes();
-    if(tab === 'tabFarm') updateFarmUI();
-    if(tab === 'tabHome') updateHomeInfo();
+    if (tab === 'tabHero') renderHeroes();
+    if (tab === 'tabFarm') updateFarmUI();
+    if (tab === 'tabHome') updateHomeInfo();
   });
 });
 
 /*
-  5) HERO POOL
+  5) HERO DATA (SAMPLE)
 */
 const heroPool = {
   Common: [
-    {name:"SlimeBaby",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",dmg:18,spd:8,hp:25,mp:4,element:"💧"},
-    // ... (bạn thêm đủ 50 hero) ...
+    { name: "SlimeBaby", rarity: "Common", img: "https://i.imgur.com/3AIUH3J.png", dmg: 18, spd: 8, hp: 25, mp: 4, element: "💧" },
+    // ... add more heroes if needed ...
   ],
   Rare: [],
   Epic: [],
   Legendary: [],
   Mythic: []
 };
+
 const chances = [
-  {rar:"Common",pct:40},
-  {rar:"Rare",pct:30},
-  {rar:"Epic",pct:15},
-  {rar:"Legendary",pct:10},
-  {rar:"Mythic",pct:5},
+  { rar: "Common", pct: 40 },
+  { rar: "Rare", pct: 30 },
+  { rar: "Epic", pct: 15 },
+  { rar: "Legendary", pct: 10 },
+  { rar: "Mythic", pct: 5 },
 ];
 
 /*
-  6) MUA BOX
+  6) BUY CHEST
 */
 const chestCosts = {
   1: 2,
   5: 8,
   10: 15
 };
-function buyChest(qty){
+function buyChest(qty) {
   const cost = chestCosts[qty] || 2;
   payWithTon(cost, () => {
     token -= cost;
     refreshTokenDisplay();
-    for(let i = 0; i < qty; i++){
+    for (let i = 0; i < qty; i++) {
       let h = randomHero();
-      heroList.push({...h, lv:1});
+      heroList.push({ ...h, lv: 1 });
       autoMergeHeroes();
     }
     renderHeroes();
     updateHomeInfo();
-    alert(`Mua thành công: ${qty} box (mất ${cost} TON).`);
+    alert(`You successfully bought ${qty} box(es) for ${cost} TON.`);
   });
 }
-function randomHero(){
+
+function randomHero() {
   let roll = Math.random() * 100;
   let sum = 0;
-  for(let c of chances){
+  for (let c of chances) {
     sum += c.pct;
-    if(roll < sum){
+    if (roll < sum) {
       let arr = heroPool[c.rar];
-      if(!arr || arr.length===0){
+      if (!arr || arr.length === 0) {
         return JSON.parse(JSON.stringify(heroPool.Common[0]));
       }
       let i = Math.floor(Math.random() * arr.length);
       return JSON.parse(JSON.stringify(arr[i]));
     }
   }
+  // fallback
   return JSON.parse(JSON.stringify(heroPool.Common[0]));
 }
-function autoMergeHeroes(){
+
+function autoMergeHeroes() {
   let map = {};
-  heroList.forEach((h,i)=>{
-    let k = h.name + "|" + (h.lv||1);
-    if(!map[k]) map[k] = [];
-    map[k].push(i);
+  heroList.forEach((hero, i) => {
+    let key = hero.name + "|" + (hero.lv || 1);
+    if (!map[key]) map[key] = [];
+    map[key].push(i);
   });
-  for(let k in map){
-    let arr = map[k];
-    while(arr.length>=2){
+  for (let key in map) {
+    let arr = map[key];
+    while (arr.length >= 2) {
       let i1 = arr.pop();
       let i2 = arr.pop();
       let h1 = heroList[i1];
       h1.lv += 1;
-      h1.dmg = Math.floor(h1.dmg*1.5);
-      h1.spd = Math.floor(h1.spd*1.5);
-      h1.hp  = Math.floor(h1.hp*1.5);
-      h1.mp  = Math.floor(h1.mp*1.5);
-      heroList.splice(i2,1);
-      arr = arr.map(x=> x>i2 ? x-1 : x);
+      h1.dmg = Math.floor(h1.dmg * 1.5);
+      h1.spd = Math.floor(h1.spd * 1.5);
+      h1.hp  = Math.floor(h1.hp  * 1.5);
+      h1.mp  = Math.floor(h1.mp  * 1.5);
+      heroList.splice(i2, 1);
+      arr = arr.map(x => x > i2 ? x - 1 : x);
     }
   }
 }
-function renderHeroes(){
-  let g = document.getElementById('heroGrid');
-  g.innerHTML = "";
-  heroList.forEach((h, idx)=>{
+
+function renderHeroes() {
+  let container = document.getElementById('heroGrid');
+  container.innerHTML = "";
+  heroList.forEach((hero, idx) => {
     let card = document.createElement('div');
     card.classList.add('heroCard');
 
     let rc = "rarity-common";
-    if(h.rarity==="Rare") rc="rarity-rare";
-    if(h.rarity==="Epic") rc="rarity-epic";
-    if(h.rarity==="Legendary") rc="rarity-legendary";
-    if(h.rarity==="Mythic") rc="rarity-mythic";
+    if (hero.rarity === "Rare") rc = "rarity-rare";
+    if (hero.rarity === "Epic") rc = "rarity-epic";
+    if (hero.rarity === "Legendary") rc = "rarity-legendary";
+    if (hero.rarity === "Mythic") rc = "rarity-mythic";
 
     card.innerHTML = `
-      <img src="${h.img}" alt="${h.name}">
-      <div class="heroName ${rc}">${h.name}</div>
-      <div class="heroLv ${rc}">Lv${h.lv} [${h.rarity}]</div>
+      <img src="${hero.img}" alt="${hero.name}">
+      <div class="heroName ${rc}">${hero.name}</div>
+      <div class="heroLv ${rc}">Lv${hero.lv} [${hero.rarity}]</div>
       <div class="heroStats">
-        ⚔${h.dmg} ✨${h.spd} ♥${h.hp} 🔮${h.mp}<br>
-        <b>${h.element||""}</b>
+        ⚔${hero.dmg} ✨${hero.spd} ♥${hero.hp} 🔮${hero.mp}<br>
+        <b>${hero.element || ""}</b>
       </div>`;
-    card.onclick = ()=>openHeroModal(idx);
-    g.appendChild(card);
+    card.onclick = () => openHeroModal(idx);
+    container.appendChild(card);
   });
 }
 
 /*
   7) HERO MODAL
 */
-function openHeroModal(i){
-  let h = heroList[i];
-  document.getElementById('heroModalOverlay').style.display='flex';
+function openHeroModal(index) {
+  let h = heroList[index];
+  document.getElementById('heroModalOverlay').style.display = 'flex';
   document.getElementById('heroModalImg').src = h.img;
 
-  let rc="rarity-common";
-  if(h.rarity==="Rare") rc="rarity-rare";
-  if(h.rarity==="Epic") rc="rarity-epic";
-  if(h.rarity==="Legendary") rc="rarity-legendary";
-  if(h.rarity==="Mythic") rc="rarity-mythic";
+  let rc = "rarity-common";
+  if (h.rarity === "Rare") rc = "rarity-rare";
+  if (h.rarity === "Epic") rc = "rarity-epic";
+  if (h.rarity === "Legendary") rc = "rarity-legendary";
+  if (h.rarity === "Mythic") rc = "rarity-mythic";
 
-  document.getElementById('heroModalName').innerHTML=
-    `<span class="${rc}"><b>${h.name}</b></span>`;
-  document.getElementById('heroModalLv').innerHTML=
-    `<span class="${rc}"><b>Lv${h.lv} [${h.rarity}]</b></span>`;
-  document.getElementById('heroModalStats').innerHTML=
-    `⚔${h.dmg} ✨${h.spd} ♥${h.hp} 🔮${h.mp}`;
-  document.getElementById('heroModalElement').innerHTML=`<b>${h.element||""}</b>`;
+  document.getElementById('heroModalName').innerHTML = `<span class="${rc}"><b>${h.name}</b></span>`;
+  document.getElementById('heroModalLv').innerHTML = `<span class="${rc}"><b>Lv${h.lv} [${h.rarity}]</b></span>`;
+  document.getElementById('heroModalStats').innerHTML = `⚔${h.dmg} ✨${h.spd} ♥${h.hp} 🔮${h.mp}`;
+  document.getElementById('heroModalElement').innerHTML = `<b>${h.element || ""}</b>`;
 }
-function closeHeroModal(){
-  document.getElementById('heroModalOverlay').style.display='none';
+
+function closeHeroModal() {
+  document.getElementById('heroModalOverlay').style.display = 'none';
 }
 
 /*
-  8) payWithTon
+  8) PAY WITH TON (TonConnect)
 */
-async function payWithTon(amountTon, onSuccess){
-  if(!tonWalletInfo){
-    alert("Bạn cần kết nối ví TON trước!");
+async function payWithTon(amountTon, onSuccess) {
+  if (!tonWalletInfo) {
+    alert("You need to connect your TON wallet first!");
     return;
   }
-  try{
-    const nanoTonAmount=Math.floor(amountTon*1e9);
-    const toAddress="UQBzUchMP1OWSQUD4_pvKk7pA10wcEA_zf--e6EIVlnwdKeq";
-    const tx={
-      validUntil:Date.now()+5*60*1000,
-      messages:[
-        {address:toAddress,amount:nanoTonAmount.toString(),payload:""}
+  try {
+    const nanoAmount = Math.floor(amountTon * 1e9);
+    // Destination address
+    const toAddress = "UQBzUchMP1OWSQUD4_pvKk7pA10wcEA_zf--e6EIVlnwdKeq";
+
+    const tx = {
+      validUntil: Date.now() + 5 * 60 * 1000,
+      messages: [
+        {
+          address: toAddress,
+          amount: nanoAmount.toString(),
+          payload: ""
+        }
       ]
     };
-    const result=await tonConnect.sendTransaction(tx);
-    console.log("Đã gửi TX:", result);
+
+    const result = await tonConnect.sendTransaction(tx);
+    console.log("Transaction sent:", result);
+    // on success
     onSuccess && onSuccess();
-  }catch(e){
-    console.error("Lỗi thanh toán:",e);
-    alert("Thanh toán thất bại hoặc bị hủy.");
+
+  } catch (e) {
+    console.error("Payment error:", e);
+    alert("Payment failed or canceled.");
   }
 }
 
 /*
-  9) MUA HOUSE
+  9) BUY HOUSE
 */
-function buyHouse(name,cost){
-  payWithTon(cost,()=>{
-    token-=cost;
+function buyHouse(name, cost) {
+  payWithTon(cost, () => {
+    token -= cost;
     refreshTokenDisplay();
-    alert(`Bạn vừa mua ${name} với ${cost} TON.`);
+    alert(`You bought a ${name} for ${cost} TON.`);
     updateHomeInfo();
   });
 }
@@ -751,38 +842,46 @@ function buyHouse(name,cost){
 /*
   10) WALLET & REF
 */
-function copyRef(){
-  let text=document.getElementById('refLink').innerText;
-  navigator.clipboard.writeText(text).then(()=>{
-    alert("Copied link!");
+function copyRef() {
+  let text = document.getElementById('refLink').innerText;
+  navigator.clipboard.writeText(text).then(() => {
+    alert("Referral link copied!");
   });
 }
-function shareRef(){
-  let text=document.getElementById('refLink').innerText;
-  if(navigator.share){
+
+function shareRef() {
+  let text = document.getElementById('refLink').innerText;
+  if (navigator.share) {
     navigator.share({
-      title:"Telegram Mystery Box",
-      text:"Join me!",
-      url:text
+      title: "Telegram Mystery Box",
+      text: "Join me!",
+      url: text
     });
-  }else{
-    alert("Trình duyệt không hỗ trợ share. Đã copy link!");
+  } else {
+    alert("Browser doesn't support share. Referral link copied!");
     navigator.clipboard.writeText(text);
   }
 }
-function withdrawRef(){
-  alert("Đã rút Ref (demo).");
+
+function withdrawRef() {
+  alert("REF withdrawn (demo).");
 }
-function withdrawMain(){
-  alert("Rút token (demo).");
+
+function withdrawMain() {
+  alert("Main tokens withdrawn (demo).");
 }
-function swapMain(){
-  alert("Swap token (demo).");
+
+function swapMain() {
+  alert("Tokens swapped (demo).");
 }
-function toggleSound(){
-  let val=document.getElementById('soundToggle').value;
-  isSoundOn=(val==="on");
-  alert("Âm thanh: "+(isSoundOn?"BẬT":"TẮT"));
+
+/*
+  SOUND TOGGLE
+*/
+function toggleSound() {
+  let val = document.getElementById('soundToggle').value;
+  isSoundOn = (val === "on");
+  alert("Sound is now " + (isSoundOn ? "ON" : "OFF"));
 }
 </script>
 </body>
