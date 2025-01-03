@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Telegram Mystery Box - Final Code with Video</title>
+  <title>Telegram Mystery Box - Full Video Home</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- TonConnect SDK from CDN -->
@@ -21,13 +21,12 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #000; /* black background */
+      background: #000;
       overflow: hidden;
     }
 
     /******************************************************
      * 2) LOADING SCREEN
-     * (You can change images if desired)
      ******************************************************/
     #loadingScreen {
       position: fixed;
@@ -119,7 +118,8 @@
     }
     .tabPage {
       display: none;
-      padding: 10px;
+      padding: 0; /* remove default padding for full-video usage in Home */
+      margin: 0;
     }
     .tabPage.show {
       display: block;
@@ -163,7 +163,6 @@
       font-size: 10px;
       line-height: 1.2;
     }
-    /* Rarity color classes */
     .rarity-common { color: #999; font-weight: bold; }
     .rarity-rare { color: #0ff; font-weight: bold; }
     .rarity-epic { color: #c66cc5; font-weight: bold; }
@@ -217,6 +216,7 @@
       display: flex;
       flex-direction: column;
       gap: 10px;
+      padding: 10px; /* add some padding for shop content */
     }
     .houseItem {
       border: 1px solid #ccc;
@@ -234,6 +234,7 @@
       flex-direction: column;
       gap: 10px;
       align-items: start;
+      padding: 10px;
     }
     .farmInfo {
       border: 1px solid #ccc;
@@ -248,12 +249,13 @@
     }
 
     /******************************************************
-     * 10) WALLET, REFERRAL, SETTINGS
+     * 10) WALLET, REF, SETTINGS
      ******************************************************/
     #walletSection {
       display: flex;
       flex-direction: column;
       gap: 10px;
+      padding: 10px;
     }
     .refBox, .settingsBox {
       border: 1px solid #ccc;
@@ -290,6 +292,22 @@
     .orangeBtn:hover {
       background: #ff7a00;
     }
+
+    /******************************************************
+     * HOME FULLSCREEN VIDEO
+     ******************************************************/
+    #tabHome {
+      /* no extra padding or margin -> full video */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #homeVideo {
+      width: 100%;
+      height: calc(100vh - 50px); /* fill area minus topBar */
+      object-fit: cover;
+      /* 'object-fit: cover' will crop edges if aspect ratio differs */
+    }
   </style>
 </head>
 
@@ -305,7 +323,7 @@
 
 <!-- MAIN APP -->
 <div id="app">
-  <!-- TOP BAR -->
+  <!-- NAV BAR -->
   <div id="topBar">
     <div class="navBtn active" data-tab="tabHome">🏠 Home</div>
     <div class="navBtn" data-tab="tabHero">⚔ Hero</div>
@@ -316,33 +334,16 @@
 
   <!-- CONTENT AREA -->
   <div id="contentArea">
-    <!-- HOME TAB -->
+    <!-- HOME TAB (VIDEO ONLY) -->
     <div id="tabHome" class="tabPage show">
-      <h2>Home</h2>
-
-      <!-- Insert video from i.imgur.com/TK6fjwG.mp4 -->
-      <div style="text-align:center; margin:10px 0;">
-        <video 
-          src="https://i.imgur.com/TK6fjwG.mp4"
-          autoplay
-          muted
-          loop
-          playsinline
-          style="max-width:80%; border-radius:8px;">
-        </video>
-      </div>
-
-      <p>This is the main overview. You can display hero info, events, announcements, etc.</p>
-      <!-- Show tokens with TON icon -->
-      <p id="tokenDisplay" style="font-size:18px; font-weight:bold; margin-top:10px;">
-        <img src="https://i.imgur.com/RtFyZfT.png"
-             alt="TON Icon"
-             style="width:16px; vertical-align:middle;">
-        0
-      </p>
-      <hr>
-      <p>Farm Level: <span id="farmLevelHome">1</span></p>
-      <p>Total Heroes: <span id="heroCount">0</span></p>
+      <video 
+        id="homeVideo"
+        src="https://i.imgur.com/1qqVJzC.mp4"
+        autoplay
+        muted
+        loop
+        playsinline
+      ></video>
     </div>
 
     <!-- HERO TAB -->
@@ -446,7 +447,7 @@
           <button id="btnConnectWallet" class="gameBtn">Connect Wallet</button>
         </div>
 
-        <!-- REFERRAL -->
+        <!-- REFERRAL SECTION -->
         <div class="refBox">
           <h4>Referral</h4>
           <p>Earn 10% from every friend you invite.</p>
@@ -497,7 +498,7 @@
   1) TONCONNECT INITIALIZATION
 */
 const TONCONNECT_MANIFEST = "https://your-domain.com/tonconnect-manifest.json"; 
-// Replace with your real link, for example:
+// Replace with your actual link, e.g:
 // "https://vannhan12312.github.io/telegram-mystery-box/tonconnect-manifest.json"
 
 let tonConnect;
@@ -556,12 +557,11 @@ let token = 100;
  * and the numeric value.
  */
 function refreshTokenDisplay() {
-  document.getElementById('tokenDisplay').innerHTML =
-    `<img src="https://i.imgur.com/RtFyZfT.png" 
-          alt="TON Icon" 
-          style="width:16px; vertical-align:middle;"> 
-     ${token}`;
+  // If you still want to show token somewhere else, you can do it. 
+  // Right now, we removed it from Home, so just keep logic if needed.
+  console.log("refreshTokenDisplay called. Token =", token);
 }
+
 refreshTokenDisplay();
 
 let heroList = [];
@@ -594,7 +594,7 @@ function harvestFarm() {
   farm.lastHarvest = now;
   alert(`You just harvested ${earned} TON!`);
   updateFarmUI();
-  updateHomeInfo();
+  // updateHomeInfo(); // We removed text in Home; no need to update?
 }
 
 /**
@@ -614,7 +614,6 @@ function upgradeFarm() {
   farm.lastHarvest = Date.now();
   alert(`Farm upgraded to level ${farm.level}! Production increased.`);
   updateFarmUI();
-  updateHomeInfo();
 }
 
 /**
@@ -628,39 +627,18 @@ function updateFarmUI() {
   document.getElementById('farmUpgradeCost').innerText = getFarmUpgradeCost();
 }
 
-/**
- * Update Home Info
- */
-function updateHomeInfo() {
-  document.getElementById('farmLevelHome').innerText = farm.level;
-  document.getElementById('heroCount').innerText = heroList.length;
-  refreshTokenDisplay();
-}
-
 /*
-  4) TAB SWITCH LOGIC
+  4) NO Home Info to update (we removed texts in Home).
+     If needed, you can keep a function updateHomeInfo
+     but there's nothing to display now.
 */
-document.querySelectorAll('#topBar .navBtn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    let tab = btn.getAttribute('data-tab');
-    document.querySelectorAll('.tabPage').forEach(pg => pg.classList.remove('show'));
-    document.querySelectorAll('.navBtn').forEach(x => x.classList.remove('active'));
-    document.getElementById(tab).classList.add('show');
-    btn.classList.add('active');
-
-    if (tab === 'tabHero') renderHeroes();
-    if (tab === 'tabFarm') updateFarmUI();
-    if (tab === 'tabHome') updateHomeInfo();
-  });
-});
 
 /*
-  5) HERO DATA (SAMPLE)
+  5) HERO DATA
 */
 const heroPool = {
   Common: [
     { name: "SlimeBaby", rarity: "Common", img: "https://i.imgur.com/3AIUH3J.png", dmg: 18, spd: 8, hp: 25, mp: 4, element: "💧" },
-    // ... add more heroes if needed ...
   ],
   Rare: [],
   Epic: [],
@@ -684,6 +662,7 @@ const chestCosts = {
   5: 8,
   10: 15
 };
+
 function buyChest(qty) {
   const cost = chestCosts[qty] || 2;
   payWithTon(cost, () => {
@@ -695,7 +674,7 @@ function buyChest(qty) {
       autoMergeHeroes();
     }
     renderHeroes();
-    updateHomeInfo();
+    // No "Home" info needed to update
     alert(`You successfully bought ${qty} box(es) for ${cost} TON.`);
   });
 }
@@ -818,9 +797,7 @@ async function payWithTon(amountTon, onSuccess) {
 
     const result = await tonConnect.sendTransaction(tx);
     console.log("Transaction sent:", result);
-    // on success
     onSuccess && onSuccess();
-
   } catch (e) {
     console.error("Payment error:", e);
     alert("Payment failed or canceled.");
@@ -835,7 +812,6 @@ function buyHouse(name, cost) {
     token -= cost;
     refreshTokenDisplay();
     alert(`You bought a ${name} for ${cost} TON.`);
-    updateHomeInfo();
   });
 }
 
