@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Telegram Mystery Box - Full Video Home</title>
+  <title>Telegram Mystery Box - Full Video Home + Clickable Tabs</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
   <!-- TonConnect SDK from CDN -->
@@ -21,7 +21,7 @@
     html, body {
       width: 100%;
       height: 100%;
-      background: #000;
+      background: #000; 
       overflow: hidden;
     }
 
@@ -118,20 +118,35 @@
     }
     .tabPage {
       display: none;
-      padding: 0; /* remove default padding for full-video usage in Home */
       margin: 0;
+      padding: 0;
     }
     .tabPage.show {
       display: block;
     }
 
     /******************************************************
-     * 6) HERO GRID
+     * HOME TAB - FULLSCREEN VIDEO
+     ******************************************************/
+    #tabHome {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    #homeVideo {
+      width: 100%;
+      height: calc(100vh - 50px); 
+      object-fit: cover;
+    }
+
+    /******************************************************
+     * HERO GRID
      ******************************************************/
     #heroGrid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 0;
+      padding: 10px;
     }
     .heroCard {
       border: 1px solid #ddd;
@@ -163,6 +178,7 @@
       font-size: 10px;
       line-height: 1.2;
     }
+    /* Rarity color classes */
     .rarity-common { color: #999; font-weight: bold; }
     .rarity-rare { color: #0ff; font-weight: bold; }
     .rarity-epic { color: #c66cc5; font-weight: bold; }
@@ -170,7 +186,7 @@
     .rarity-mythic { color: #f00; font-weight: bold; }
 
     /******************************************************
-     * 7) HERO MODAL
+     * HERO MODAL
      ******************************************************/
     #heroModalOverlay {
       position: fixed;
@@ -200,7 +216,7 @@
     }
     #heroModalClose {
       position: absolute;
-      top: 5px;
+      top: 5px; 
       right: 5px;
       cursor: pointer;
       background: #ddd;
@@ -210,13 +226,13 @@
     }
 
     /******************************************************
-     * 8) SHOP (House)
+     * SHOP, FARM, WALLET
      ******************************************************/
     .houseList {
       display: flex;
       flex-direction: column;
       gap: 10px;
-      padding: 10px; /* add some padding for shop content */
+      padding: 10px;
     }
     .houseItem {
       border: 1px solid #ccc;
@@ -225,36 +241,7 @@
       align-items: center;
       justify-content: space-between;
     }
-
-    /******************************************************
-     * 9) FARM SECTION
-     ******************************************************/
     #farmSection {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: start;
-      padding: 10px;
-    }
-    .farmInfo {
-      border: 1px solid #ccc;
-      padding: 8px;
-      border-radius: 4px;
-      width: 100%;
-      max-width: 300px;
-    }
-    .farmLabel {
-      font-weight: bold;
-      margin-right: 6px;
-    }
-
-    /******************************************************
-     * 10) WALLET, REF, SETTINGS
-     ******************************************************/
-    #walletSection {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
       padding: 10px;
     }
     .refBox, .settingsBox {
@@ -262,9 +249,15 @@
       padding: 8px;
       border-radius: 4px;
     }
+    #walletSection {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      padding: 10px;
+    }
 
     /******************************************************
-     * EXTRA: Button Style to Match Screenshot
+     * EXTRA: Button Style
      ******************************************************/
     .gameBtn {
       background: #333;
@@ -292,27 +285,10 @@
     .orangeBtn:hover {
       background: #ff7a00;
     }
-
-    /******************************************************
-     * HOME FULLSCREEN VIDEO
-     ******************************************************/
-    #tabHome {
-      /* no extra padding or margin -> full video */
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    #homeVideo {
-      width: 100%;
-      height: calc(100vh - 50px); /* fill area minus topBar */
-      object-fit: cover;
-      /* 'object-fit: cover' will crop edges if aspect ratio differs */
-    }
   </style>
 </head>
 
 <body>
-
 <!-- LOADING SCREEN -->
 <div id="loadingScreen">
   <div id="loadingLogo"></div>
@@ -323,7 +299,7 @@
 
 <!-- MAIN APP -->
 <div id="app">
-  <!-- NAV BAR -->
+  <!-- TOP NAV -->
   <div id="topBar">
     <div class="navBtn active" data-tab="tabHome">🏠 Home</div>
     <div class="navBtn" data-tab="tabHero">⚔ Hero</div>
@@ -334,7 +310,7 @@
 
   <!-- CONTENT AREA -->
   <div id="contentArea">
-    <!-- HOME TAB (VIDEO ONLY) -->
+    <!-- HOME: FULL SCREEN VIDEO -->
     <div id="tabHome" class="tabPage show">
       <video 
         id="homeVideo"
@@ -439,7 +415,6 @@
     <!-- WALLET TAB -->
     <div id="tabWallet" class="tabPage">
       <div id="walletSection">
-        
         <!-- CONNECT TON WALLET -->
         <div class="refBox">
           <h4>Connect TON Wallet</h4>
@@ -447,7 +422,7 @@
           <button id="btnConnectWallet" class="gameBtn">Connect Wallet</button>
         </div>
 
-        <!-- REFERRAL SECTION -->
+        <!-- REFERRAL -->
         <div class="refBox">
           <h4>Referral</h4>
           <p>Earn 10% from every friend you invite.</p>
@@ -498,8 +473,7 @@
   1) TONCONNECT INITIALIZATION
 */
 const TONCONNECT_MANIFEST = "https://your-domain.com/tonconnect-manifest.json"; 
-// Replace with your actual link, e.g:
-// "https://vannhan12312.github.io/telegram-mystery-box/tonconnect-manifest.json"
+// Replace with your real link
 
 let tonConnect;
 let tonWalletInfo = null;
@@ -551,18 +525,10 @@ setTimeout(() => {
   3) BASIC GAME VARIABLES
 */
 let token = 100;
-
-/** 
- * We'll update the token display with the TON icon 
- * and the numeric value.
- */
 function refreshTokenDisplay() {
-  // If you still want to show token somewhere else, you can do it. 
-  // Right now, we removed it from Home, so just keep logic if needed.
-  console.log("refreshTokenDisplay called. Token =", token);
+  // We removed token from Home, but logic is here if needed
+  console.log("Token:", token);
 }
-
-refreshTokenDisplay();
 
 let heroList = [];
 let isSoundOn = true;
@@ -573,17 +539,12 @@ let farm = {
   lastHarvest: Date.now(),
   baseProduction: 2
 };
-
 function getFarmProduction() {
   return farm.level * farm.baseProduction;
 }
 function getFarmUpgradeCost() {
   return farm.level * farm.level * 50; 
 }
-
-/**
- * Harvest Farm
- */
 function harvestFarm() {
   const now = Date.now();
   const diffSec = (now - farm.lastHarvest) / 1000;
@@ -594,19 +555,13 @@ function harvestFarm() {
   farm.lastHarvest = now;
   alert(`You just harvested ${earned} TON!`);
   updateFarmUI();
-  // updateHomeInfo(); // We removed text in Home; no need to update?
 }
-
-/**
- * Upgrade Farm
- */
 function upgradeFarm() {
   const cost = getFarmUpgradeCost();
   if (token < cost) {
     alert("Not enough TON to upgrade!");
     return;
   }
-  // Harvest first
   harvestFarm();
   token -= cost;
   refreshTokenDisplay();
@@ -615,10 +570,6 @@ function upgradeFarm() {
   alert(`Farm upgraded to level ${farm.level}! Production increased.`);
   updateFarmUI();
 }
-
-/**
- * Update Farm UI
- */
 function updateFarmUI() {
   document.getElementById('farmLevel').innerText = farm.level;
   document.getElementById('farmProduction').innerText = getFarmProduction();
@@ -628,10 +579,26 @@ function updateFarmUI() {
 }
 
 /*
-  4) NO Home Info to update (we removed texts in Home).
-     If needed, you can keep a function updateHomeInfo
-     but there's nothing to display now.
+  4) TAB SWITCH: MAKE SURE BUTTONS WORK
 */
+document.querySelectorAll('#topBar .navBtn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    let tab = btn.getAttribute('data-tab');
+    // Hide all tab pages
+    document.querySelectorAll('.tabPage').forEach(pg => pg.classList.remove('show'));
+    // Remove 'active' from all nav buttons
+    document.querySelectorAll('.navBtn').forEach(x => x.classList.remove('active'));
+
+    // Show chosen tab
+    document.getElementById(tab).classList.add('show');
+    btn.classList.add('active');
+
+    // Additional logic for each tab
+    if (tab === 'tabHero') renderHeroes();
+    if (tab === 'tabFarm') updateFarmUI();
+    // If you want to do something on Shop or Wallet, add here
+  });
+});
 
 /*
   5) HERO DATA
@@ -645,7 +612,6 @@ const heroPool = {
   Legendary: [],
   Mythic: []
 };
-
 const chances = [
   { rar: "Common", pct: 40 },
   { rar: "Rare", pct: 30 },
@@ -662,7 +628,6 @@ const chestCosts = {
   5: 8,
   10: 15
 };
-
 function buyChest(qty) {
   const cost = chestCosts[qty] || 2;
   payWithTon(cost, () => {
@@ -674,11 +639,9 @@ function buyChest(qty) {
       autoMergeHeroes();
     }
     renderHeroes();
-    // No "Home" info needed to update
-    alert(`You successfully bought ${qty} box(es) for ${cost} TON.`);
+    alert(`You bought ${qty} box(es) for ${cost} TON.`);
   });
 }
-
 function randomHero() {
   let roll = Math.random() * 100;
   let sum = 0;
@@ -693,10 +656,8 @@ function randomHero() {
       return JSON.parse(JSON.stringify(arr[i]));
     }
   }
-  // fallback
   return JSON.parse(JSON.stringify(heroPool.Common[0]));
 }
-
 function autoMergeHeroes() {
   let map = {};
   heroList.forEach((hero, i) => {
@@ -720,7 +681,6 @@ function autoMergeHeroes() {
     }
   }
 }
-
 function renderHeroes() {
   let container = document.getElementById('heroGrid');
   container.innerHTML = "";
@@ -766,13 +726,12 @@ function openHeroModal(index) {
   document.getElementById('heroModalStats').innerHTML = `⚔${h.dmg} ✨${h.spd} ♥${h.hp} 🔮${h.mp}`;
   document.getElementById('heroModalElement').innerHTML = `<b>${h.element || ""}</b>`;
 }
-
 function closeHeroModal() {
   document.getElementById('heroModalOverlay').style.display = 'none';
 }
 
 /*
-  8) PAY WITH TON (TonConnect)
+  8) PAY WITH TON
 */
 async function payWithTon(amountTon, onSuccess) {
   if (!tonWalletInfo) {
@@ -781,9 +740,7 @@ async function payWithTon(amountTon, onSuccess) {
   }
   try {
     const nanoAmount = Math.floor(amountTon * 1e9);
-    // Destination address
     const toAddress = "UQBzUchMP1OWSQUD4_pvKk7pA10wcEA_zf--e6EIVlnwdKeq";
-
     const tx = {
       validUntil: Date.now() + 5 * 60 * 1000,
       messages: [
@@ -794,7 +751,6 @@ async function payWithTon(amountTon, onSuccess) {
         }
       ]
     };
-
     const result = await tonConnect.sendTransaction(tx);
     console.log("Transaction sent:", result);
     onSuccess && onSuccess();
@@ -824,7 +780,6 @@ function copyRef() {
     alert("Referral link copied!");
   });
 }
-
 function shareRef() {
   let text = document.getElementById('refLink').innerText;
   if (navigator.share) {
@@ -838,15 +793,12 @@ function shareRef() {
     navigator.clipboard.writeText(text);
   }
 }
-
 function withdrawRef() {
   alert("REF withdrawn (demo).");
 }
-
 function withdrawMain() {
   alert("Main tokens withdrawn (demo).");
 }
-
 function swapMain() {
   alert("Tokens swapped (demo).");
 }
