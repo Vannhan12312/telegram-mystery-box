@@ -1,747 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>R&F Merge Game - Full 50 Heroes</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    /* RESET */
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
-    html, body {
-      width: 100%;
-      height: 100%;
-      background: #000;
-      overflow: hidden;
-    }
-    /* LOADING SCREEN */
-    #loadingScreen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw; height: 100vh;
-      background: url('https://i.imgur.com/gguz2yw.png') center/cover no-repeat;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: flex-end;
-      z-index: 99999;
-    }
-    #loadingLogo {
-      margin-bottom: 20px;
-      width: 120px;
-      height: 120px;
-      background: url('https://i.imgur.com/4spxSKK.png') center/contain no-repeat;
-    }
-    #loadingBarOuter {
-      width: 60%;
-      max-width: 300px;
-      height: 10px;
-      background: rgba(0,0,0,0.3);
-      margin-bottom: 40px;
-      border-radius: 5px;
-      overflow: hidden;
-    }
-    #loadingBarInner {
-      width: 0%;
-      height: 100%;
-      background: #ff8800;
-      transition: width 0.2s;
-    }
-
-    /* MAIN APP */
-    #app {
-      display: none;
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      background: #f5f5f5;
-      overflow: hidden;
-    }
-
-    /* TOP NAV (5 nút) */
-    #topBar {
-      height: 50px;
-      background: #222;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: space-around;
-    }
-    #topBar .navBtn {
-      cursor: pointer;
-      padding: 8px 14px;
-      border-radius: 4px;
-      background: #333;
-      margin: 0 6px;
-      font-weight: bold;
-      transition: background 0.2s;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-    }
-    #topBar .navBtn:hover {
-      background: #444;
-    }
-    #topBar .navBtn.active {
-      background: #ff7a00;
-    }
-
-    /* CONTENT AREA */
-    #contentArea {
-      position: absolute;
-      top: 50px;
-      left: 0;
-      width: 100%;
-      height: calc(100% - 50px);
-      overflow-y: auto;
-      background: #fff;
-    }
-    .tabPage {
-      display: none;
-      padding: 10px;
-    }
-    .tabPage.show {
-      display: block;
-    }
-
-    /* HERO GRID (4 columns) */
-    #heroGrid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0;
-    }
-    .heroCard {
-      border: 1px solid #ddd;
-      width: 100%;
-      height: 130px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      font-size: 12px;
-      cursor: pointer;
-    }
-    .heroCard img {
-      width: 50px;
-      height: 50px;
-      object-fit: cover;
-      border-radius: 4px;
-    }
-    .heroName {
-      margin: 2px 0;
-      font-weight: bold;
-    }
-    .heroLv {
-      margin-bottom: 2px;
-      font-weight: bold;
-    }
-    .heroStats {
-      font-size: 10px;
-      line-height: 1.2;
-    }
-
-    /* Rarity colors (bold) */
-    .rarity-common { color: #999; font-weight: bold; }
-    .rarity-rare { color: #0ff; font-weight: bold; }
-    .rarity-epic { color: #c66cc5; font-weight: bold; }
-    .rarity-legendary { color: #ffa600; font-weight: bold; }
-    .rarity-mythic { color: #f00; font-weight: bold; }
-
-    /* HERO MODAL */
-    #heroModalOverlay {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100vw;
-      height: 100vh;
-      background: rgba(0,0,0,0.5);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 999999;
-    }
-    #heroModal {
-      background: #fff;
-      border-radius: 6px;
-      padding: 10px;
-      width: 240px;
-      text-align: center;
-      position: relative;
-    }
-    #heroModal img {
-      width: 80px;
-      height: 80px;
-      object-fit: cover;
-      border-radius: 4px;
-      margin-bottom: 8px;
-    }
-    #heroModalClose {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      cursor: pointer;
-      background: #ddd;
-      border: none;
-      border-radius: 4px;
-      padding: 2px 6px;
-    }
-
-    /* SHOP (House) */
-    .houseList {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .houseItem {
-      border: 1px solid #ccc;
-      padding: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-    }
-    .houseItem button {
-      background: #f57c00;
-      color:#fff;
-      border:none;
-      border-radius:4px;
-      padding:4px 8px;
-      cursor:pointer;
-    }
-
-    /* FARM SECTION */
-    #farmSection {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      align-items: start;
-    }
-    .farmInfo {
-      border:1px solid #ccc;
-      padding:8px;
-      border-radius:4px;
-      width: 100%;
-      max-width: 300px;
-    }
-    #farmSection button {
-      background:#4CAF50;
-      color:#fff;
-      border:none;
-      padding:6px 12px;
-      border-radius:4px;
-      margin-top:6px;
-      cursor:pointer;
-    }
-    .farmLabel {
-      font-weight: bold;
-      margin-right: 6px;
-    }
-
-    /* WALLET, REF, SETTINGS */
-    #walletSection {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-    }
-    .refBox, .settingsBox {
-      border:1px solid #ccc;
-      padding:8px;
-      border-radius:4px;
-    }
-    .refBox button, .settingsBox button {
-      background:#f57c00;
-      color:#fff;
-      border:none;
-      padding:4px 8px;
-      border-radius:4px;
-      margin:4px;
-      cursor:pointer;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mở Hộp Băng Ma Thuật</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(to bottom, #1c92d2, #f2fcfe);
+            overflow: hidden;
+        }
+        .box-container {
+            text-align: center;
+        }
+        .magic-box {
+            width: 200px;
+            height: 200px;
+            margin: 0 auto;
+            background: url('https://source.unsplash.com/200x200/?ice,box') no-repeat center/cover;
+            border: 3px solid #fff;
+            border-radius: 20px;
+            box-shadow: 0 0 20px #4fc3f7, 0 0 40px #ffcc00;
+            animation: glow 2s infinite;
+        }
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px #4fc3f7; }
+            50% { box-shadow: 0 0 40px #ffcc00; }
+        }
+        .open-btn {
+            margin-top: 20px;
+            padding: 15px 30px;
+            font-size: 20px;
+            color: #fff;
+            background: linear-gradient(to right, #4fc3f7, #1c92d2);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        .open-btn:hover {
+            transform: scale(1.1);
+            background: linear-gradient(to right, #1c92d2, #4fc3f7);
+        }
+        .reward {
+            margin-top: 20px;
+            display: none;
+            font-size: 18px;
+            color: #fff;
+            text-shadow: 0 0 10px #4fc3f7;
+        }
+    </style>
 </head>
-
 <body>
-
-<!-- LOADING SCREEN -->
-<div id="loadingScreen">
-  <div id="loadingLogo"></div>
-  <div id="loadingBarOuter">
-    <div id="loadingBarInner"></div>
-  </div>
-</div>
-
-<!-- MAIN APP -->
-<div id="app">
-  <!-- NAVIGATION BAR -->
-  <div id="topBar">
-    <!-- Home -->
-    <div class="navBtn active" data-tab="tabHome">🏠 Home</div>
-    <!-- Hero -->
-    <div class="navBtn" data-tab="tabHero">⚔ Hero</div>
-    <!-- Farm -->
-    <div class="navBtn" data-tab="tabFarm">🚜 Farm</div>
-    <!-- Shop -->
-    <div class="navBtn" data-tab="tabShop">🏷 Shop</div>
-    <!-- Wallet -->
-    <div class="navBtn" data-tab="tabWallet">💰 Wallet</div>
-  </div>
-
-  <!-- CONTENT -->
-  <div id="contentArea">
-    <!-- HOME -->
-    <div id="tabHome" class="tabPage show">
-      <h2>Home</h2>
-      <p>Đây là trang tổng quan. Bạn có thể hiển thị thông tin: Hero, thông báo, event...</p>
-      <p id="tokenDisplay" style="font-size:18px; font-weight:bold; margin-top:10px;">
-        🪙 0
-      </p>
-      <hr>
-      <p>Farm Level: <span id="farmLevelHome">1</span></p>
-      <p>Số Hero hiện có: <span id="heroCount">0</span></p>
+    <div class="box-container">
+        <div class="magic-box" id="magicBox"></div>
+        <button class="open-btn" id="openBtn">Mở Hộp</button>
+        <div class="reward" id="rewardBox"></div>
     </div>
 
-    <!-- HERO -->
-    <div id="tabHero" class="tabPage">
-      <h3>Hero Collection</h3>
-      <div style="margin-bottom:8px;">
-        <button onclick="buyChest(1)" style="font-weight:bold;">Mua 1 Rương (10 TON)</button>
-        <button onclick="buyChest(5)" style="font-weight:bold;">Mua 5 Rương (50 TON)</button>
-      </div>
-      <div id="heroGrid"></div>
-    </div>
+    <script>
+        const openBtn = document.getElementById('openBtn');
+        const rewardBox = document.getElementById('rewardBox');
+        const rewards = [
+            { name: 'Gươm Băng Giá', type: 'NFT', rarity: 'Hiếm' },
+            { name: 'Khiên Lửa Băng', type: 'NFT', rarity: 'Cực Hiếm' },
+            { name: '50 Token', type: 'Token', rarity: 'Thường' },
+            { name: 'Phượng Hoàng Băng', type: 'NFT', rarity: 'Huyền Thoại' }
+        ];
 
-    <!-- FARM -->
-    <div id="tabFarm" class="tabPage">
-      <h3>My Farm</h3>
-      <div id="farmSection">
-        <div class="farmInfo">
-          <div><span class="farmLabel">Level:</span><span id="farmLevel">1</span></div>
-          <div><span class="farmLabel">Production:</span><span id="farmProduction">0</span> TON / sec</div>
-          <div><span class="farmLabel">Last Harvest:</span><span id="farmLastHarvest">N/A</span></div>
-          <button onclick="harvestFarm()">Harvest</button>
-        </div>
-        <div class="farmInfo">
-          <h4>Upgrade Farm</h4>
-          <p>Nâng cấp sẽ tăng sản lượng theo cấp độ.</p>
-          <div>
-            <span class="farmLabel">Cost:</span>
-            <span id="farmUpgradeCost">?</span> TON
-          </div>
-          <button onclick="upgradeFarm()">Upgrade</button>
-        </div>
-      </div>
-    </div>
+        openBtn.addEventListener('click', () => {
+            openBtn.disabled = true;
+            rewardBox.style.display = 'none';
 
-    <!-- SHOP -->
-    <div id="tabShop" class="tabPage">
-      <h3>Shop - Buy House</h3>
-      <div class="houseList">
-        <div class="houseItem">
-          <span><b>Tiny House</b> (20 TON)</span>
-          <button onclick="buyHouse('Tiny',20)">Buy</button>
-        </div>
-        <div class="houseItem">
-          <span><b>Pen House</b> (50 TON)</span>
-          <button onclick="buyHouse('Pen',50)">Buy</button>
-        </div>
-        <div class="houseItem">
-          <span><b>Villa</b> (100 TON)</span>
-          <button onclick="buyHouse('Villa',100)">Buy</button>
-        </div>
-      </div>
-    </div>
-
-    <!-- WALLET & REFERRAL -->
-    <div id="tabWallet" class="tabPage">
-      <div id="walletSection">
-        <!-- REFERRAL -->
-        <div class="refBox">
-          <h4>Referral</h4>
-          <p>Get 10% in TON from each invited friend.</p>
-          <p>Ref link: <span id="refLink">https://t.me/RFMergeBot?start=777</span></p>
-          <button onclick="copyRef()">Copy</button>
-          <button onclick="shareRef()">Share</button>
-          <hr>
-          <button onclick="withdrawRef()">Withdraw REF</button>
-        </div>
-
-        <!-- WALLET MAIN -->
-        <div class="refBox">
-          <h4>Wallet</h4>
-          <button onclick="withdrawMain()">Withdraw</button>
-          <button onclick="swapMain()">Swap</button>
-        </div>
-
-        <!-- SETTINGS -->
-        <div class="settingsBox">
-          <h4>Settings</h4>
-          <label style="margin-right:8px;">
-            Sound:
-            <select id="soundToggle" onchange="toggleSound()">
-              <option value="on">On</option>
-              <option value="off">Off</option>
-            </select>
-          </label>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- HERO MODAL -->
-<div id="heroModalOverlay">
-  <div id="heroModal">
-    <button id="heroModalClose" onclick="closeHeroModal()">X</button>
-    <img id="heroModalImg" src="" alt="hero">
-    <h4 id="heroModalName" style="margin:4px 0;"></h4>
-    <p id="heroModalLv" style="margin:4px 0;"></p>
-    <p id="heroModalStats" style="margin:4px 0;"></p>
-    <p id="heroModalElement" style="margin:4px 0;"></p>
-  </div>
-</div>
-
-<script>
-/* LOADING BAR SETUP (3s) */
-let loadPct = 0;
-const loadInterval = setInterval(() => {
-  loadPct += 5;
-  if(loadPct > 100) loadPct = 100;
-  document.getElementById('loadingBarInner').style.width = loadPct + '%';
-}, 200);
-
-setTimeout(() => {
-  clearInterval(loadInterval);
-  document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('app').style.display = 'block';
-}, 3000);
-
-/* BASIC DATA */
-let token = 100;
-document.getElementById('tokenDisplay').innerText = "🪙 " + token;
-let heroList = [];
-let isSoundOn = true;
-
-/* FARM DATA */
-let farm = {
-  level: 1,
-  lastHarvest: Date.now(),
-  baseProduction: 2 // Mỗi cấp x2 TON/giây
-};
-
-/* Tính sản lượng farm */
-function getFarmProduction() {
-  return farm.level * farm.baseProduction;
-}
-function getFarmUpgradeCost() {
-  // cost nâng cấp: level^2 * 50
-  return farm.level * farm.level * 50;
-}
-
-/* Harvest */
-function harvestFarm(){
-  const now = Date.now();
-  const diffSec = (now - farm.lastHarvest) / 1000;
-  const productionPerSec = getFarmProduction();
-  const earned = Math.floor(diffSec * productionPerSec);
-  token += earned;
-  document.getElementById('tokenDisplay').innerText = "🪙 " + token;
-  farm.lastHarvest = now;
-  alert(`Bạn vừa thu hoạch được ${earned} TON!`);
-  updateFarmUI();
-  updateHomeInfo();
-}
-
-/* Upgrade Farm */
-function upgradeFarm(){
-  const cost = getFarmUpgradeCost();
-  if(token < cost){
-    alert("Bạn không đủ TON để nâng cấp!");
-    return;
-  }
-  // Thu hoạch trước khi nâng cấp
-  harvestFarm();
-
-  token -= cost;
-  farm.level += 1;
-  farm.lastHarvest = Date.now();
-  document.getElementById('tokenDisplay').innerText = "🪙 " + token;
-  alert(`Farm lên level ${farm.level}! (+ Tăng sản lượng)`);
-  updateFarmUI();
-  updateHomeInfo();
-}
-
-/* Cập nhật UI Farm */
-function updateFarmUI(){
-  document.getElementById('farmLevel').innerText = farm.level;
-  document.getElementById('farmProduction').innerText = getFarmProduction();
-  let last = new Date(farm.lastHarvest).toLocaleTimeString();
-  document.getElementById('farmLastHarvest').innerText = last;
-  document.getElementById('farmUpgradeCost').innerText = getFarmUpgradeCost();
-}
-
-/* Cập nhật UI Home */
-function updateHomeInfo(){
-  document.getElementById('farmLevelHome').innerText = farm.level;
-  document.getElementById('heroCount').innerText = heroList.length;
-  document.getElementById('tokenDisplay').innerText = "🪙 " + token;
-}
-
-/* NAV switch */
-document.querySelectorAll('#topBar .navBtn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    let tab = btn.getAttribute('data-tab');
-    document.querySelectorAll('.tabPage').forEach(pg=>pg.classList.remove('show'));
-    document.querySelectorAll('.navBtn').forEach(x=>x.classList.remove('active'));
-    document.getElementById(tab).classList.add('show');
-    btn.classList.add('active');
-
-    // Cập nhật khi chuyển tab
-    if(tab === 'tabHero') renderHeroes();
-    if(tab === 'tabFarm') updateFarmUI();
-    if(tab === 'tabHome') updateHomeInfo();
-  });
-});
-
-/* DANH SÁCH 50 HERO */
-const heroPool = {
-  Common:[
-    {name:"SlimeBaby",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",dmg:18,spd:8,hp:25,mp:4,element:"💧"},
-    {name:"ShellMin",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",dmg:20,spd:10,hp:30,mp:5,element:"🌱"},
-    {name:"TinyFrog",rarity:"Common",img:"https://i.imgur.com/eVNSFSH.png",dmg:22,spd:9,hp:28,mp:6,element:"🐸"},
-    {name:"BlueKid",rarity:"Common",img:"https://i.imgur.com/hjZPOpf.png",dmg:24,spd:11,hp:32,mp:7,element:"💠"},
-    {name:"CrabKid",rarity:"Common",img:"https://i.imgur.com/TvssIKL.png",dmg:25,spd:12,hp:34,mp:8,element:"🦀"},
-    {name:"MudCrab",rarity:"Common",img:"https://i.imgur.com/9soOAZz.png",dmg:26,spd:10,hp:30,mp:6,element:"🌱"},
-    {name:"JellyBoy",rarity:"Common",img:"https://i.imgur.com/ZRG9eiQ.png",dmg:19,spd:11,hp:27,mp:5,element:"🪸"},
-    {name:"CrabEdge",rarity:"Common",img:"https://i.imgur.com/aOV5P1e.png",dmg:23,spd:9,hp:29,mp:6,element:"🦀"},
-    {name:"LavaMini",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",dmg:27,spd:13,hp:32,mp:9,element:"🔥"},
-    {name:"SlimyJr",rarity:"Common",img:"https://i.imgur.com/tq1KRm5.png",dmg:28,spd:14,hp:34,mp:10,element:"💧"},
-  ],
-  Rare:[
-    {name:"CoralWar",rarity:"Rare",img:"https://i.imgur.com/Iy1X8r1.png",dmg:35,spd:14,hp:50,mp:8,element:"💧"},
-    {name:"KrakenKid",rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png",dmg:36,spd:15,hp:52,mp:9,element:"🦑"},
-    {name:"ScorpionKid",rarity:"Rare",img:"https://i.imgur.com/aUTGKeg.png",dmg:38,spd:15,hp:54,mp:9,element:"🦂"},
-    {name:"AquaShield",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png",dmg:34,spd:16,hp:52,mp:10,element:"💧"},
-    {name:"ClamGuard",rarity:"Rare",img:"https://i.imgur.com/8rZaJYc.png",dmg:37,spd:14,hp:51,mp:9,element:"🐚"},
-    {name:"MermaidMia",rarity:"Rare",img:"https://i.imgur.com/QRJyOyp.png",dmg:36,spd:15,hp:53,mp:8,element:"🧜"},
-    {name:"RiverRonin",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png",dmg:40,spd:16,hp:55,mp:10,element:"🌊"},
-    {name:"AngryFish",rarity:"Rare",img:"https://i.imgur.com/8nR0o5k.png",dmg:39,spd:15,hp:52,mp:9,element:"🐟"},
-    {name:"ShellFish",rarity:"Rare",img:"https://i.imgur.com/zaWeuIb.png",dmg:35,spd:14,hp:50,mp:8,element:"💠"},
-    {name:"DarkFrog",rarity:"Rare",img:"https://i.imgur.com/NK8EQm1.png",dmg:40,spd:17,hp:54,mp:10,element:"🌑"},
-  ],
-  Epic:[
-    {name:"ShellBuster",rarity:"Epic",img:"https://i.imgur.com/02jTwGp.png",dmg:50,spd:17,hp:60,mp:12,element:"🐚"},
-    {name:"StormSummoner",rarity:"Epic",img:"https://i.imgur.com/wr71ePx.png",dmg:55,spd:18,hp:62,mp:13,element:"🌩"},
-    {name:"OceanLancer",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",dmg:51,spd:17,hp:60,mp:12,element:"🌊"},
-    {name:"PearlMage",rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png",dmg:54,spd:19,hp:63,mp:14,element:"🔮"},
-    {name:"ReefDragon",rarity:"Epic",img:"https://i.imgur.com/EB7WHnW.png",dmg:52,spd:18,hp:61,mp:13,element:"🐉"},
-    {name:"SeaKnight",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",dmg:53,spd:17,hp:65,mp:15,element:"⚔"},
-    {name:"ShellMin2",rarity:"Epic",img:"https://i.imgur.com/PqCgXay.png",dmg:56,spd:20,hp:64,mp:14,element:"🪨"},
-    {name:"JellyMage",rarity:"Epic",img:"https://i.imgur.com/EmWFXPq.png",dmg:50,spd:17,hp:60,mp:13,element:"🪸"},
-    {name:"CrabEdgeX",rarity:"Epic",img:"https://i.imgur.com/mnMCDvt.png",dmg:57,spd:20,hp:66,mp:16,element:"🦀"},
-    {name:"LavaClam",rarity:"Epic",img:"https://i.imgur.com/QkkGPnK.png",dmg:58,spd:21,hp:68,mp:17,element:"🔥"},
-  ],
-  Legendary:[
-    {name:"InfernoCrab",rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png",dmg:60,spd:20,hp:80,mp:15,element:"🔥"},
-    {name:"AbyssDragon",rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png",dmg:65,spd:22,hp:85,mp:18,element:"🌑"},
-    {name:"MegaShark",rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png",dmg:68,spd:23,hp:88,mp:19,element:"🦈"},
-    {name:"PearlDragon",rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png",dmg:66,spd:21,hp:86,mp:18,element:"🔮"},
-    {name:"LavaClamX",rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png",dmg:70,spd:24,hp:90,mp:19,element:"🔥"},
-    {name:"CoralKnight",rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png",dmg:67,spd:22,hp:85,mp:18,element:"💧"},
-    {name:"StoneWar",rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png",dmg:72,spd:23,hp:90,mp:20,element:"🪨"},
-    {name:"MudGolem",rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png",dmg:73,spd:22,hp:92,mp:21,element:"🌱"},
-    {name:"AngelCrab",rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png",dmg:75,spd:25,hp:95,mp:22,element:"🌟"},
-    {name:"AquaDino",rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png",dmg:74,spd:24,hp:93,mp:21,element:"💧"},
-  ],
-  Mythic:[
-    {name:"ElderDragon",rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png",dmg:80,spd:25,hp:100,mp:20,element:"🐉"},
-    {name:"AquaGod",rarity:"Mythic",img:"https://i.imgur.com/ujlhSVK.png",dmg:82,spd:26,hp:105,mp:22,element:"💧"},
-    {name:"ArcAngel",rarity:"Mythic",img:"https://i.imgur.com/1K8xEcc.png",dmg:85,spd:27,hp:108,mp:23,element:"🌟"},
-    {name:"CyberDino",rarity:"Mythic",img:"https://i.imgur.com/EokU1JU.png",dmg:88,spd:28,hp:110,mp:25,element:"🤖"},
-    {name:"PhoenixKing",rarity:"Mythic",img:"https://i.imgur.com/Qg9MLyO.png",dmg:90,spd:30,hp:115,mp:26,element:"🔥"},
-    {name:"TimeSerpent",rarity:"Mythic",img:"https://i.imgur.com/Xsqp1Zl.png",dmg:92,spd:29,hp:112,mp:25,element:"⏳"},
-    {name:"GalaxyWolf",rarity:"Mythic",img:"https://i.imgur.com/YeDYlBO.png",dmg:95,spd:31,hp:118,mp:27,element:"🌌"},
-    {name:"AuraKnight",rarity:"Mythic",img:"https://i.imgur.com/h8LyWQG.png",dmg:94,spd:29,hp:114,mp:26,element:"🌟"},
-    {name:"BlazeGod",rarity:"Mythic",img:"https://i.imgur.com/u2hcKvV.png",dmg:97,spd:32,hp:120,mp:28,element:"🔥"},
-    {name:"AncientGolem",rarity:"Mythic",img:"https://i.imgur.com/WWF50XS.png",dmg:99,spd:33,hp:125,mp:30,element:"⛰"},
-  ]
-};
-
-/* Tỷ lệ random */
-const chances = [
-  {rar:"Common",pct:40},
-  {rar:"Rare",pct:30},
-  {rar:"Epic",pct:15},
-  {rar:"Legendary",pct:10},
-  {rar:"Mythic",pct:5},
-];
-
-/* BUY CHEST => random hero => autoMerge => render */
-function buyChest(qty){
-  let cost = qty * 10;
-  if(token < cost){
-    alert("Không đủ TON để mua rương!");
-    return;
-  }
-  token -= cost;
-  for(let i = 0; i < qty; i++){
-    let h = randomHero();
-    heroList.push({...h, lv:1});
-    autoMergeHeroes();
-  }
-  renderHeroes();
-  updateHomeInfo();
-}
-
-/* randomHero by chance */
-function randomHero(){
-  let roll = Math.random() * 100;
-  let sum = 0;
-  for(let c of chances){
-    sum += c.pct;
-    if(roll < sum){
-      let arr = heroPool[c.rar];
-      let i = Math.floor(Math.random() * arr.length);
-      return JSON.parse(JSON.stringify(arr[i]));
-    }
-  }
-  // fallback
-  return JSON.parse(JSON.stringify(heroPool.Common[0]));
-}
-
-/* autoMerge if 2 hero same name+lv => lv+1 & stats*1.5 => remove dup */
-function autoMergeHeroes(){
-  let map = {};
-  heroList.forEach((h,i)=>{
-    let k = h.name + "|" + (h.lv || 1);
-    if(!map[k]) map[k] = [];
-    map[k].push(i);
-  });
-  for(let k in map){
-    let arr = map[k];
-    while(arr.length >= 2){
-      let i1 = arr.pop();
-      let i2 = arr.pop();
-      let h1 = heroList[i1];
-      h1.lv = (h1.lv || 1) + 1;
-      h1.dmg = Math.floor(h1.dmg * 1.5);
-      h1.spd = Math.floor(h1.spd * 1.5);
-      h1.hp  = Math.floor(h1.hp  * 1.5);
-      h1.mp  = Math.floor(h1.mp  * 1.5);
-      // remove i2
-      heroList.splice(i2,1);
-      // adjust indexes
-      arr = arr.map(x=> x>i2 ? x-1 : x);
-    }
-  }
-}
-
-/* Render Heroes */
-function renderHeroes(){
-  let g = document.getElementById('heroGrid');
-  g.innerHTML = "";
-  heroList.forEach((h, idx) => {
-    let card = document.createElement('div');
-    card.classList.add('heroCard');
-
-    let rc = "rarity-common";
-    if(h.rarity === "Rare") rc = "rarity-rare";
-    if(h.rarity === "Epic") rc = "rarity-epic";
-    if(h.rarity === "Legendary") rc = "rarity-legendary";
-    if(h.rarity === "Mythic") rc = "rarity-mythic";
-
-    card.innerHTML = `
-      <img src="${h.img}" alt="${h.name}">
-      <div class="heroName ${rc}">${h.name}</div>
-      <div class="heroLv ${rc}">Lv${h.lv} [${h.rarity}]</div>
-      <div class="heroStats">
-        ⚔${h.dmg} ✨${h.spd} ♥${h.hp} 🔮${h.mp}<br>
-        <b>${h.element || ""}</b>
-      </div>
-    `;
-    card.onclick = () => openHeroModal(idx);
-    g.appendChild(card);
-  });
-}
-
-/* Hero Modal */
-function openHeroModal(i){
-  let h = heroList[i];
-  document.getElementById('heroModalOverlay').style.display = 'flex';
-  document.getElementById('heroModalImg').src = h.img;
-
-  let rc = "rarity-common";
-  if(h.rarity === "Rare") rc = "rarity-rare";
-  if(h.rarity === "Epic") rc = "rarity-epic";
-  if(h.rarity === "Legendary") rc = "rarity-legendary";
-  if(h.rarity === "Mythic") rc = "rarity-mythic";
-
-  document.getElementById('heroModalName').innerHTML = `
-    <span class="${rc}"><b>${h.name}</b></span>
-  `;
-  document.getElementById('heroModalLv').innerHTML = `
-    <span class="${rc}"><b>Lv${h.lv} [${h.rarity}]</b></span>
-  `;
-  document.getElementById('heroModalStats').innerHTML = `
-    ⚔${h.dmg} ✨${h.spd} ♥${h.hp} 🔮${h.mp}
-  `;
-  document.getElementById('heroModalElement').innerHTML = `<b>${h.element || ""}</b>`;
-}
-function closeHeroModal(){
-  document.getElementById('heroModalOverlay').style.display = 'none';
-}
-
-/* BUY HOUSE */
-function buyHouse(name, cost){
-  if(token < cost){
-    alert("Not enough TON!");
-    return;
-  }
-  token -= cost;
-  alert("You bought " + name + " with " + cost + " TON.");
-  updateHomeInfo();
-}
-
-/* WALLET & REF */
-function copyRef(){
-  let text = document.getElementById('refLink').innerText;
-  navigator.clipboard.writeText(text).then(()=>{
-    alert("Copied link!");
-  });
-}
-function shareRef(){
-  let text = document.getElementById('refLink').innerText;
-  if(navigator.share){
-    navigator.share({
-      title:"R&F Game",
-      text:"Join me!",
-      url:text
-    });
-  } else {
-    alert("Browser not supported to share. Link copied!");
-    navigator.clipboard.writeText(text);
-  }
-}
-function withdrawRef(){
-  alert("Ref reward withdrawn (demo).");
-}
-
-/* WALLET MAIN */
-function withdrawMain(){
-  alert("Withdraw main tokens (demo).");
-}
-function swapMain(){
-  alert("Swap tokens (demo).");
-}
-
-/* SOUND SETTINGS */
-function toggleSound(){
-  let val = document.getElementById('soundToggle').value;
-  isSoundOn = (val === "on");
-  alert("Sound is now " + (isSoundOn ? "ON" : "OFF"));
-}
-</script>
+            setTimeout(() => {
+                const reward = rewards[Math.floor(Math.random() * rewards.length)];
+                rewardBox.innerHTML = `
+                    🎁 Bạn nhận được: <strong>${reward.name}</strong><br>
+                    🌟 Loại: ${reward.type}<br>
+                    🔥 Độ hiếm: <strong>${reward.rarity}</strong>
+                `;
+                rewardBox.style.display = 'block';
+                openBtn.disabled = false;
+            }, 2000);
+        });
+    </script>
 </body>
 </html>
