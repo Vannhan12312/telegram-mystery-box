@@ -58,11 +58,22 @@
     </div>
 
     <script>
+        // Kiểm tra SDK đã tải chưa
+        console.log("TonConnect SDK:", typeof TonConnect !== "undefined" ? "Loaded successfully!" : "Not loaded");
+
+        // Khởi tạo TonConnect
         const TONConnect = TonConnect;
         const connector = new TONConnect();
-        const recipientAddress = "UQBzUchMP1OWSQUD4_pvKk7pA10wcEA_zf--e6EIVlnwdKeq"; // Replace with your wallet address
+        const recipientAddress = "UQBzUchMP1OWSQUD4_pvKk7pA10wcEA_zf--e6EIVlnwdKeq"; // Địa chỉ ví nhận
 
+        // Kiểm tra sự kiện click nút "Connect Wallet"
+        document.getElementById("connectBtn").addEventListener("click", () => {
+            console.log("Connect Wallet button clicked!"); // Log kiểm tra sự kiện
+        });
+
+        // Hàm kết nối ví TON
         async function connectWallet() {
+            console.log("Attempting to connect wallet...");
             try {
                 await connector.connectWallet();
                 alert("Wallet connected!");
@@ -74,6 +85,7 @@
             }
         }
 
+        // Kiểm tra số dư ví
         async function checkBalance() {
             try {
                 const account = await connector.connect();
@@ -91,6 +103,7 @@
             }
         }
 
+        // Gửi thanh toán TON
         async function sendPayment() {
             try {
                 const transaction = {
@@ -108,6 +121,7 @@
             }
         }
 
+        // Hiển thị phần thưởng
         function displayReward() {
             const phoenixLevels = [
                 { name: "Ember Phoenix", level: 1, chance: 50, color: "#ff5722" },
@@ -134,6 +148,7 @@
             }
         }
 
+        // Liên kết sự kiện click
         document.getElementById("connectBtn").addEventListener("click", connectWallet);
         document.getElementById("openBtn").addEventListener("click", async () => {
             const canPay = await checkBalance();
@@ -144,7 +159,3 @@
     </script>
 </body>
 </html>
-document.getElementById("connectBtn").addEventListener("click", () => {
-    console.log("Connect Wallet button clicked!"); // Log để kiểm tra sự kiện
-});
-
