@@ -1,665 +1,714 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Rost & Flame - TON Extended</title>
+  <meta charset="UTF-8">
+  <title>R&F Merge MiniApp + Farm Feature</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     /* RESET */
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: Arial, sans-serif; }
-    html,body { background:#f5f5f5; color:#333; width:100%; height:100%; overflow:auto; }
+    * {
+      box-sizing: border-box;
+      margin: 0; 
+      padding: 0;
+      font-family: sans-serif;
+    }
+    html, body {
+      width: 100%; 
+      height: 100%; 
+      background: #000; 
+      overflow: hidden;
+    }
+    /* LOADING SCREEN */
+    #loadingScreen {
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100vw; height: 100vh;
+      background: url('https://i.imgur.com/gguz2yw.png') center/cover no-repeat;
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: flex-end; 
+      z-index: 99999;
+    }
+    #loadingLogo {
+      margin-bottom: 20px;
+      width: 120px; 
+      height: 120px;
+      background: url('https://i.imgur.com/4spxSKK.png') center/contain no-repeat;
+    }
+    #loadingBarOuter {
+      width: 60%; 
+      max-width: 300px; 
+      height: 10px; 
+      background: rgba(0,0,0,0.3);
+      margin-bottom: 40px;
+      border-radius: 5px; 
+      overflow: hidden;
+    }
+    #loadingBarInner {
+      width: 0%; 
+      height: 100%; 
+      background: #ff8800; 
+      transition: width 0.2s;
+    }
 
-    header {
-      text-align:center; background:#ff5733; color:#fff; padding:10px;
+    /* MAIN APP */
+    #app {
+      display: none;
+      position: relative;
+      width: 100vw; 
+      height: 100vh;
+      background: #f5f5f5;
+      overflow: hidden;
     }
-    nav {
-      display:flex; justify-content:space-around; background:#eee; border-bottom:1px solid #ccc;
+    /* TOP NAV (5 nút) - thêm Farm */
+    #topBar {
+      height: 50px; 
+      background: #222;
+      color: #fff;
+      display: flex; 
+      align-items: center; 
+      justify-content: space-around;
     }
-    nav button {
-      flex:1; border:none; background:#fff; padding:8px; cursor:pointer; font-weight:bold; transition:0.2s;
+    #topBar .navBtn {
+      cursor: pointer; 
+      padding: 8px 14px; 
+      border-radius: 4px;
+      background: #333;
+      margin: 0 6px;
+      font-weight: bold;
+      transition: background 0.2s;
     }
-    .active-tab { background:#c3f0d1; }
+    #topBar .navBtn:hover {
+      background: #444;
+    }
+    #topBar .navBtn.active {
+      background: #ff7a00;
+    }
 
-    main { padding:8px; display:none; }
-    main.active { display:block; }
-
-    footer {
-      text-align:center; background:#eee; padding:6px;
+    /* CONTENT */
+    #contentArea {
+      position: absolute; 
+      top: 50px; 
+      left: 0; 
+      width: 100%; 
+      height: calc(100% - 50px);
+      overflow-y: auto; 
+      background: #fff;
+    }
+    .tabPage {
+      display: none; 
+      padding: 10px;
+    }
+    .tabPage.show {
+      display: block;
     }
 
-    /* HERO GRID (5 hero / row) */
-    .hero-container {
-      display:grid; grid-template-columns: repeat(5, 1fr);
-      gap:6px; justify-items:center;
+    /* HERO GRID (4 columns, no gap) */
+    #heroGrid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
     }
-    .hero-card {
-      width:60px; height:90px; background:#fff; border:1px solid #ddd; border-radius:6px;
-      display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
-      cursor:pointer; padding:3px; overflow:hidden;
+    .heroCard {
+      border: 1px solid #ddd;
+      width: 100%;
+      height: 130px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-size: 12px;
+      cursor: pointer;
     }
-    .hero-card img {
-      width:40px; height:40px; object-fit:cover; border-radius:4px;
+    .heroCard img {
+      width: 50px; 
+      height: 50px; 
+      object-fit: cover; 
+      border-radius: 4px;
     }
-    .hero-card p {
-      font-size:10px; margin:2px 0; text-align:center; overflow:hidden; white-space:nowrap; text-overflow:ellipsis;
-      max-width:100%;
+    .heroName {
+      margin: 2px 0; 
+      font-weight: bold;
     }
-    .color-common    { color:#999; }
-    .color-rare      { color:#54FFFE; }
-    .color-epic      { color:#C66CC5; }
-    .color-legendary { color:#FFA800; }
-    .color-mythic    { color:#FF0000; }
+    .heroLv {
+      margin-bottom: 2px;
+      font-weight: bold;
+    }
+    .heroStats {
+      font-size: 10px; 
+      line-height: 1.2;
+    }
+
+    /* Rarity colors (bold) */
+    .rarity-common { color: #999; font-weight:bold; }
+    .rarity-rare { color: #0ff; font-weight:bold; }
+    .rarity-epic { color: #c66cc5; font-weight:bold; }
+    .rarity-legendary { color: #ffa600; font-weight:bold; }
+    .rarity-mythic { color: #f00; font-weight:bold; }
 
     /* MODAL */
-    #modal-overlay {
-      position:fixed; top:0; left:0; right:0; bottom:0;
-      background:rgba(0,0,0,0.5); display:none; justify-content:center; align-items:center; z-index:9999;
+    #heroModalOverlay {
+      position: fixed; 
+      top: 0; left: 0; 
+      width: 100vw; 
+      height: 100vh; 
+      background: rgba(0,0,0,0.5);
+      display: none; 
+      justify-content: center; 
+      align-items: center;
+      z-index: 999999;
     }
-    #modal-content {
-      background:#fff; padding:10px; border-radius:6px; width:220px; position:relative; text-align:center;
+    #heroModal {
+      background: #fff;
+      border-radius: 6px;
+      padding: 10px;
+      width: 240px;
+      text-align: center;
+      position: relative;
     }
-    #modal-close {
-      position:absolute; top:5px; right:5px; background:#ddd; border:none; border-radius:4px; cursor:pointer; padding:2px 5px;
+    #heroModal img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 4px; 
+      margin-bottom: 8px;
     }
-    #modal-hero-img { width:60px; height:60px; object-fit:cover; border-radius:4px; margin-bottom:6px; }
+    #heroModalClose {
+      position: absolute; 
+      top: 5px; 
+      right: 5px; 
+      cursor: pointer; 
+      background: #ddd; 
+      border: none; 
+      border-radius: 4px; 
+      padding: 2px 6px;
+    }
 
-    /* Simple Boss raid + Arena UI */
-    .raid-container, .arena-container {
-      border:1px solid #ddd; padding:6px; border-radius:6px; background:#fff; margin-top:8px;
+    /* House style placeholder */
+    .houseList {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
     }
-    .raid-container button, .arena-container button {
-      margin:4px 0; padding:4px 8px; cursor:pointer; border:none; background:#ffd700; border-radius:4px;
-      font-weight:bold;
+    .houseItem {
+      border: 1px solid #ccc;
+      padding: 6px;
+      display: flex; 
+      align-items: center; 
+      justify-content: space-between;
+    }
+    .houseItem button {
+      background: #f57c00; 
+      color:#fff; 
+      border:none; 
+      border-radius:4px; 
+      padding:4px 8px; 
+      cursor:pointer;
+    }
+
+    /* WALLET: REF, SETTINGS inside */
+    #walletSection {
+      display: flex; 
+      flex-direction: column; 
+      gap: 10px;
+    }
+    .refBox, .settingsBox {
+      border:1px solid #ccc; 
+      padding:8px; 
+      border-radius:4px;
+    }
+    .refBox button, .settingsBox button {
+      background:#f57c00; 
+      color:#fff; 
+      border:none; 
+      padding:4px 8px; 
+      border-radius:4px; 
+      margin:4px;
+      cursor:pointer;
+    }
+
+    /* FARM SECTION */
+    #farmSection {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: start;
+    }
+    .farmInfo {
+      border:1px solid #ccc; 
+      padding:8px; 
+      border-radius:4px;
+      width: 100%;
+      max-width: 300px;
+    }
+    #farmSection button {
+      background:#4CAF50; 
+      color:#fff; 
+      border:none; 
+      padding:6px 12px; 
+      border-radius:4px; 
+      margin-top:6px;
+      cursor:pointer;
+    }
+    .farmLabel {
+      font-weight: bold; 
+      margin-right: 6px;
     }
   </style>
 </head>
+
 <body>
-  <header>
-    <h1>Rost & Flame (TON Extended)</h1>
-    <p>P2E Mini Game with Boss & Arena</p>
-  </header>
 
-  <nav>
-    <button class="active-tab" onclick="switchTab('home')">Home</button>
-    <button onclick="switchTab('shop')">Shop</button>
-    <button onclick="switchTab('hero')">Hero</button>
-    <button onclick="switchTab('quest')">Quest</button>
-    <button onclick="switchTab('wallet')">Wallet</button>
-  </nav>
+<!-- LOADING SCREEN -->
+<div id="loadingScreen">
+  <div id="loadingLogo"></div>
+  <div id="loadingBarOuter">
+    <div id="loadingBarInner"></div>
+  </div>
+</div>
 
-  <!-- HOME -->
-  <main id="home" class="active">
-    <p>Welcome to the extended version of Rost & Flame!</p>
-    <p>Connected with TON blockchain (simulated). Build heroes, fight boss, do arena!</p>
-    <div id="player-info"></div>
-    <button onclick="addTokens(50)" style="margin-top:8px;">Get +50 tokens</button>
-    <div class="raid-container" style="margin-top:10px;">
-      <h4>Boss Raid (daily free 1 time)</h4>
-      <p>Fight the Giant Crab Boss. Win => + tokens, hero may lose HP (demo?).</p>
-      <button onclick="openRaidPanel()">Battle Boss</button>
-      <div id="raid-result" style="margin-top:6px; font-size:13px;"></div>
-    </div>
-    <div class="arena-container" style="margin-top:10px;">
-      <h4>Arena PvP (daily free 1 time)</h4>
-      <p>Pick 1 hero vs random hero. Win => + tokens. Loser => no reward.</p>
-      <button onclick="openArenaPanel()">Enter Arena</button>
-      <div id="arena-result" style="margin-top:6px; font-size:13px;"></div>
-    </div>
-
-    <!-- 
-      ADDED FARM SECTION - EXACTLY AS REQUESTED
-      "VẼ THÊM 1 BẢN FARM Ở NGOÀI MỤC HOME 
-       FARM ĐƯỢC ĐỒNG FTM 
-       MỖI HERO TRONG MỤC HERO SẼ CÓ THÊM CHỨC NĂNG FARM TỐI ĐA KÍCH HOẠT FARM ĐƯỢC 20 HERO 
-       TIỀN FARM MỖI HERO LÀ SỐ DAME CỦA TỔNG20 HERO BẬT NÚT FARM + LẠI TÍNH TOÁN LOGIC = KẾT QUẢ Ở BẢN MỤC HOME TÍNH SỐ COIN ĐÀO ĐƯỢC BAO NHIÊU 1 NGÀY"
-    -->
-    <hr>
-    <h4>FARM for FTM</h4>
-    <p>You can activate up to 20 heroes to farm FTM daily. <br>
-       Daily FTM gain = sum of damage of all farming heroes. 
-    </p>
-    <p>Your FTM Balance: <span id="farmFTM">0</span></p>
-    <button onclick="claimFarm()">Claim Farm Reward</button>
-  </main>
-
-  <!-- SHOP -->
-  <main id="shop">
-    <h3>Shop</h3>
-    <p>Each chest costs 10 tokens. Random hero from 50 heroes. <br>(Auto-merge duplicates)</p>
-    <button onclick="buyChest(1)">Buy 1 Chest</button>
-    <button onclick="buyChest(5)">Buy 5 Chest</button>
-    <button onclick="buyChest(10)">Buy 10 Chest</button>
-    <p id="shop-message" style="margin-top:6px; color:#f33; font-size:13px;"></p>
-  </main>
-
-  <!-- HERO -->
-  <main id="hero">
-    <h3>Your Heroes</h3>
-    <div class="hero-container" id="hero-list"></div>
-  </main>
-
-  <!-- QUEST -->
-  <main id="quest">
-    <h3>Quests</h3>
-    <p>Daily Quests & Missions</p>
-    <div id="quest-list"></div>
-  </main>
-
-  <!-- WALLET -->
-  <main id="wallet">
-    <h3>TON Wallet</h3>
-    <p>Address: <span id="wallet-address">-</span></p>
-    <p>Balance: <span id="wallet-balance">0</span> TON</p>
-    <button onclick="connectTON()">Connect TON</button>
-    <button onclick="disconnectTON()">Disconnect</button>
-    <hr>
-    <p>In-Game Tokens: <span id="game-tokens"></span></p>
-    <button onclick="withdrawTokens()">Withdraw to TON</button>
-  </main>
-
-  <!-- MODAL: show hero info -->
-  <div id="modal-overlay">
-    <div id="modal-content">
-      <button id="modal-close" onclick="closeModal()">X</button>
-      <img id="modal-hero-img" src="" alt="Hero">
-      <p id="modal-hero-name" style="font-weight:bold;"></p>
-      <p id="modal-hero-rarity"></p>
-      <p id="modal-hero-attr"></p>
-      <p id="modal-hero-stats"></p>
-      <p id="modal-hero-level"></p>
-      <p id="modal-hero-skill"></p>
-    </div>
+<!-- MAIN APP -->
+<div id="app">
+  <!-- NAV -->
+  <div id="topBar">
+    <div class="navBtn active" data-tab="tabHome">🏠</div>
+    <div class="navBtn" data-tab="tabHero">⚔</div>
+    <div class="navBtn" data-tab="tabShop">🏷</div>
+    <div class="navBtn" data-tab="tabFarm">🚜</div>
+    <div class="navBtn" data-tab="tabWallet">💰</div>
   </div>
 
-  <footer>
-    &copy; 2023 Rost & Flame - Powered by TON
-  </footer>
+  <!-- CONTENT -->
+  <div id="contentArea">
+    <!-- HOME -->
+    <div id="tabHome" class="tabPage show">
+      <p style="display:none;"></p>
+      <p id="tokenDisplay" style="display:none;"></p>
+    </div>
 
-  <script>
-    /***********************************************************************
-     * 1. PLAYER, Quests, Daily Limit
-     * - dailyRaidUsed: true/false => free raid?
-     * - dailyArenaUsed => free arena?
-     ***********************************************************************/
-    const player = {
-      tokens: 100,
-      heroes: [],
-      quests: [
-        {id:1, name:"Reach 5 Heroes",        completed:false, reward:20},
-        {id:2, name:"Merge 1 Hero to Lv2",   completed:false, reward:30},
-        {id:3, name:"Daily Sign-In",         completed:false, reward:10, daily:true},
-        {id:4, name:"Defeat Boss (Daily)",   completed:false, reward:15, daily:true},
-        {id:5, name:"Arena Win (Daily)",     completed:false, reward:15, daily:true},
-      ],
-      dailyRaidUsed: false,
-      dailyArenaUsed:false,
-      raidCount:0, // track total raid done
-      arenaCount:0, // track total arena done
-    };
+    <!-- HERO -->
+    <div id="tabHero" class="tabPage">
+      <div id="heroGrid"></div>
+    </div>
 
-    let tonAddress=null;
-    let tonBalance=5.0; // TON balance demo
+    <!-- SHOP -->
+    <div id="tabShop" class="tabPage">
+      <div style="display:flex;gap:8px;">
+        <button onclick="buyChest(1)" style="font-weight:bold;">⏳ x1</button>
+        <button onclick="buyChest(5)" style="font-weight:bold;">⏳ x5</button>
+      </div>
+      <hr>
+      <!-- 3 House -->
+      <div class="houseList">
+        <div class="houseItem">
+          <span><b>Tiny House</b> (20 TON)</span>
+          <button onclick="buyHouse('Tiny',20)">Buy</button>
+        </div>
+        <div class="houseItem">
+          <span><b>Pen House</b> (50 TON)</span>
+          <button onclick="buyHouse('Pen',50)">Buy</button>
+        </div>
+        <div class="houseItem">
+          <span><b>Villa</b> (100 TON)</span>
+          <button onclick="buyHouse('Villa',100)">Buy</button>
+        </div>
+      </div>
+    </div>
 
-    /***********************************************************************
-     * 2. TABS
-     ***********************************************************************/
-    function switchTab(tabId){
-      document.querySelectorAll('main').forEach(m=>m.classList.remove('active'));
-      document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active-tab'));
-      document.getElementById(tabId).classList.add('active');
-      document.querySelector(`[onclick="switchTab('${tabId}')"]`).classList.add('active-tab');
-      if(tabId==='home') updateHome();
-      if(tabId==='hero') renderHeroes();
-      if(tabId==='quest') updateQuestUI();
-      if(tabId==='wallet') updateWallet();
-    }
-
-    /***********************************************************************
-     * 3. HOME
-     ***********************************************************************/
-    function updateHome(){
-      document.getElementById('player-info').textContent=`Tokens: ${player.tokens}`;
-      document.getElementById('game-tokens').textContent=player.tokens;
-      // ADDED: Refresh farm display
-      refreshFarmDisplay();
-    }
-    function addTokens(n){
-      player.tokens+=n;
-      updateHome();
-      alert(`+${n} tokens`);
-    }
-
-    /***********************************************************************
-     * 4. WALLET (TON)
-     ***********************************************************************/
-    function connectTON(){
-      tonAddress="EQ_demoTON_12345";
-      alert("TON wallet connected!");
-      updateWallet();
-    }
-    function disconnectTON(){
-      tonAddress=null;
-      alert("TON disconnected");
-      updateWallet();
-    }
-    function updateWallet(){
-      document.getElementById('wallet-address').textContent= tonAddress? tonAddress : "-";
-      document.getElementById('wallet-balance').textContent= tonBalance.toFixed(2);
-      document.getElementById('game-tokens').textContent= player.tokens;
-    }
-    function withdrawTokens(){
-      if(!tonAddress){
-        alert("No TON wallet connected!");
-        return;
-      }
-      if(player.tokens<50){
-        alert("Need at least 50 tokens to withdraw => 1 TON!");
-        return;
-      }
-      player.tokens-=50;
-      tonBalance+=1;
-      alert("Withdraw 50 tokens => +1 TON!");
-      updateWallet();
-      updateHome();
-    }
-
-    /***********************************************************************
-     * 5. SHOP
-     ***********************************************************************/
-    const rarityChances=[
-      {rarity:"Common",    chance:40},
-      {rarity:"Rare",      chance:30},
-      {rarity:"Epic",      chance:15},
-      {rarity:"Legendary", chance:10},
-      {rarity:"Mythic",    chance:5}
-    ];
-
-    function buyChest(count){
-      let cost=10*count;
-      if(player.tokens<cost){
-        document.getElementById('shop-message').textContent="Not enough tokens!";
-        return;
-      }
-      player.tokens-=cost;
-      for(let i=0;i<count;i++){
-        let rar=getRandomRarity();
-        let pool=allHeroes.filter(h=>h.rarity===rar);
-        if(pool.length>0){
-          let rnd=Math.floor(Math.random()*pool.length);
-          let newH={...pool[rnd]};
-          // Add farm property
-          newH.farmActive=false; 
-          player.heroes.push(newH);
-        }
-      }
-      autoMerge();
-      updateHome();
-      renderHeroes();
-      document.getElementById('shop-message').textContent=`Bought ${count} chest(s). (Auto merged)`;
-    }
-    function getRandomRarity(){
-      let roll=Math.random()*100, accum=0;
-      for(let rc of rarityChances){
-        accum+=rc.chance;
-        if(roll<accum) return rc.rarity;
-      }
-      return "Common";
-    }
-
-    /***********************************************************************
-     * 6. HERO DATA (50 heroes)
-     ***********************************************************************/
-    const allHeroes=[ 
-      // Common (10)
-      {name:"SlimeKid",   rarity:"Common",    img:"https://i.imgur.com/wY0nzE9.png", attribute:"Water",  symbol:"💧", damage:12, speed:4, skill:"Splash", level:1},
-      {name:"ShellFish",  rarity:"Common",    img:"https://i.imgur.com/Iy1X8r1.png", attribute:"Water",  symbol:"💧", damage:14, speed:5, skill:"Shield", level:1},
-      {name:"GreenFish",  rarity:"Common",    img:"https://i.imgur.com/81Ypu1S.png", attribute:"Earth",  symbol:"🌱", damage:10, speed:5, skill:"LeafCut",level:1},
-      {name:"MudCrab",    rarity:"Common",    img:"https://i.imgur.com/XMUx21e.png", attribute:"Earth",  symbol:"🌱", damage:15, speed:3, skill:"MudThrow",level:1},
-      {name:"RockyShell", rarity:"Common",    img:"https://i.imgur.com/eVNSFSH.png", attribute:"Earth",  symbol:"🌱", damage:16, speed:4, skill:"RockHit", level:1},
-      {name:"JellyMold",  rarity:"Common",    img:"https://i.imgur.com/hjZPOpf.png", attribute:"Water",  symbol:"💧", damage:10, speed:6, skill:"JellyZap",level:1},
-      {name:"TinyCrab",   rarity:"Common",    img:"https://i.imgur.com/TvssIKL.png", attribute:"Water",  symbol:"💧", damage:12, speed:5, skill:"CrabClaw",level:1},
-      {name:"BluishCrab", rarity:"Common",    img:"https://i.imgur.com/9soOAZz.png", attribute:"Water",  symbol:"💧", damage:13, speed:4, skill:"Bubble",  level:1},
-      {name:"PearlCrab",  rarity:"Common",    img:"https://i.imgur.com/ZRG9eiQ.png", attribute:"Water",  symbol:"💧", damage:11, speed:6, skill:"PearlShot",level:1},
-      {name:"SlimyJr",    rarity:"Common",    img:"https://i.imgur.com/aOV5P1e.png", attribute:"Water",  symbol:"💧", damage:14, speed:4, skill:"SlimeGlue",level:1},
-      // Rare (10)
-      {name:"FireCrab",   rarity:"Rare",      img:"https://i.imgur.com/3l9MKIl.png", attribute:"Fire",   symbol:"🔥", damage:22, speed:8, skill:"FireClaw",level:1},
-      {name:"TurtleWar",  rarity:"Rare",      img:"https://i.imgur.com/cSy6okk.png", attribute:"Water",  symbol:"💧", damage:20, speed:9, skill:"ShellSpin",level:1},
-      {name:"SeaKnight",  rarity:"Rare",      img:"https://i.imgur.com/QRJyOyp.png", attribute:"Water",  symbol:"💧", damage:25, speed:7, skill:"SeaSlash",level:1},
-      {name:"DarkFrog",   rarity:"Rare",      img:"https://i.imgur.com/NK8EQm1.png", attribute:"Dark",   symbol:"🌑", damage:24, speed:8, skill:"ShadowSting",level:1},
-      {name:"CrabLord",   rarity:"Rare",      img:"https://i.imgur.com/Aa396uh.png", attribute:"Earth",  symbol:"🌱", damage:28, speed:6, skill:"EarthSmash",level:1},
-      {name:"ScorpionKid",rarity:"Rare",      img:"https://i.imgur.com/aUTGKeg.png", attribute:"Earth",  symbol:"🌱", damage:27, speed:8, skill:"PoisonStab",level:1},
-      {name:"AquaShield", rarity:"Rare",      img:"https://i.imgur.com/H65ycJW.png", attribute:"Water",  symbol:"💧", damage:22, speed:9, skill:"BubbleWall",level:1},
-      {name:"CoralWar",   rarity:"Rare",      img:"https://i.imgur.com/TcSRW3O.png", attribute:"Water",  symbol:"💧", damage:23, speed:8, skill:"CoralSpear",level:1},
-      {name:"ClamGuard",  rarity:"Rare",      img:"https://i.imgur.com/Juwfrcz.png", attribute:"Water",  symbol:"💧", damage:20, speed:10,skill:"ClamShot", level:1},
-      {name:"AngryFish",  rarity:"Rare",      img:"https://i.imgur.com/8rZaJYc.png", attribute:"Water",  symbol:"💧", damage:26, speed:7, skill:"FishFury", level:1},
-      // Epic (10)
-      {name:"SharkWar",   rarity:"Epic",      img:"https://i.imgur.com/02jTwGp.png", attribute:"Water",  symbol:"💧", damage:35, speed:12,skill:"JawBreak", level:1},
-      {name:"PearlMage",  rarity:"Epic",      img:"https://i.imgur.com/JOCwUzy.png", attribute:"Earth",  symbol:"🌱", damage:32, speed:12,skill:"GemPulse", level:1},
-      {name:"EpicFrog",   rarity:"Epic",      img:"https://i.imgur.com/wr71ePx.png", attribute:"Dark",   symbol:"🌑", damage:40, speed:10,skill:"FrogCurse",level:1},
-      {name:"DeepCrab",   rarity:"Epic",      img:"https://i.imgur.com/OXjxfTK.png", attribute:"Water",  symbol:"💧", damage:36, speed:11,skill:"DeepStab", level:1},
-      {name:"ShellBuster",rarity:"Epic",      img:"https://i.imgur.com/PqCgXay.png", attribute:"Fire",   symbol:"🔥", damage:42, speed:9, skill:"FlameBust",level:1},
-      {name:"OceanLancer",rarity:"Epic",      img:"https://i.imgur.com/wxAAFkK.png", attribute:"Water",  symbol:"💧", damage:39, speed:10,skill:"LanceShot",level:1},
-      {name:"ReefDragon", rarity:"Epic",      img:"https://i.imgur.com/EB7WHnW.png", attribute:"Earth",  symbol:"🌱", damage:37, speed:12,skill:"ReefRoar", level:1},
-      {name:"StormFish",  rarity:"Epic",      img:"https://i.imgur.com/EmWFXPq.png", attribute:"Lightning",symbol:"⚡",damage:38, speed:13,skill:"SparkFin", level:1},
-      {name:"KrakenKid",  rarity:"Epic",      img:"https://i.imgur.com/mnMCDvt.png", attribute:"Water",  symbol:"💧", damage:41, speed:11,skill:"Tentacle", level:1},
-      {name:"AbyssCrab",  rarity:"Epic",      img:"https://i.imgur.com/QkkGPnK.png", attribute:"Dark",   symbol:"🌑", damage:43, speed:9, skill:"AbyssGaze",level:1},
-      // Legendary (10)
-      {name:"InfernoCrab",rarity:"Legendary", img:"https://i.imgur.com/23DhlYC.png", attribute:"Fire",  symbol:"🔥", damage:52, speed:15,skill:"InfernoClaw",level:1},
-      {name:"AbyssDragon",rarity:"Legendary", img:"https://i.imgur.com/Rhu6apu.png", attribute:"Dark",  symbol:"🌑", damage:55, speed:16,skill:"DarkRoar",   level:1},
-      {name:"MegaShark",  rarity:"Legendary", img:"https://i.imgur.com/OCaOjCv.png", attribute:"Water", symbol:"💧", damage:58, speed:14,skill:"MegaBite",   level:1},
-      {name:"PearlDragon",rarity:"Legendary", img:"https://i.imgur.com/SXQMxBI.png", attribute:"Water", symbol:"💧", damage:54, speed:16,skill:"PearlRoar",  level:1},
-      {name:"LavaClam",   rarity:"Legendary", img:"https://i.imgur.com/5HE6crv.png", attribute:"Fire",  symbol:"🔥", damage:57, speed:15,skill:"LavaShell",  level:1},
-      {name:"CoralKnight",rarity:"Legendary", img:"https://i.imgur.com/NKvEj0j.png", attribute:"Water", symbol:"💧", damage:53, speed:17,skill:"CoralSlash", level:1},
-      {name:"StoneWar",   rarity:"Legendary", img:"https://i.imgur.com/6sHJI0I.png", attribute:"Earth", symbol:"🌱", damage:56, speed:15,skill:"StoneClub",  level:1},
-      {name:"MudGolem",   rarity:"Legendary", img:"https://i.imgur.com/qhSP9PR.png", attribute:"Earth", symbol:"🌱", damage:59, speed:14,skill:"MudPunch",   level:1},
-      {name:"AngelCrab",  rarity:"Legendary", img:"https://i.imgur.com/uqiRB2H.png", attribute:"Light", symbol:"🌟", damage:60, speed:16,skill:"HolyPinch",  level:1},
-      {name:"AquaDino",   rarity:"Legendary", img:"https://i.imgur.com/NnVOlP8.png", attribute:"Water", symbol:"💧", damage:62, speed:15,skill:"AquaBlast",  level:1},
-      // Mythic (10)
-      {name:"ElderDragon",rarity:"Mythic",    img:"https://i.imgur.com/tFzK3iu.png", attribute:"Light", symbol:"🌟", damage:80, speed:20,skill:"ElderRoar",  level:1},
-      {name:"AquaGod",     rarity:"Mythic",   img:"https://i.imgur.com/ujlhSVK.png", attribute:"Water", symbol:"💧", damage:78, speed:22,skill:"Tsunami",    level:1},
-      {name:"ArcAngel",    rarity:"Mythic",   img:"https://i.imgur.com/1K8xEcc.png", attribute:"Light", symbol:"🌟", damage:85, speed:19,skill:"DivineBow",  level:1},
-      {name:"CyberDino",   rarity:"Mythic",   img:"https://i.imgur.com/EokU1JU.png", attribute:"Dark",  symbol:"🌑", damage:82, speed:21,skill:"CyberClaw", level:1},
-      {name:"PhoenixKing", rarity:"Mythic",   img:"https://i.imgur.com/Qg9MLyO.png", attribute:"Fire",  symbol:"🔥", damage:88, speed:18,skill:"FlameWing", level:1},
-      {name:"TimeSerpent", rarity:"Mythic",   img:"https://i.imgur.com/Xsqp1Zl.png", attribute:"Time",  symbol:"⏳", damage:90, speed:23,skill:"TimeCrash", level:1},
-      {name:"GalaxyWolf",  rarity:"Mythic",   img:"https://i.imgur.com/YeDYlBO.png", attribute:"Space", symbol:"🌌", damage:86, speed:22,skill:"GalaxyHowl",level:1},
-      {name:"AuraKnight",  rarity:"Mythic",   img:"https://i.imgur.com/h8LyWQG.png", attribute:"Light", symbol:"🌟", damage:84, speed:20,skill:"AuraSlash", level:1},
-      {name:"BlazeGod",    rarity:"Mythic",   img:"https://i.imgur.com/u2hcKvV.png", attribute:"Fire",  symbol:"🔥", damage:89, speed:19,skill:"BlazeSpin", level:1},
-      {name:"AncientGolem",rarity:"Mythic",   img:"https://i.imgur.com/WWF50XS.png", attribute:"Earth", symbol:"🌱", damage:92, speed:18,skill:"GolemFist", level:1},
-    ];
-
-    /***********************************************************************
-     * 7. AUTO MERGE (như cũ)
-     ***********************************************************************/
-    function autoMerge(){
-      let groupMap={};
-      player.heroes.forEach((h,idx)=>{
-        let key=`${h.name}__${h.rarity}__Lv${h.level}`;
-        if(!groupMap[key]) groupMap[key]=[];
-        groupMap[key].push(idx);
-      });
-      for(let key in groupMap){
-        let arr=groupMap[key];
-        while(arr.length>=2){
-          let i1=arr.pop();
-          let i2=arr.pop();
-          let big=Math.max(i1,i2);
-          let sm =Math.min(i1,i2);
-          let h1=player.heroes[sm];
-          // remove
-          player.heroes.splice(big,1);
-          player.heroes.splice(sm,1);
-          let merged={...h1};
-          if(merged.level<5){
-            merged.level++;
-            merged.damage=Math.floor(merged.damage*1.5);
-          }
-          player.heroes.push(merged);
-        }
-      }
-      // check quest lv2
-      let haveLv2=player.heroes.some(h=>h.level>=2);
-      if(haveLv2){
-        let q2=player.quests.find(x=>x.id===2);
-        if(q2 && !q2.completed){
-          q2.completed=true;
-          player.tokens+=q2.reward;
-          updateHome();
-          alert(`Quest done: Merge hero to level 2 => +${q2.reward} tokens`);
-        }
-      }
-    }
-
-    /***********************************************************************
-     * 8. HERO => render + modal
-     ***********************************************************************/
-    function renderHeroes(){
-      // quest 1 => if heroes >=5 => done
-      if(player.heroes.length>=5){
-        let q=player.quests.find(x=>x.id===1);
-        if(q && !q.completed){
-          q.completed=true;
-          player.tokens+=q.reward;
-          updateHome();
-          alert(`Quest done: 5 heroes => +${q.reward} tokens`);
-        }
-      }
-      let c=document.getElementById('hero-list');
-      c.innerHTML= player.heroes.map((h,idx)=>{
-        let rarClass=`color-${h.rarity.toLowerCase()}`;
-        return `
-          <div class="hero-card" onclick="showHeroModal(${idx})">
-            <img src="${h.img}" alt="${h.name}">
-            <p class="${rarClass}">${h.name}</p>
-            <p>Lv${h.level}</p>
+    <!-- FARM -->
+    <div id="tabFarm" class="tabPage">
+      <h3>My Farm</h3>
+      <div id="farmSection">
+        <div class="farmInfo">
+          <div><span class="farmLabel">Level:</span><span id="farmLevel">1</span></div>
+          <div><span class="farmLabel">Production:</span><span id="farmProduction">0</span> TON / sec</div>
+          <div><span class="farmLabel">Last Harvest:</span><span id="farmLastHarvest">N/A</span></div>
+          <button onclick="harvestFarm()">Harvest</button>
+        </div>
+        <div class="farmInfo">
+          <h4>Upgrade Farm</h4>
+          <p>Nâng cấp sẽ tăng sản lượng theo cấp độ.</p>
+          <div>
+            <span class="farmLabel">Cost:</span> 
+            <span id="farmUpgradeCost">?</span> TON
           </div>
-        `;
-      }).join('');
+          <button onclick="upgradeFarm()">Upgrade</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- WALLET -->
+    <div id="tabWallet" class="tabPage">
+      <div id="walletSection">
+        <!-- REF (copy/share, 10%, withdraw) -->
+        <div class="refBox">
+          <h4>Referral</h4>
+          <p>Get 10% in TON from each invited friend.</p>
+          <p>Ref link: <span id="refLink">https://t.me/RFMergeBot?start=777</span></p>
+          <button onclick="copyRef()">Copy</button>
+          <button onclick="shareRef()">Share</button>
+          <hr>
+          <button onclick="withdrawRef()">Withdraw REF</button>
+        </div>
+
+        <!-- WALLET main (Withdraw, Swap) -->
+        <div class="refBox">
+          <h4>Wallet</h4>
+          <button onclick="withdrawMain()">Withdraw</button>
+          <button onclick="swapMain()">Swap</button>
+        </div>
+
+        <!-- SETTINGS (sound on/off) -->
+        <div class="settingsBox">
+          <h4>Settings</h4>
+          <label style="margin-right:8px;">
+            Sound:
+            <select id="soundToggle" onchange="toggleSound()">
+              <option value="on">On</option>
+              <option value="off">Off</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- HERO MODAL -->
+<div id="heroModalOverlay">
+  <div id="heroModal">
+    <button id="heroModalClose" onclick="closeHeroModal()">X</button>
+    <img id="heroModalImg" src="" alt="hero">
+    <h4 id="heroModalName" style="margin:4px 0;"></h4>
+    <p id="heroModalLv" style="margin:4px 0;"></p>
+    <p id="heroModalStats" style="margin:4px 0;"></p>
+    <p id="heroModalElement" style="margin:4px 0;"></p>
+  </div>
+</div>
+
+<script>
+/* LOADING 3s */
+let loadPct=0;
+const loadInterval=setInterval(()=>{
+  loadPct+=5;
+  if(loadPct>100) loadPct=100;
+  document.getElementById('loadingBarInner').style.width=loadPct+'%';
+},200);
+
+setTimeout(()=>{
+  clearInterval(loadInterval);
+  document.getElementById('loadingScreen').style.display='none';
+  document.getElementById('app').style.display='block';
+  // Hiện token trên Home
+  document.getElementById('tokenDisplay').style.display='block';
+},3000);
+
+/* BASIC DATA */
+let token = 100; 
+document.getElementById('tokenDisplay').innerText = "🪙 " + token;
+let heroList = [];
+let isSoundOn = true;
+
+/* NAV switch */
+document.querySelectorAll('#topBar .navBtn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    let tab = btn.getAttribute('data-tab');
+    document.querySelectorAll('.tabPage').forEach(pg=>pg.classList.remove('show'));
+    document.querySelectorAll('.navBtn').forEach(x=>x.classList.remove('active'));
+    document.getElementById(tab).classList.add('show');
+    btn.classList.add('active');
+    if(tab==='tabHero') renderHeroes();
+    if(tab==='tabFarm') updateFarmUI(); // Cập nhật khi vào farm
+  });
+});
+
+/* 50 hero data */
+const heroPool = {
+  Common:[
+    {name:"SlimeBaby",rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png",dmg:18,spd:8,hp:25,mp:4,element:"💧"},
+    {name:"ShellMin",rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png",dmg:20,spd:10,hp:30,mp:5,element:"🌱"},
+    {name:"TinyFrog",rarity:"Common",img:"https://i.imgur.com/eVNSFSH.png",dmg:22,spd:9,hp:28,mp:6,element:"🐸"},
+    {name:"BlueKid",rarity:"Common",img:"https://i.imgur.com/hjZPOpf.png",dmg:24,spd:11,hp:32,mp:7,element:"💠"},
+    {name:"CrabKid",rarity:"Common",img:"https://i.imgur.com/TvssIKL.png",dmg:25,spd:12,hp:34,mp:8,element:"🦀"},
+    {name:"MudCrab",rarity:"Common",img:"https://i.imgur.com/9soOAZz.png",dmg:26,spd:10,hp:30,mp:6,element:"🌱"},
+    {name:"JellyBoy",rarity:"Common",img:"https://i.imgur.com/ZRG9eiQ.png",dmg:19,spd:11,hp:27,mp:5,element:"🪸"},
+    {name:"CrabEdge",rarity:"Common",img:"https://i.imgur.com/aOV5P1e.png",dmg:23,spd:9,hp:29,mp:6,element:"🦀"},
+    {name:"LavaMini",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png",dmg:27,spd:13,hp:32,mp:9,element:"🔥"},
+    {name:"SlimyJr",rarity:"Common",img:"https://i.imgur.com/tq1KRm5.png",dmg:28,spd:14,hp:34,mp:10,element:"💧"},
+  ],
+  Rare:[
+    {name:"CoralWar",rarity:"Rare",img:"https://i.imgur.com/Iy1X8r1.png",dmg:35,spd:14,hp:50,mp:8,element:"💧"},
+    {name:"KrakenKid",rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png",dmg:36,spd:15,hp:52,mp:9,element:"🦑"},
+    {name:"ScorpionKid",rarity:"Rare",img:"https://i.imgur.com/aUTGKeg.png",dmg:38,spd:15,hp:54,mp:9,element:"🦂"},
+    {name:"AquaShield",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png",dmg:34,spd:16,hp:52,mp:10,element:"💧"},
+    {name:"ClamGuard",rarity:"Rare",img:"https://i.imgur.com/8rZaJYc.png",dmg:37,spd:14,hp:51,mp:9,element:"🐚"},
+    {name:"MermaidMia",rarity:"Rare",img:"https://i.imgur.com/QRJyOyp.png",dmg:36,spd:15,hp:53,mp:8,element:"🧜"},
+    {name:"RiverRonin",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png",dmg:40,spd:16,hp:55,mp:10,element:"🌊"},
+    {name:"AngryFish",rarity:"Rare",img:"https://i.imgur.com/8nR0o5k.png",dmg:39,spd:15,hp:52,mp:9,element:"🐟"},
+    {name:"ShellFish",rarity:"Rare",img:"https://i.imgur.com/zaWeuIb.png",dmg:35,spd:14,hp:50,mp:8,element:"💠"},
+    {name:"DarkFrog",rarity:"Rare",img:"https://i.imgur.com/NK8EQm1.png",dmg:40,spd:17,hp:54,mp:10,element:"🌑"},
+  ],
+  Epic:[
+    {name:"ShellBuster",rarity:"Epic",img:"https://i.imgur.com/02jTwGp.png",dmg:50,spd:17,hp:60,mp:12,element:"🐚"},
+    {name:"StormSummoner",rarity:"Epic",img:"https://i.imgur.com/wr71ePx.png",dmg:55,spd:18,hp:62,mp:13,element:"🌩"},
+    {name:"OceanLancer",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",dmg:51,spd:17,hp:60,mp:12,element:"🌊"},
+    {name:"PearlMage",rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png",dmg:54,spd:19,hp:63,mp:14,element:"🔮"},
+    {name:"ReefDragon",rarity:"Epic",img:"https://i.imgur.com/EB7WHnW.png",dmg:52,spd:18,hp:61,mp:13,element:"🐉"},
+    {name:"SeaKnight",rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png",dmg:53,spd:17,hp:65,mp:15,element:"⚔"},
+    {name:"ShellMin2",rarity:"Epic",img:"https://i.imgur.com/PqCgXay.png",dmg:56,spd:20,hp:64,mp:14,element:"🪨"},
+    {name:"JellyMage",rarity:"Epic",img:"https://i.imgur.com/EmWFXPq.png",dmg:50,spd:17,hp:60,mp:13,element:"🪸"},
+    {name:"CrabEdgeX",rarity:"Epic",img:"https://i.imgur.com/mnMCDvt.png",dmg:57,spd:20,hp:66,mp:16,element:"🦀"},
+    {name:"LavaClam",rarity:"Epic",img:"https://i.imgur.com/QkkGPnK.png",dmg:58,spd:21,hp:68,mp:17,element:"🔥"},
+  ],
+  Legendary:[
+    {name:"InfernoCrab",rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png",dmg:60,spd:20,hp:80,mp:15,element:"🔥"},
+    {name:"AbyssDragon",rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png",dmg:65,spd:22,hp:85,mp:18,element:"🌑"},
+    {name:"MegaShark",rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png",dmg:68,spd:23,hp:88,mp:19,element:"🦈"},
+    {name:"PearlDragon",rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png",dmg:66,spd:21,hp:86,mp:18,element:"🔮"},
+    {name:"LavaClamX",rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png",dmg:70,spd:24,hp:90,mp:19,element:"🔥"},
+    {name:"CoralKnight",rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png",dmg:67,spd:22,hp:85,mp:18,element:"💧"},
+    {name:"StoneWar",rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png",dmg:72,spd:23,hp:90,mp:20,element:"🪨"},
+    {name:"MudGolem",rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png",dmg:73,spd:22,hp:92,mp:21,element:"🌱"},
+    {name:"AngelCrab",rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png",dmg:75,spd:25,hp:95,mp:22,element:"🌟"},
+    {name:"AquaDino",rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png",dmg:74,spd:24,hp:93,mp:21,element:"💧"},
+  ],
+  Mythic:[
+    {name:"ElderDragon",rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png",dmg:80,spd:25,hp:100,mp:20,element:"🐉"},
+    {name:"AquaGod",rarity:"Mythic",img:"https://i.imgur.com/ujlhSVK.png",dmg:82,spd:26,hp:105,mp:22,element:"💧"},
+    {name:"ArcAngel",rarity:"Mythic",img:"https://i.imgur.com/1K8xEcc.png",dmg:85,spd:27,hp:108,mp:23,element:"🌟"},
+    {name:"CyberDino",rarity:"Mythic",img:"https://i.imgur.com/EokU1JU.png",dmg:88,spd:28,hp:110,mp:25,element:"🤖"},
+    {name:"PhoenixKing",rarity:"Mythic",img:"https://i.imgur.com/Qg9MLyO.png",dmg:90,spd:30,hp:115,mp:26,element:"🔥"},
+    {name:"TimeSerpent",rarity:"Mythic",img:"https://i.imgur.com/Xsqp1Zl.png",dmg:92,spd:29,hp:112,mp:25,element:"⏳"},
+    {name:"GalaxyWolf",rarity:"Mythic",img:"https://i.imgur.com/YeDYlBO.png",dmg:95,spd:31,hp:118,mp:27,element:"🌌"},
+    {name:"AuraKnight",rarity:"Mythic",img:"https://i.imgur.com/h8LyWQG.png",dmg:94,spd:29,hp:114,mp:26,element:"🌟"},
+    {name:"BlazeGod",rarity:"Mythic",img:"https://i.imgur.com/u2hcKvV.png",dmg:97,spd:32,hp:120,mp:28,element:"🔥"},
+    {name:"AncientGolem",rarity:"Mythic",img:"https://i.imgur.com/WWF50XS.png",dmg:99,spd:33,hp:125,mp:30,element:"⛰"},
+  ]
+};
+const chances = [
+  {rar:"Common",pct:40},
+  {rar:"Rare",pct:30},
+  {rar:"Epic",pct:15},
+  {rar:"Legendary",pct:10},
+  {rar:"Mythic",pct:5},
+];
+
+/* FARM DATA */
+let farm = {
+  level: 1,
+  lastHarvest: Date.now(), // Lưu thời gian lần cuối
+  baseProduction: 2 // Mỗi cấp tăng x2 TON/giây
+};
+
+/* Tính toán sản lượng hiện tại (TON/sec) */
+function getFarmProduction() {
+  return farm.level * farm.baseProduction; 
+}
+
+/* Tính toán cost nâng cấp farm */
+function getFarmUpgradeCost() {
+  // Ví dụ cost = (level^2) * 50
+  return farm.level * farm.level * 50; 
+}
+
+/* Khi nhấn "Harvest" */
+function harvestFarm(){
+  const now = Date.now();
+  const diffSec = (now - farm.lastHarvest) / 1000; // Tính bằng giây
+  const productionPerSec = getFarmProduction();
+  const earned = Math.floor(diffSec * productionPerSec);
+  token += earned;
+  document.getElementById('tokenDisplay').innerText = "🪙 " + token;
+  
+  farm.lastHarvest = now;
+  alert(`Bạn vừa thu hoạch được ${earned} TON!`);
+  updateFarmUI();
+}
+
+/* Khi nhấn "Upgrade" */
+function upgradeFarm(){
+  const cost = getFarmUpgradeCost();
+  if(token < cost){
+    alert("Bạn không đủ TON để nâng cấp!");
+    return;
+  }
+  // Thu hoạch luôn 1 lần trước khi nâng cấp
+  harvestFarm();
+
+  token -= cost;
+  document.getElementById('tokenDisplay').innerText = "🪙 " + token;
+  farm.level += 1;
+  farm.lastHarvest = Date.now();
+  alert(`Farm lên level ${farm.level}! (+ Tăng sản lượng)`);
+  updateFarmUI();
+}
+
+/* Cập nhật giao diện farm */
+function updateFarmUI(){
+  document.getElementById('farmLevel').innerText = farm.level;
+  document.getElementById('farmProduction').innerText = getFarmProduction();
+  
+  let last = new Date(farm.lastHarvest).toLocaleTimeString();
+  document.getElementById('farmLastHarvest').innerText = last;
+  
+  document.getElementById('farmUpgradeCost').innerText = getFarmUpgradeCost();
+}
+
+/* BUY HOUSE */
+function buyHouse(name,cost){
+  if(token<cost){
+    alert("Not enough TON!");
+    return;
+  }
+  token-=cost;
+  document.getElementById('tokenDisplay').innerText="🪙 "+token;
+  alert("You bought "+name+" with "+cost+" TON.");
+}
+
+/* BUY CHEST => random hero => autoMerge => render */
+function buyChest(qty){
+  let cost = qty*10;
+  if(token<cost){ 
+    alert("Not enough tokens"); 
+    return; 
+  }
+  token -= cost;
+  document.getElementById('tokenDisplay').innerText="🪙 "+token;
+  for(let i=0; i<qty; i++){
+    let h = randomHero();
+    heroList.push({...h, lv:1});
+    autoMergeHeroes();
+  }
+  renderHeroes();
+}
+/* randomHero by chance */
+function randomHero(){
+  let roll = Math.random()*100; 
+  let sum=0;
+  for(let c of chances){
+    sum += c.pct;
+    if(roll<sum){
+      let arr = heroPool[c.rar];
+      let i = Math.floor(Math.random()*arr.length);
+      return JSON.parse(JSON.stringify(arr[i]));
     }
-    function showHeroModal(idx){
-      let h=player.heroes[idx];
-      document.getElementById('modal-hero-img').src=h.img;
-      document.getElementById('modal-hero-name').textContent=h.name;
-      document.getElementById('modal-hero-rarity').innerHTML=`<span class="color-${h.rarity.toLowerCase()}">${h.rarity}</span>`;
-      document.getElementById('modal-hero-attr').textContent=`${h.symbol} ${h.attribute}`;
-      document.getElementById('modal-hero-stats').textContent=`⚔${h.damage} ⚡${h.speed}`;
-      document.getElementById('modal-hero-level').textContent=`Level: ${h.level}`;
-      document.getElementById('modal-hero-skill').textContent=`Skill: ${h.skill}`;
-      document.getElementById('modal-overlay').style.display='flex';
+  }
+  // fallback
+  return JSON.parse(JSON.stringify(heroPool.Common[0]));
+}
+/* autoMerge if 2 hero same name+lv => lv+1 & stats*1.5 => remove dup */
+function autoMergeHeroes(){
+  let map={};
+  heroList.forEach((h,i)=>{
+    let k=h.name+"|"+(h.lv||1);
+    if(!map[k]) map[k]=[];
+    map[k].push(i);
+  });
+  for(let k in map){
+    let arr=map[k];
+    while(arr.length>=2){
+      let i1=arr.pop(); 
+      let i2=arr.pop();
+      let h1=heroList[i1];
+      h1.lv=(h1.lv||1)+1;
+      h1.dmg=Math.floor(h1.dmg*1.5);
+      h1.spd=Math.floor(h1.spd*1.5);
+      h1.hp=Math.floor(h1.hp*1.5);
+      h1.mp=Math.floor(h1.mp*1.5);
+      // remove i2
+      heroList.splice(i2,1);
+      // adjust indexes
+      arr=arr.map(x=> x>i2? x-1:x);
     }
-    function closeModal(){
-      document.getElementById('modal-overlay').style.display='none';
-    }
+  }
+}
+/* render 4-col no gap, hero stats in bold + colored */
+function renderHeroes(){
+  let g=document.getElementById('heroGrid');
+  g.innerHTML="";
+  heroList.forEach((h,idx)=>{
+    let card=document.createElement('div');
+    card.classList.add('heroCard');
+    // rarity class
+    let rc="rarity-common";
+    if(h.rarity==="Rare") rc="rarity-rare";
+    if(h.rarity==="Epic") rc="rarity-epic";
+    if(h.rarity==="Legendary") rc="rarity-legendary";
+    if(h.rarity==="Mythic") rc="rarity-mythic";
+    card.innerHTML=`
+      <img src="${h.img}" alt="${h.name}">
+      <div class="heroName ${rc}"><b>${h.name}</b></div>
+      <div class="heroLv ${rc}">Lv${h.lv} [${h.rarity}]</div>
+      <div class="heroStats">
+        <b>⚔${h.dmg}</b> <b>✨${h.spd}</b> <b>♥${h.hp}</b> <b>🔮${h.mp}</b><br>
+        <b>${h.element||""}</b>
+      </div>
+    `;
+    card.onclick=()=>openHeroModal(idx);
+    g.appendChild(card);
+  });
+}
+/* openHeroModal */
+function openHeroModal(i){
+  let h=heroList[i];
+  document.getElementById('heroModalOverlay').style.display='flex';
+  document.getElementById('heroModalImg').src=h.img;
+  let rc="rarity-common";
+  if(h.rarity==="Rare") rc="rarity-rare";
+  if(h.rarity==="Epic") rc="rarity-epic";
+  if(h.rarity==="Legendary") rc="rarity-legendary";
+  if(h.rarity==="Mythic") rc="rarity-mythic";
+  document.getElementById('heroModalName').innerHTML=`
+    <span class="${rc}"><b>${h.name}</b></span>
+  `;
+  document.getElementById('heroModalLv').innerHTML=`
+    <span class="${rc}"><b>Lv${h.lv} [${h.rarity}]</b></span>
+  `;
+  document.getElementById('heroModalStats').innerHTML=`
+    <b>⚔${h.dmg}</b> <b>✨${h.spd}</b> <b>♥${h.hp}</b> <b>🔮${h.mp}</b>
+  `;
+  document.getElementById('heroModalElement').innerHTML=`
+    <b>${h.element||""}</b>
+  `;
+}
+function closeHeroModal(){
+  document.getElementById('heroModalOverlay').style.display='none';
+}
 
-    /***********************************************************************
-     * 9. QUEST: daily + normal
-     ***********************************************************************/
-    function updateQuestUI(){
-      // daily quest #3 => sign-in => if not done => do
-      let dq=player.quests.find(x=>x.id===3); // "Daily Sign-In"
-      if(dq && !dq.completed){
-        dq.completed=true;
-        player.tokens+=dq.reward;
-        updateHome();
-        alert(`Daily sign-in => +${dq.reward} tokens`);
-      }
-      let qDiv=document.getElementById('quest-list');
-      qDiv.innerHTML= player.quests.map(q=>{
-        return `
-          <div style="border:1px solid #ccc; margin:4px; padding:4px;">
-            <strong>${q.name}</strong>
-            <p>Reward: ${q.reward} tokens</p>
-            <p>Status: ${q.completed?'Done':'Ongoing'}</p>
-            ${q.daily?'(Daily Quest)':''}
-          </div>
-        `;
-      }).join('');
-    }
+/* REF */
+function copyRef(){
+  let text=document.getElementById('refLink').innerText;
+  navigator.clipboard.writeText(text).then(()=>{ alert("Copied link!"); });
+}
+function shareRef(){
+  let text=document.getElementById('refLink').innerText;
+  if(navigator.share){
+    navigator.share({title:"R&F Game",text:"Join me!",url:text});
+  } else {
+    alert("Browser not supported to share. Link copied!");
+    navigator.clipboard.writeText(text);
+  }
+}
+function withdrawRef(){
+  alert("Ref reward withdrawn (demo).");
+}
 
-    /***********************************************************************
-     * 10. BOSS RAID
-     ***********************************************************************/
-    function openRaidPanel(){
-      if(player.dailyRaidUsed){
-        let cost=10; // cost 10 tokens to raid again
-        if(player.tokens<cost){
-          alert("You used free daily raid. Not enough tokens to raid again!");
-          return;
-        }
-        player.tokens-=cost;
-        updateHome();
-        alert("Spent 10 tokens to do another boss raid!");
-      } else {
-        player.dailyRaidUsed=true;
-      }
-      doRaid();
-    }
-    function doRaid(){
-      if(player.heroes.length===0){
-        document.getElementById('raid-result').textContent="No hero to fight boss!";
-        return;
-      }
-      let idx=Math.floor(Math.random()*player.heroes.length);
-      let hero=player.heroes[idx];
-      let bossHP= hero.level*50 + 50; 
-      let heroPower = hero.damage + hero.speed*2; 
-      if(heroPower>bossHP){
-        let reward= hero.rarity==="Mythic"? 30 : 
-                    hero.rarity==="Legendary"? 20 :
-                    hero.rarity==="Epic"? 15 :
-                    hero.rarity==="Rare"? 10 : 
-                    5;
-        player.tokens+=reward;
-        document.getElementById('raid-result').textContent=`Hero ${hero.name} wins vs boss! +${reward} tokens. (HeroPower=${heroPower}, bossHP=${bossHP})`;
-        let q4=player.quests.find(q=>q.id===4);
-        if(q4 && !q4.completed){
-          q4.completed=true;
-          player.tokens+=q4.reward;
-          updateHome();
-          alert(`Daily quest (defeat boss) => +${q4.reward} tokens!`);
-        }
-      } else {
-        document.getElementById('raid-result').textContent=`Hero ${hero.name} lost vs boss. (HeroPower=${heroPower}, bossHP=${bossHP}) No reward.`;
-      }
-      updateHome();
-    }
+/* WALLET MAIN */
+function withdrawMain(){
+  alert("Withdraw main tokens (demo).");
+}
+function swapMain(){
+  alert("Swap tokens (demo).");
+}
 
-    /***********************************************************************
-     * 11. ARENA PVP
-     ***********************************************************************/
-    function openArenaPanel(){
-      if(player.dailyArenaUsed){
-        let cost=5;
-        if(player.tokens<cost){
-          alert("No free daily arena. Not enough tokens to fight again!");
-          return;
-        }
-        player.tokens-=cost;
-        updateHome();
-        alert("Spent 5 tokens to fight arena again!");
-      } else {
-        player.dailyArenaUsed=true;
-      }
-      doArena();
-    }
-    function doArena(){
-      if(player.heroes.length===0){
-        document.getElementById('arena-result').textContent="No hero to do arena!";
-        return;
-      }
-      let idx=Math.floor(Math.random()*player.heroes.length);
-      let myHero= player.heroes[idx];
-      let e = allHeroes[Math.floor(Math.random()*allHeroes.length)];
-      let myPower= myHero.damage + myHero.speed*3;
-      let ePower= e.damage + e.speed*3;
-      if(myPower>=ePower){
-        let gain= myHero.rarity==="Mythic"?25:
-                  myHero.rarity==="Legendary"?15:
-                  myHero.rarity==="Epic"?10:
-                  myHero.rarity==="Rare"?8:5;
-        player.tokens+=gain;
-        document.getElementById('arena-result').textContent=`Arena: Your ${myHero.name} WON vs ${e.name} => +${gain} tokens! (YourPower=${myPower}, EnemyPower=${ePower})`;
-        let q5=player.quests.find(x=>x.id===5);
-        if(q5 && !q5.completed){
-          q5.completed=true;
-          player.tokens+=q5.reward;
-          alert(`Daily quest (Arena Win) => +${q5.reward} tokens!`);
-        }
-      } else {
-        document.getElementById('arena-result').textContent=`Arena: Your ${myHero.name} LOST vs ${e.name}. (YourPower=${myPower}, Enemy=${ePower})`;
-      }
-      updateHome();
-    }
-
-    /************************************************************************
-     *         ADDED: FARM LOGIC FOR FTM. 
-     *         - Up to 20 heroes can be set to "farming" 
-     *         - Daily FTM = sum(damage of those heroes) 
-     *         - farmFTM is the total FTM we hold. 
-     *         - We do not modify or remove existing lines above.
-     ************************************************************************/
-    let farmFTM=0;                  // how much FTM user currently has
-    let dailyFarmClaimed=false;     // to track daily claim or you can allow multiple claims
-    const MAX_FARM_HEROES=20;       // up to 20 heroes can farm
-
-    // We store who is "farming" in the hero object as "farmActive" (we appended in buyChest).
-    // We'll do dailyFarm power = sum(damage) of all farmActive heroes (max 20).
-    // We'll show the result in home tab => "Your FTM Balance: farmFTM"
-
-    // Re-render in updateHome => refreshFarmDisplay
-    function refreshFarmDisplay(){
-      // do nothing visually, the user requested "1 BẢN FARM Ở NGOÀI MỤC HOME" but we only show a line
-      document.getElementById('farmFTM').textContent=farmFTM; 
-    }
-
-    // In the hero, we can show a "toggleFarm" button => but user said "we cannot change interface" 
-    // So let's forcibly set hero.farmActive = !hero.farmActive if we want. 
-    // But the user specifically said "MỖI HERO TRONG MỤC HERO SẼ CÓ THÊM CHỨC NĂNG FARM"
-    // We'll add a small function to turn on/off farm and re-render.
-
-    function toggleFarmHero(index){
-      let h=player.heroes[index];
-      // if already farming => toggle off
-      if(h.farmActive){
-        h.farmActive=false;
-        alert(`Stopped farming: ${h.name}`);
-      } else {
-        // check how many heroes are farming
-        let countFarming=player.heroes.filter(x=>x.farmActive).length;
-        if(countFarming>=MAX_FARM_HEROES){
-          alert(`Max ${MAX_FARM_HEROES} heroes can farm!`);
-          return;
-        }
-        h.farmActive=true;
-        alert(`Started farming: ${h.name}`);
-      }
-      renderHeroes(); // re-render
-      updateHome();
-    }
-
-    // We'll override the renderHeroes function so it displays a small "FARM" label or something. 
-    // But we cannot remove or modify the existing function lines. We'll do partial override at the end 
-    // by hooking into the final c.innerHTML.
-
-    // We'll do a daily "claimFarm" => sum damage of all farmActive heroes => add to farmFTM
-    function claimFarm(){
-      // sum damage
-      let farmHeroes=player.heroes.filter(x=>x.farmActive);
-      let totalDamage = farmHeroes.reduce((acc,h)=>acc+h.damage, 0);
-      if(totalDamage<=0){
-        alert("No heroes are farming, or damage=0!");
-        return;
-      }
-      // we do not limit to once per day in code, but user can handle logic.
-      // let's do it daily or multiple times => user asked "TÍNH SỐ COIN ĐÀO ĐƯỢC BAO NHIÊU 1 NGÀY"
-      // We'll just add immediately for simplicity
-      farmFTM += totalDamage;
-      refreshFarmDisplay();
-      alert(`Claimed FTM = +${totalDamage}`);
-    }
-
-    // We'll do a small override at the end of the existing renderHeroes to add a "Farm" toggle button 
-    // The user asked to keep the code. We'll do it by hooking into the c.innerHTML after the code is done. 
-    // But we cannot remove the existing code. We'll just re-run c.innerHTML and add a small button. 
-    // This is the simplest approach that doesn't remove lines. We'll do a setTimeout to append buttons.
-
-    setTimeout(()=>{
-      // Now we append a "Farm" button to each hero card
-      const container = document.getElementById('hero-list');
-      const cards = container.querySelectorAll('.hero-card');
-      cards.forEach((card, index)=>{
-        // create a small button
-        let btn=document.createElement('button');
-        btn.style.fontSize="8px";
-        btn.style.marginTop="2px";
-        btn.textContent="FARM";
-        btn.onclick=(evt)=>{
-          evt.stopPropagation();
-          toggleFarmHero(index);
-        };
-        card.appendChild(btn);
-      });
-    },1000);
-
-  </script>
+/* SOUND SETTINGS */
+function toggleSound(){
+  let val = document.getElementById('soundToggle').value;
+  isSoundOn = (val==="on");
+  alert("Sound is now "+(isSoundOn?"ON":"OFF"));
+}
+</script>
 </body>
 </html>
