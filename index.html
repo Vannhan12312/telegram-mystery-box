@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mở Hộp Băng Ma Thuật</title>
+    <title>Magic Ice Box</title>
     <style>
         body {
             margin: 0;
@@ -60,7 +60,7 @@
 <body>
     <div class="box-container">
         <div class="magic-box" id="magicBox"></div>
-        <button class="open-btn" id="openBtn">Mở Hộp</button>
+        <button class="open-btn" id="openBtn">Open Box</button>
         <div class="reward" id="rewardBox"></div>
     </div>
 
@@ -68,10 +68,10 @@
         const openBtn = document.getElementById('openBtn');
         const rewardBox = document.getElementById('rewardBox');
         const rewards = [
-            { name: 'Gươm Băng Giá', type: 'NFT', rarity: 'Hiếm' },
-            { name: 'Khiên Lửa Băng', type: 'NFT', rarity: 'Cực Hiếm' },
-            { name: '50 Token', type: 'Token', rarity: 'Thường' },
-            { name: 'Phượng Hoàng Băng', type: 'NFT', rarity: 'Huyền Thoại' }
+            { name: 'Frozen Sword', type: 'NFT', rarity: 'Rare' },
+            { name: 'Flaming Shield', type: 'NFT', rarity: 'Epic' },
+            { name: '50 Tokens', type: 'Token', rarity: 'Common' },
+            { name: 'Ice Phoenix', type: 'NFT', rarity: 'Legendary' }
         ];
 
         openBtn.addEventListener('click', () => {
@@ -81,9 +81,9 @@
             setTimeout(() => {
                 const reward = rewards[Math.floor(Math.random() * rewards.length)];
                 rewardBox.innerHTML = `
-                    🎁 Bạn nhận được: <strong>${reward.name}</strong><br>
-                    🌟 Loại: ${reward.type}<br>
-                    🔥 Độ hiếm: <strong>${reward.rarity}</strong>
+                    🎁 You received: <strong>${reward.name}</strong><br>
+                    🌟 Type: ${reward.type}<br>
+                    🔥 Rarity: <strong>${reward.rarity}</strong>
                 `;
                 rewardBox.style.display = 'block';
                 openBtn.disabled = false;
