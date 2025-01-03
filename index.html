@@ -2,96 +2,171 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>R & F - Merge MiniApp (Telegram)</title>
+  <title>R & F - Merge MiniApp</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    * { box-sizing:border-box; margin:0; padding:0; font-family:sans-serif; }
-    html, body { width:100%; height:100%; background:#f2f2f2; }
+    * {
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+      font-family: sans-serif;
+    }
+    html, body {
+      width: 100%;
+      height: 100%;
+      background: #f2f2f2;
+    }
     header {
-      text-align:center; padding:8px; color:#fff;
+      text-align: center;
+      padding: 8px;
+      color: #fff;
       background: linear-gradient(90deg, #fa7b58, #ffbe70);
       box-shadow: 0 2px 4px rgba(0,0,0,0.2);
     }
     nav {
-      display:flex; justify-content:center; gap:4px; background:#fff; padding:6px;
-      box-shadow:0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      background: #fff;
+      padding: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
     }
     nav button {
-      border:none; background:#eee; padding:6px 10px;
-      border-radius:4px; cursor:pointer; font-weight:bold; font-size:13px;
+      border: none; 
+      background: #eee; 
+      padding: 6px 10px;
+      border-radius: 4px; 
+      cursor: pointer; 
+      font-weight: bold; 
+      font-size: 13px;
     }
-    .active-tab { background:#c5ffe2; }
+    .active-tab {
+      background: #c5ffe2;
+    }
     main {
-      display:none; padding:6px;
+      display: none; 
+      padding: 6px;
     }
-    main.active { display:block; }
-
-    /* Nút chung */
+    main.active {
+      display: block;
+    }
     .btn {
-      background:#fd7c38; color:#fff; border:none; cursor:pointer;
-      padding:5px 8px; border-radius:4px; margin:2px; font-size:12px; font-weight:bold;
+      background: #fd7c38; 
+      color: #fff; 
+      border: none; 
+      cursor: pointer;
+      padding: 5px 8px; 
+      border-radius: 4px; 
+      margin: 2px; 
+      font-size: 12px; 
+      font-weight: bold;
     }
 
-    /* Hero grid (5 cột) */
+    /* Hero Grid */
     .hero-grid {
-      display:grid;
+      display: grid;
       grid-template-columns: repeat(5, 1fr);
-      gap:6px;  /* tăng gap chút để tránh dính nhau */
+      gap: 6px;
     }
     .hero-card {
-      width:60px; height:85px;
-      background:#fff; border:1px solid #ccc; border-radius:5px;
-      display:flex; flex-direction:column; align-items:center; justify-content:center;
-      text-align:center; font-size:9px; cursor:pointer; overflow:hidden;
+      width: 60px; 
+      height: 90px;
+      background: #fff; 
+      border: 1px solid #ccc; 
+      border-radius: 5px;
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      justify-content: center;
+      text-align: center; 
+      font-size: 9px; 
+      cursor: pointer; 
+      overflow: hidden;
     }
     .hero-card img {
-      width:28px; height:28px; object-fit:cover; border-radius:4px;
+      width: 28px; 
+      height: 28px; 
+      object-fit: cover; 
+      border-radius: 4px;
     }
     .hero-info {
-      margin-top:3px; font-weight:bold; line-height:1.2;
-      /* cỡ chữ đủ gọn trên Telegram mini app */
+      margin-top: 3px; 
+      line-height: 1.2;
     }
-
     /* Màu chữ theo độ hiếm */
-    .color-common    { color:#888; }
-    .color-rare      { color:#54ffff; }
-    .color-epic      { color:#c66cc5; }
-    .color-legendary { color:#ffa800; }
-    .color-mythic    { color:#ff4444; }
+    .color-common    { color: #888; }
+    .color-rare      { color: #54ffff; }
+    .color-epic      { color: #c66cc5; }
+    .color-legendary { color: #ffa800; }
+    .color-mythic    { color: #ff4444; }
 
     /* Modal overlay */
     .modal-overlay {
-      position:fixed; top:0; left:0; width:100%; height:100%;
-      background:rgba(0,0,0,0.5); display:none;
-      justify-content:center; align-items:center; z-index:9999;
+      position: fixed; 
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%;
+      background: rgba(0,0,0,0.5); 
+      display: none;
+      justify-content: center; 
+      align-items: center; 
+      z-index: 9999;
     }
     .modal-content {
-      width:200px; background:#fff; border-radius:6px; padding:10px; position:relative;
-      text-align:center; font-size:12px;
+      width: 200px; 
+      background: #fff; 
+      border-radius: 6px; 
+      padding: 10px; 
+      position: relative;
+      text-align: center; 
+      font-size: 12px;
     }
     .modal-content button {
-      position:absolute; top:4px; right:4px; background:#eee; border:none;
-      border-radius:4px; padding:2px 6px; cursor:pointer; font-size:12px;
+      position: absolute; 
+      top: 4px; 
+      right: 4px; 
+      background: #eee; 
+      border: none;
+      border-radius: 4px; 
+      padding: 2px 6px; 
+      cursor: pointer; 
+      font-size: 12px;
     }
     .modal-content img {
-      width:50px; height:50px; object-fit:cover; border-radius:4px; margin-bottom:4px;
+      width: 50px; 
+      height: 50px; 
+      object-fit: cover; 
+      border-radius: 4px; 
+      margin-bottom: 4px;
     }
 
     /* House */
     .house-card {
-      border:1px solid #ccc; border-radius:4px; background:#fff;
-      padding:4px; margin:4px 0; font-size:12px;
+      border: 1px solid #ccc; 
+      border-radius: 4px; 
+      background: #fff;
+      padding: 4px; 
+      margin: 4px 0; 
+      font-size: 12px;
     }
-    .house-card strong { font-size:12px; }
+    .house-card strong {
+      font-size: 12px;
+    }
 
     /* Shop message */
-    #shopMsg { font-size:12px; color:#d33; margin-left:4px; }
+    #shopMsg {
+      font-size: 12px; 
+      color: #d33; 
+      margin-left: 4px;
+    }
   </style>
 </head>
 <body>
 
 <header><h4>R & F - Merge MiniApp</h4></header>
 
+<!-- Navigation -->
 <nav>
   <button id="homeBtn"  class="active-tab" onclick="switchTab('home')">Home</button>
   <button id="heroBtn"  onclick="switchTab('hero')">Hero</button>
@@ -180,77 +255,77 @@ let player={
   heroes:[],
   houses:[],
   refCount:0,
-  refBonus:0, // TON from referral
+  refBonus:0
 };
 let soundOn=true;
 let tonConnected=false;
 let tonAddress="";
 let tonBal=3.0;
 
-/* 50 heroes pool (like your final list) */
-const allHeroPool=[ 
+/* 50 heroes pool */
+const allHeroPool=[
   /* Common (10) */
-  {name:"CrabKid",    rarity:"Common",    img:"https://i.imgur.com/wY0nzE9.png", dmg:18, spd:12, hp:30, mana:8,  lv:1, elem:"🐟"},
-  {name:"SlimeBaby",  rarity:"Common",    img:"https://i.imgur.com/Iy1X8r1.png", dmg:22, spd: 9, hp:35, mana:10, lv:1, elem:"🍀"},
-  {name:"TinyFrog",   rarity:"Common",    img:"https://i.imgur.com/81Ypu1S.png", dmg:20, spd:11, hp:32, mana:11, lv:1, elem:"🌱"},
-  {name:"MudCrab",    rarity:"Common",    img:"https://i.imgur.com/p08Obdb.png", dmg:24, spd:10, hp:34, mana: 9, lv:1, elem:"🌊"},
-  {name:"JellyBoy",   rarity:"Common",    img:"https://i.imgur.com/3AIUH3J.png", dmg:19, spd:12, hp:36, mana:10, lv:1, elem:"🍀"},
-  {name:"CrabEdge",   rarity:"Common",    img:"https://i.imgur.com/7tfCqWd.png", dmg:25, spd: 9, hp:37, mana:12, lv:1, elem:"🐟"},
-  {name:"BlueKid",    rarity:"Common",    img:"https://i.imgur.com/pHyAG2b.png", dmg:21, spd:10, hp:31, mana: 9, lv:1, elem:"🌊"},
-  {name:"PearlTiny",  rarity:"Common",    img:"https://i.imgur.com/TCszIj0.png", dmg:23, spd:10, hp:38, mana:11, lv:1, elem:"🍀"},
-  {name:"ShellMin",   rarity:"Common",    img:"https://i.imgur.com/tq1KRm5.png", dmg:20, spd:11, hp:35, mana: 8, lv:1, elem:"🍀"},
-  {name:"SlimyJr",    rarity:"Common",    img:"https://i.imgur.com/zaWeuIb.png", dmg:24, spd:11, hp:33, mana:10, lv:1, elem:"🐟"},
+  {name:"CrabKid",  rarity:"Common",img:"https://i.imgur.com/wY0nzE9.png", dmg:18, spd:12, hp:30, mana:8,  lv:1, elem:"🐟"},
+  {name:"SlimeBaby",rarity:"Common",img:"https://i.imgur.com/Iy1X8r1.png", dmg:22, spd:9,  hp:35, mana:10, lv:1, elem:"🍀"},
+  {name:"TinyFrog", rarity:"Common",img:"https://i.imgur.com/81Ypu1S.png", dmg:20, spd:11, hp:32, mana:11, lv:1, elem:"🌱"},
+  {name:"MudCrab",  rarity:"Common",img:"https://i.imgur.com/p08Obdb.png", dmg:24, spd:10, hp:34, mana:9,  lv:1, elem:"🌊"},
+  {name:"JellyBoy", rarity:"Common",img:"https://i.imgur.com/3AIUH3J.png", dmg:19, spd:12, hp:36, mana:10, lv:1, elem:"🍀"},
+  {name:"CrabEdge", rarity:"Common",img:"https://i.imgur.com/7tfCqWd.png", dmg:25, spd:9,  hp:37, mana:12, lv:1, elem:"🐟"},
+  {name:"BlueKid",  rarity:"Common",img:"https://i.imgur.com/pHyAG2b.png", dmg:21, spd:10, hp:31, mana:9,  lv:1, elem:"🌊"},
+  {name:"PearlTiny",rarity:"Common",img:"https://i.imgur.com/TCszIj0.png", dmg:23, spd:10, hp:38, mana:11, lv:1, elem:"🍀"},
+  {name:"ShellMin", rarity:"Common",img:"https://i.imgur.com/tq1KRm5.png", dmg:20, spd:11, hp:35, mana:8,  lv:1, elem:"🍀"},
+  {name:"SlimyJr",  rarity:"Common",img:"https://i.imgur.com/zaWeuIb.png", dmg:24, spd:11, hp:33, mana:10, lv:1, elem:"🐟"},
 
   /* Rare (10) */
-  {name:"MermaidMia", rarity:"Rare",      img:"https://i.imgur.com/3l9MKIl.png", dmg:30, spd:14, hp:45, mana:15, lv:1, elem:"🐚"},
-  {name:"CoralWar",   rarity:"Rare",      img:"https://i.imgur.com/cSy6okk.png", dmg:34, spd:13, hp:48, mana:16, lv:1, elem:"🌊"},
-  {name:"FireCrab",   rarity:"Rare",      img:"https://i.imgur.com/QRJyOyp.png", dmg:38, spd:14, hp:44, mana:14, lv:1, elem:"🔥"},
-  {name:"DarkFrog",   rarity:"Rare",      img:"https://i.imgur.com/NK8EQm1.png", dmg:36, spd:13, hp:46, mana:15, lv:1, elem:"🕸"},
-  {name:"CrabLord",   rarity:"Rare",      img:"https://i.imgur.com/Aa396uh.png", dmg:40, spd:12, hp:50, mana:15, lv:1, elem:"⚔"},
-  {name:"SeaKnight",  rarity:"Rare",      img:"https://i.imgur.com/aUTGKeg.png", dmg:35, spd:15, hp:48, mana:16, lv:1, elem:"🐟"},
-  {name:"AquaShield", rarity:"Rare",      img:"https://i.imgur.com/H65ycJW.png", dmg:32, spd:15, hp:46, mana:18, lv:1, elem:"💧"},
-  {name:"ClamGuard",  rarity:"Rare",      img:"https://i.imgur.com/TcSRW3O.png", dmg:39, spd:14, hp:44, mana:17, lv:1, elem:"🛡"},
-  {name:"AngryFish",  rarity:"Rare",      img:"https://i.imgur.com/8rZaJYc.png", dmg:37, spd:13, hp:49, mana:16, lv:1, elem:"🐠"},
-  {name:"ScorpionKid",rarity:"Rare",      img:"https://i.imgur.com/H65ycJW.png", dmg:41, spd:13, hp:46, mana:14, lv:1, elem:"🦂"},
+  {name:"MermaidMia",rarity:"Rare",img:"https://i.imgur.com/3l9MKIl.png", dmg:30,spd:14,hp:45,mana:15,lv:1,elem:"🐚"},
+  {name:"CoralWar",  rarity:"Rare",img:"https://i.imgur.com/cSy6okk.png", dmg:34,spd:13,hp:48,mana:16,lv:1,elem:"🌊"},
+  {name:"FireCrab",  rarity:"Rare",img:"https://i.imgur.com/QRJyOyp.png", dmg:38,spd:14,hp:44,mana:14,lv:1,elem:"🔥"},
+  {name:"DarkFrog",  rarity:"Rare",img:"https://i.imgur.com/NK8EQm1.png", dmg:36,spd:13,hp:46,mana:15,lv:1,elem:"🕸"},
+  {name:"CrabLord",  rarity:"Rare",img:"https://i.imgur.com/Aa396uh.png", dmg:40,spd:12,hp:50,mana:15,lv:1,elem:"⚔"},
+  {name:"SeaKnight", rarity:"Rare",img:"https://i.imgur.com/aUTGKeg.png", dmg:35,spd:15,hp:48,mana:16,lv:1,elem:"🐟"},
+  {name:"AquaShield",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png", dmg:32,spd:15,hp:46,mana:18,lv:1,elem:"💧"},
+  {name:"ClamGuard", rarity:"Rare",img:"https://i.imgur.com/TcSRW3O.png", dmg:39,spd:14,hp:44,mana:17,lv:1,elem:"🛡"},
+  {name:"AngryFish", rarity:"Rare",img:"https://i.imgur.com/8rZaJYc.png", dmg:37,spd:13,hp:49,mana:16,lv:1,elem:"🐠"},
+  {name:"ScorpionKid",rarity:"Rare",img:"https://i.imgur.com/H65ycJW.png", dmg:41,spd:13,hp:46,mana:14,lv:1,elem:"🦂"},
 
   /* Epic (10) */
-  {name:"StormSummoner",rarity:"Epic",    img:"https://i.imgur.com/02jTwGp.png", dmg:50, spd:17, hp:60, mana:20, lv:1, elem:"⛈"},
-  {name:"PearlMage",    rarity:"Epic",    img:"https://i.imgur.com/JOCwUzy.png", dmg:54, spd:18, hp:58, mana:22, lv:1, elem:"💎"},
-  {name:"EpicFrog",     rarity:"Epic",    img:"https://i.imgur.com/wr71ePx.png", dmg:52, spd:16, hp:62, mana:19, lv:1, elem:"🍃"},
-  {name:"DeepCrab",     rarity:"Epic",    img:"https://i.imgur.com/OXjxfTK.png", dmg:56, spd:15, hp:64, mana:21, lv:1, elem:"🌊"},
-  {name:"ShellBuster",  rarity:"Epic",    img:"https://i.imgur.com/PqCgXay.png", dmg:58, spd:16, hp:60, mana:23, lv:1, elem:"🔥"},
-  {name:"OceanLancer",  rarity:"Epic",    img:"https://i.imgur.com/wxAAFkK.png", dmg:55, spd:17, hp:63, mana:20, lv:1, elem:"🔱"},
-  {name:"ReefDragon",   rarity:"Epic",    img:"https://i.imgur.com/EB7WHnW.png", dmg:59, spd:18, hp:60, mana:22, lv:1, elem:"🐉"},
-  {name:"StormFish",    rarity:"Epic",    img:"https://i.imgur.com/EmWFXPq.png", dmg:53, spd:17, hp:61, mana:21, lv:1, elem:"⚡"},
-  {name:"KrakenKid",    rarity:"Epic",    img:"https://i.imgur.com/mnMCDvt.png", dmg:57, spd:16, hp:65, mana:24, lv:1, elem:"🐙"},
-  {name:"AbyssCrab",    rarity:"Epic",    img:"https://i.imgur.com/QkkGPnK.png", dmg:60, spd:17, hp:63, mana:20, lv:1, elem:"🌑"},
+  {name:"StormSummoner",rarity:"Epic",img:"https://i.imgur.com/02jTwGp.png", dmg:50,spd:17,hp:60,mana:20,lv:1,elem:"⛈"},
+  {name:"PearlMage",    rarity:"Epic",img:"https://i.imgur.com/JOCwUzy.png", dmg:54,spd:18,hp:58,mana:22,lv:1,elem:"💎"},
+  {name:"EpicFrog",     rarity:"Epic",img:"https://i.imgur.com/wr71ePx.png", dmg:52,spd:16,hp:62,mana:19,lv:1,elem:"🍃"},
+  {name:"DeepCrab",     rarity:"Epic",img:"https://i.imgur.com/OXjxfTK.png", dmg:56,spd:15,hp:64,mana:21,lv:1,elem:"🌊"},
+  {name:"ShellBuster",  rarity:"Epic",img:"https://i.imgur.com/PqCgXay.png", dmg:58,spd:16,hp:60,mana:23,lv:1,elem:"🔥"},
+  {name:"OceanLancer",  rarity:"Epic",img:"https://i.imgur.com/wxAAFkK.png", dmg:55,spd:17,hp:63,mana:20,lv:1,elem:"🔱"},
+  {name:"ReefDragon",   rarity:"Epic",img:"https://i.imgur.com/EB7WHnW.png", dmg:59,spd:18,hp:60,mana:22,lv:1,elem:"🐉"},
+  {name:"StormFish",    rarity:"Epic",img:"https://i.imgur.com/EmWFXPq.png", dmg:53,spd:17,hp:61,mana:21,lv:1,elem:"⚡"},
+  {name:"KrakenKid",    rarity:"Epic",img:"https://i.imgur.com/mnMCDvt.png", dmg:57,spd:16,hp:65,mana:24,lv:1,elem:"🐙"},
+  {name:"AbyssCrab",    rarity:"Epic",img:"https://i.imgur.com/QkkGPnK.png", dmg:60,spd:17,hp:63,mana:20,lv:1,elem:"🌑"},
 
   /* Legendary (10) */
-  {name:"InfernoCrab",  rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png", dmg:70, spd:20, hp:80, mana:30, lv:1, elem:"🔥"},
-  {name:"AbyssDragon",  rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png", dmg:74, spd:19, hp:82, mana:28, lv:1, elem:"🐉"},
-  {name:"MegaShark",    rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png", dmg:72, spd:18, hp:84, mana:29, lv:1, elem:"🦈"},
-  {name:"PearlDragon",  rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png", dmg:76, spd:20, hp:80, mana:30, lv:1, elem:"💎"},
-  {name:"LavaClam",     rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png", dmg:79, spd:19, hp:82, mana:27, lv:1, elem:"🌋"},
-  {name:"CoralKnight",  rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png", dmg:75, spd:21, hp:85, mana:30, lv:1, elem:"⚔"},
-  {name:"StoneWar",     rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png", dmg:78, spd:19, hp:83, mana:31, lv:1, elem:"🗿"},
-  {name:"MudGolem",     rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png", dmg:77, spd:18, hp:86, mana:28, lv:1, elem:"🌱"},
-  {name:"AngelCrab",    rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png", dmg:80, spd:20, hp:80, mana:29, lv:1, elem:"🌟"},
-  {name:"AquaDino",     rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png", dmg:74, spd:19, hp:85, mana:30, lv:1, elem:"💧"},
+  {name:"InfernoCrab",  rarity:"Legendary",img:"https://i.imgur.com/23DhlYC.png", dmg:70,spd:20,hp:80,mana:30,lv:1,elem:"🔥"},
+  {name:"AbyssDragon",  rarity:"Legendary",img:"https://i.imgur.com/Rhu6apu.png", dmg:74,spd:19,hp:82,mana:28,lv:1,elem:"🐉"},
+  {name:"MegaShark",    rarity:"Legendary",img:"https://i.imgur.com/OCaOjCv.png", dmg:72,spd:18,hp:84,mana:29,lv:1,elem:"🦈"},
+  {name:"PearlDragon",  rarity:"Legendary",img:"https://i.imgur.com/SXQMxBI.png", dmg:76,spd:20,hp:80,mana:30,lv:1,elem:"💎"},
+  {name:"LavaClam",     rarity:"Legendary",img:"https://i.imgur.com/5HE6crv.png", dmg:79,spd:19,hp:82,mana:27,lv:1,elem:"🌋"},
+  {name:"CoralKnight",  rarity:"Legendary",img:"https://i.imgur.com/NKvEj0j.png", dmg:75,spd:21,hp:85,mana:30,lv:1,elem:"⚔"},
+  {name:"StoneWar",     rarity:"Legendary",img:"https://i.imgur.com/6sHJI0I.png", dmg:78,spd:19,hp:83,mana:31,lv:1,elem:"🗿"},
+  {name:"MudGolem",     rarity:"Legendary",img:"https://i.imgur.com/qhSP9PR.png", dmg:77,spd:18,hp:86,mana:28,lv:1,elem:"🌱"},
+  {name:"AngelCrab",    rarity:"Legendary",img:"https://i.imgur.com/uqiRB2H.png", dmg:80,spd:20,hp:80,mana:29,lv:1,elem:"🌟"},
+  {name:"AquaDino",     rarity:"Legendary",img:"https://i.imgur.com/NnVOlP8.png", dmg:74,spd:19,hp:85,mana:30,lv:1,elem:"💧"},
 
   /* Mythic (10) */
-  {name:"ElderDragon",  rarity:"Mythic",   img:"https://i.imgur.com/tFzK3iu.png", dmg:90, spd:25, hp:100,mana:40, lv:1, elem:"🐉"},
-  {name:"AquaGod",      rarity:"Mythic",   img:"https://i.imgur.com/ujlhSVK.png", dmg:94, spd:24, hp:102,mana:42, lv:1, elem:"💧"},
-  {name:"ArcAngel",     rarity:"Mythic",   img:"https://i.imgur.com/1K8xEcc.png", dmg:92, spd:23, hp:105,mana:39, lv:1, elem:"👼"},
-  {name:"CyberDino",    rarity:"Mythic",   img:"https://i.imgur.com/EokU1JU.png", dmg:88, spd:22, hp:98, mana:41, lv:1, elem:"🤖"},
-  {name:"PhoenixKing",  rarity:"Mythic",   img:"https://i.imgur.com/Qg9MLyO.png", dmg:96, spd:24, hp:99, mana:40, lv:1, elem:"🔥"},
-  {name:"TimeSerpent",  rarity:"Mythic",   img:"https://i.imgur.com/Xsqp1Zl.png", dmg:95, spd:26, hp:104,mana:43, lv:1, elem:"⏳"},
-  {name:"GalaxyWolf",   rarity:"Mythic",   img:"https://i.imgur.com/YeDYlBO.png", dmg:97, spd:24, hp:100,mana:42,lv:1, elem:"🌌"},
-  {name:"AuraKnight",   rarity:"Mythic",   img:"https://i.imgur.com/h8LyWQG.png", dmg:91, spd:23, hp:103,mana:41,lv:1, elem:"⭐"},
-  {name:"BlazeGod",     rarity:"Mythic",   img:"https://i.imgur.com/u2hcKvV.png", dmg:99, spd:25, hp:101,mana:39, lv:1, elem:"🔥"},
-  {name:"AncientGolem", rarity:"Mythic",   img:"https://i.imgur.com/WWF50XS.png", dmg:93, spd:22, hp:106,mana:42,lv:1, elem:"🗿"},
+  {name:"ElderDragon",  rarity:"Mythic",img:"https://i.imgur.com/tFzK3iu.png", dmg:90,spd:25,hp:100,mana:40,lv:1,elem:"🐉"},
+  {name:"AquaGod",      rarity:"Mythic",img:"https://i.imgur.com/ujlhSVK.png", dmg:94,spd:24,hp:102,mana:42,lv:1,elem:"💧"},
+  {name:"ArcAngel",     rarity:"Mythic",img:"https://i.imgur.com/1K8xEcc.png", dmg:92,spd:23,hp:105,mana:39,lv:1,elem:"👼"},
+  {name:"CyberDino",    rarity:"Mythic",img:"https://i.imgur.com/EokU1JU.png", dmg:88,spd:22,hp:98,mana:41,lv:1,elem:"🤖"},
+  {name:"PhoenixKing",  rarity:"Mythic",img:"https://i.imgur.com/Qg9MLyO.png", dmg:96,spd:24,hp:99,mana:40,lv:1,elem:"🔥"},
+  {name:"TimeSerpent",  rarity:"Mythic",img:"https://i.imgur.com/Xsqp1Zl.png", dmg:95,spd:26,hp:104,mana:43,lv:1,elem:"⏳"},
+  {name:"GalaxyWolf",   rarity:"Mythic",img:"https://i.imgur.com/YeDYlBO.png", dmg:97,spd:24,hp:100,mana:42,lv:1,elem:"🌌"},
+  {name:"AuraKnight",   rarity:"Mythic",img:"https://i.imgur.com/h8LyWQG.png", dmg:91,spd:23,hp:103,mana:41,lv:1,elem:"⭐"},
+  {name:"BlazeGod",     rarity:"Mythic",img:"https://i.imgur.com/u2hcKvV.png", dmg:99,spd:25,hp:101,mana:39,lv:1,elem:"🔥"},
+  {name:"AncientGolem", rarity:"Mythic",img:"https://i.imgur.com/WWF50XS.png", dmg:93,spd:22,hp:106,mana:42,lv:1,elem:"🗿"},
 ];
 
-/* Tỉ lệ ra rarity */
+/* Tỉ lệ rarity */
 const rarityChance=[
   {rar:"Common", chance:40},
   {rar:"Rare", chance:30},
@@ -259,7 +334,7 @@ const rarityChance=[
   {rar:"Mythic", chance:5}
 ];
 
-/* House data */
+/* House base data */
 const baseHouseData=[
   {type:"Tiny",  cost:20, rent:5,  lv:1},
   {type:"Pen",   cost:50, rent:12, lv:1},
@@ -299,66 +374,12 @@ function earnDaily(){
   player.tokens+=5;
   updateHome();
 }
-function addTokens(n){ player.tokens+=n; updateHome(); }
-
-/* HERO RENDER */
-function renderHero(){
-  let g=document.getElementById('heroGrid');
-  g.innerHTML= player.heroes.map((h,i)=>{
-    let rar=h.rarity.toLowerCase();
-    return `<div class="hero-card" onclick="openHeroModal(${i})">
-      <img src="${h.img}" alt="${h.name}">
-      <div class="hero-info color-${rar}">${h.name}</div>
-    </div>`;
-  }).join('');
+function addTokens(n){
+  player.tokens+=n;
+  updateHome();
 }
 
-/* SHOP */
-function renderShop(){
-  document.getElementById('shopMsg').textContent="";
-  // houses
-  let ownedHtml= player.houses.map((ho,idx)=>{
-    return `<div class="house-card">
-      <strong>${ho.type} (Lv${ho.lv})</strong> &nbsp; Rent:${ho.rent}
-      <br>
-      <button class="btn" onclick="collectRent(${idx})">Collect</button>
-      <button class="btn" onclick="upgradeHouse(${idx})">Upgrade</button>
-    </div>`;
-  }).join('');
-  let saleHtml= baseHouseData.map((hd,idx)=>{
-    return `<div class="house-card">
-      <strong>${hd.type}</strong>
-      <br>Cost:${hd.cost} Rent:${hd.rent}
-      <button class="btn" onclick="buyHouse(${idx})">Buy</button>
-    </div>`;
-  }).join('');
-  document.getElementById('houseList').innerHTML=`
-    <p style="font-size:12px;font-weight:bold;">Owned:</p>
-    ${ownedHtml || '<p style="font-size:12px;">(none)</p>'}
-    <hr>
-    <p style="font-size:12px;font-weight:bold;">Buy new:</p>
-    ${saleHtml}
-  `;
-}
-function buyChest(n){
-  let cost=n*10;
-  if(player.tokens<cost){
-    document.getElementById('shopMsg').textContent="Not enough tokens!";
-    return;
-  }
-  player.tokens-=cost;
-  for(let i=0;i<n;i++){
-    let rar=randomRarity();
-    let pool= allHeroPool.filter(x=>x.rarity===rar);
-    if(pool.length>0){
-      let picked=pool[Math.floor(Math.random()*pool.length)];
-      player.heroes.push({...picked});
-    }
-  }
-  autoMerge();
-  document.getElementById('shopMsg').textContent=`Bought x${n}, auto-merge done.`;
-  updateHome(); renderHero();
-}
+/* Rarity random */
 function randomRarity(){
   let roll=Math.random()*100, s=0;
   for(let rc of rarityChance){
@@ -367,68 +388,159 @@ function randomRarity(){
   }
   return "Common";
 }
+
+/* BUY CHEST => hero => auto-merge */
+function buyChest(n){
+  let cost=n*10;
+  if(player.tokens<cost){
+    document.getElementById('shopMsg').textContent="Not enough tokens!";
+    return;
+  }
+  player.tokens-=cost;
+  document.getElementById('shopMsg').textContent= `Bought x${n} chest(s). Auto-merge checking...`;
+  for(let i=0;i<n;i++){
+    let rar=randomRarity();
+    let filtered=allHeroPool.filter(x=>x.rarity===rar);
+    if(filtered.length>0){
+      let h= filtered[Math.floor(Math.random()*filtered.length)];
+      player.heroes.push(JSON.parse(JSON.stringify(h)));
+    }
+  }
+  autoMerge();
+  updateHome();
+  renderHero();
+}
+
+/* RENDER HERO */
+function renderHero(){
+  let g=document.getElementById('heroGrid');
+  g.innerHTML="";
+  player.heroes.forEach((h,idx)=>{
+    let rar=h.rarity.toLowerCase();
+    /* Tên + Rarity + LV, in đậm + màu */
+    let colorClass= "color-"+rar; 
+    let line=`<span class="${colorClass}" style="font-weight:bold;">${h.name}</span><br>
+              <span class="${colorClass}" style="font-weight:bold;">Lv${h.lv}</span>`;
+    let div=document.createElement('div');
+    div.className="hero-card";
+    div.onclick=()=>openHeroModal(idx);
+    div.innerHTML=`
+      <img src="${h.img}" alt="hero">
+      <div class="hero-info">${line}</div>
+    `;
+    g.appendChild(div);
+  });
+}
+
+/* AUTO MERGE */
 function autoMerge(){
+  /* Gom key "name-lv" => merge 2 => lv+1 => stats +50% (nhiều cặp => lặp) */
   let map={};
   player.heroes.forEach((h,i)=>{
-    let key=h.name+"|lv"+h.lv;
+    let key=h.name+"_lv"+h.lv;
     if(!map[key]) map[key]=[];
     map[key].push(i);
   });
+  // For each key => while length>=2 => merge
   for(let k in map){
     let arr=map[k];
     while(arr.length>=2){
       let i1=arr.pop(), i2=arr.pop();
       if(i1>i2){ let tmp=i1; i1=i2; i2=tmp; }
       let base= player.heroes[i1];
-      // remove second
+      // remove second hero from array
       player.heroes.splice(i2,1);
-      // remove first
+      // remove first hero from array
       player.heroes.splice(i1,1);
 
+      // Now upgrade base
       let merged={...base};
       if(merged.lv<5){
         merged.lv++;
-        merged.dmg=Math.floor(merged.dmg*1.5);
-        merged.spd=Math.floor(merged.spd*1.5);
-        merged.hp= Math.floor(merged.hp*1.5);
+        merged.dmg= Math.floor(merged.dmg *1.5);
+        merged.spd= Math.floor(merged.spd *1.5);
+        merged.hp = Math.floor(merged.hp  *1.5);
         merged.mana=Math.floor(merged.mana*1.5);
       }
+      // push back
       player.heroes.push(merged);
     }
   }
 }
 
-/* HOUSES */
+/* Modal show hero detail */
+function openHeroModal(i){
+  let h=player.heroes[i];
+  document.getElementById('modalImg').src= h.img;
+  let rar=h.rarity.toLowerCase();
+  document.getElementById('modalName').innerHTML= h.name;
+  document.getElementById('modalRarity').innerHTML= `<span class="color-${rar}" style="font-weight:bold;">${h.rarity} Lv${h.lv}</span>`;
+  let st=`DMG:${h.dmg} SPD:${h.spd} HP:${h.hp} MP:${h.mana}`;
+  document.getElementById('modalStats').textContent= st;
+  let total=h.dmg+h.spd+h.hp+h.mana;
+  document.getElementById('modalLv').textContent= `Power: ${total}`;
+  document.getElementById('heroModal').style.display='flex';
+}
+function closeHeroModal(){
+  document.getElementById('heroModal').style.display='none';
+}
+
+/* SHOP => HOUSES */
+function renderShop(){
+  document.getElementById('shopMsg').textContent="";
+  let htmlOwned= player.houses.map((h,idx)=>{
+    return `<div class="house-card">
+      <strong>${h.type} (Lv${h.lv})</strong> &nbsp; Rent:${h.rent}
+      <br>
+      <button class="btn" onclick="collectRent(${idx})">Collect</button>
+      <button class="btn" onclick="upgradeHouse(${idx})">Upgrade</button>
+    </div>`;
+  }).join('');
+  let saleHtml= baseHouseData.map((ho,idx)=>{
+    return `<div class="house-card">
+      <strong>${ho.type}</strong>
+      <br>Cost:${ho.cost} Rent:${ho.rent}
+      <button class="btn" onclick="buyHouse(${idx})">Buy</button>
+    </div>`;
+  }).join('');
+  document.getElementById('houseList').innerHTML=`
+    <p style="font-size:12px; font-weight:bold;">Owned:</p>
+    ${htmlOwned || '<p style="font-size:12px;">(none)</p>'}
+    <hr>
+    <p style="font-size:12px; font-weight:bold;">Buy new:</p>
+    ${saleHtml}
+  `;
+}
 function buyHouse(i){
-  let base=baseHouseData[i];
-  if(player.tokens<base.cost){alert("Not enough tokens!");return;}
-  player.tokens-=base.cost;
-  player.houses.push(JSON.parse(JSON.stringify(base)));
-  alert(`Bought ${base.type} house`);
+  let ho=baseHouseData[i];
+  if(player.tokens<ho.cost){ alert("Not enough tokens!"); return;}
+  player.tokens-=ho.cost;
+  player.houses.push({...ho});
+  alert(`Bought ${ho.type} house!`);
   renderShop(); updateHome();
 }
 function collectRent(i){
-  let ho= player.houses[i];
+  let ho=player.houses[i];
   player.tokens+=ho.rent;
-  alert(`Collected +${ho.rent} tokens from ${ho.type}`);
+  alert(`+${ho.rent} tokens from ${ho.type}`);
   renderShop(); updateHome();
 }
 function upgradeHouse(i){
-  let ho= player.houses[i];
-  if(ho.lv>=5){ alert("Max lv 5!"); return;}
-  let upCost=Math.floor( ho.cost*(ho.lv+1)/2 );
+  let ho=player.houses[i];
+  if(ho.lv>=5){alert("Max level 5!");return;}
+  let upCost= Math.floor( ho.cost*(ho.lv+1)/2 );
   if(player.tokens<upCost){alert("Not enough tokens!");return;}
   player.tokens-=upCost;
   ho.lv++;
-  ho.rent=Math.floor( ho.rent*1.6 );
+  ho.rent= Math.floor(ho.rent*1.6);
   alert(`${ho.type} => Lv${ho.lv}, rent=>${ho.rent}`);
   renderShop(); updateHome();
 }
 
 /* WALLET */
 function renderWallet(){
-  document.getElementById('tonAddr').textContent= tonConnected?tonAddress:"-";
-  document.getElementById('tonBal').textContent= tonBal.toFixed(2);
+  document.getElementById('tonAddr').textContent=tonConnected? tonAddress : "-";
+  document.getElementById('tonBal').textContent=tonBal.toFixed(2);
   document.getElementById('walletTokens').textContent= player.tokens;
   document.getElementById('refCount').textContent= player.refCount;
   document.getElementById('refBonus').textContent= player.refBonus.toFixed(2);
@@ -447,10 +559,10 @@ function disconnectTon(){
 }
 function swapForTon(){
   if(!tonConnected){alert("Connect TON first!");return;}
-  if(player.tokens<50){alert("Need 50 tokens to swap => 1 TON");return;}
+  if(player.tokens<50){alert("Need 50 tokens => 1 TON");return;}
   player.tokens-=50;
   tonBal+=1;
-  alert("Swapped 50 tokens => +1 TON");
+  alert("Swapped 50 => +1 TON");
   updateHome(); renderWallet();
 }
 
@@ -475,30 +587,12 @@ function withdrawRef(){
   if(!tonConnected){alert("Connect TON first!");return;}
   if(player.refBonus<=0){alert("No referral bonus!");return;}
   tonBal+=player.refBonus;
-  alert(`Withdrew ${player.refBonus.toFixed(2)} TON from referral`);
+  alert(`Withdrew ${player.refBonus.toFixed(2)} TON from referral bonus`);
   player.refBonus=0;
   renderWallet();
 }
 
-/* HERO MODAL */
-function openHeroModal(i){
-  let h= player.heroes[i];
-  document.getElementById('modalImg').src = h.img;
-  let rc= h.rarity.toLowerCase();
-  let rarHtml=`<span class="color-${rc}">${h.rarity} LV${h.lv}</span>`;
-  let stats=`DMG:${h.dmg} SPD:${h.spd} HP:${h.hp} MP:${h.mana}`;
-  let total= h.dmg+h.spd+h.hp+h.mana;
-  document.getElementById('modalName').textContent= h.name;
-  document.getElementById('modalRarity').innerHTML= rarHtml+" "+h.elem;
-  document.getElementById('modalStats').textContent= stats;
-  document.getElementById('modalLv').textContent= `Power: ${total}`;
-  document.getElementById('heroModal').style.display='flex';
-}
-function closeHeroModal(){
-  document.getElementById('heroModal').style.display='none';
-}
-
-/* SETTINGS (MODAL) */
+/* SETTINGS MODAL */
 function openSettings(){
   document.getElementById('settingsOverlay').style.display='flex';
   document.getElementById('soundChk').checked=soundOn;
@@ -511,6 +605,5 @@ function toggleSound(){
   alert(soundOn?"Sound ON":"Sound OFF");
 }
 </script>
-
 </body>
 </html>
