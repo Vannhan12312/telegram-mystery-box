@@ -1,155 +1,336 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rost & Flame</title>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dragon Egg Presale - Telegram Mini App</title>
+
+  <!-- Telegram WebApp JavaScript (bắt buộc khi làm Mini App) -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+  <!-- 
+    Gợi ý: Bạn có thể sử dụng thêm thư viện CSS như Bootstrap, Tailwind, 
+    hoặc framework UI khác để tăng tốc độ phát triển giao diện.
+  -->
+
   <style>
-    /* General styles */
+    /* Reset và định dạng cơ bản */
+    * {
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      font-family: "Roboto", sans-serif;
+    }
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Poppins', sans-serif;
-      background: linear-gradient(180deg, #001f3f, #004e92);
+      background: #0f0f0f;
       color: #fff;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+    header, footer {
       text-align: center;
-      overflow: hidden;
+      padding: 1rem;
+      background: #1e1e1e;
+    }
+    h1, h2, h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    /* Hiệu ứng nền hologram/futuristic (chỉ mang tính minh họa) */
+    .bg-hero {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(0,255,234,0.15) 0%, rgba(0,0,0,0) 70%);
+      animation: pulse 5s infinite alternate;
+    }
+    @keyframes pulse {
+      from { opacity: 0.3; }
+      to { opacity: 0.6; }
+    }
+
+    /* Nội dung chính */
+    main {
+      margin: 0 auto;
+      max-width: 1200px;
+      width: 100%;
+      flex: 1;
+      padding: 1.5rem;
+      position: relative;
+      z-index: 10; /* để nội dung nổi lên trên lớp nền */
     }
 
     .container {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      text-align: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      justify-content: space-between;
     }
 
-    .title {
-      font-size: 3rem;
-      font-weight: bold;
-      margin-bottom: 20px;
-      text-transform: uppercase;
-      text-shadow: 0 0 20px #00c6ff, 0 0 40px #0072ff;
-    }
-
-    .hero {
-      margin: 20px 0;
-      padding: 20px;
-      background: rgba(30, 58, 138, 0.8);
-      border-radius: 20px;
-      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    /* Khối card tổng quan: "Buy Eggs", "Referral", "My TON Balance" */
+    .card {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      flex: 1 1 300px;
+      min-width: 250px;
       position: relative;
-    }
-
-    .hero img {
-      width: 150px;
-      margin: 0 auto;
-      display: block;
-      filter: drop-shadow(0 0 20px #7fdbff);
-    }
-
-    .hero h2 {
-      font-size: 1.5rem;
-      margin: 10px 0;
-      text-shadow: 0 0 5px #7fdbff;
-    }
-
-    .unlock-btn {
-      margin-top: 20px;
-      padding: 15px 30px;
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #fff;
-      background: linear-gradient(90deg, #ff512f, #f09819);
-      border: none;
-      border-radius: 30px;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-    }
-
-    .unlock-btn:hover {
-      transform: scale(1.1);
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .progress-bar {
-      margin-top: 20px;
-      height: 20px;
-      background: #c2e9fb;
-      border-radius: 10px;
       overflow: hidden;
     }
-
-    .progress-bar div {
-      height: 100%;
-      width: 0%;
-      background: linear-gradient(90deg, #00c6ff, #0072ff);
-      border-radius: 10px;
-      transition: width 0.5s ease;
+    .card h3 {
+      margin-bottom: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+    .card p {
+      line-height: 1.5;
     }
 
-    .success {
-      margin-top: 10px;
-      color: #00ffcc;
-      text-shadow: 0 0 10px #00ffcc;
+    /* Button phong cách futuristic */
+    .btn {
+      display: inline-block;
+      padding: 0.75rem 1.25rem;
+      border: none;
+      border-radius: 5px;
+      font-size: 1rem;
+      cursor: pointer;
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+      color: #fff;
+      transition: 0.3s;
+      margin-top: 1rem;
+      text-decoration: none;
+      font-weight: 500;
+    }
+    .btn:hover {
+      background: linear-gradient(45deg, #0072ff, #00c6ff);
+    }
+
+    /* Danh sách trứng và hero */
+    .list-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .egg-card, .hero-card {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      width: 180px;
+      text-align: center;
+      position: relative;
+    }
+    .egg-card img, .hero-card img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      margin-bottom: 0.5rem;
+      border-radius: 50%;
+      border: 2px solid #00c6ff;
+    }
+    .egg-card h4, .hero-card h4 {
+      margin-bottom: 0.25rem;
+      font-size: 1.1rem;
+    }
+    .egg-card p, .hero-card p {
+      font-size: 0.9rem;
+      margin-bottom: 0.25rem;
+    }
+    /* Hiệu ứng hover card */
+    .egg-card:hover, .hero-card:hover {
+      transform: scale(1.02);
+      transition: transform 0.2s;
+    }
+
+    /* Footer */
+    footer p {
+      font-size: 0.875rem;
+      opacity: 0.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1 class="title" id="game-title">Rost & Flame</h1>
-    <div class="hero">
-      <img id="hero-image" src="https://source.unsplash.com/150x150/?phoenix,ice" alt="Hero">
-      <h2 id="hero-name">Level 1: Ice Phoenix Basic</h2>
-      <div class="progress-bar">
-        <div id="progress"></div>
+  <!-- Nền hologram -->
+  <div class="bg-hero"></div>
+
+  <header>
+    <h1>Dragon Egg Presale</h1>
+    <h2>Telegram Mini App - Futuristic Design</h2>
+  </header>
+
+  <main>
+    <!-- Chèn nhạc ở đây (nếu cần) -->
+    <!-- <audio src="path-to-your-music.mp3" autoplay loop></audio> -->
+
+    <section class="container">
+      <!-- Card: Mua trứng -->
+      <div class="card">
+        <h3>Mua Trứng</h3>
+        <p>Số lượng tối đa: <strong>3000</strong> trứng</p>
+        <p>Giá 1 trứng: <strong>5 TON</strong></p>
+        <label for="eggQuantity">Chọn số lượng trứng:</label>
+        <input 
+          type="number" 
+          id="eggQuantity" 
+          name="eggQuantity" 
+          min="1" 
+          max="3000" 
+          value="1"
+          style="width:60px; margin-left:0.5rem;"
+        />
+        <br />
+        <button class="btn" onclick="buyEggs()">Mua ngay</button>
       </div>
-      <button class="unlock-btn" id="unlock-btn" onclick="unlockHero()">Unlock</button>
-    </div>
-    <audio id="box-sound" src="https://www.myinstants.com/media/sounds/magic-box-opening.mp3" preload="auto"></audio>
-  </div>
 
+      <!-- Card: Referral -->
+      <div class="card">
+        <h3>Referral</h3>
+        <p>Chia sẻ link để nhận 10% TON khi có người mua trứng.</p>
+        <p><strong>Link giới thiệu:</strong></p>
+        <input 
+          type="text" 
+          id="refLink" 
+          value="https://t.me/dragonEggBot?start=ref123" 
+          readonly 
+          style="width:100%; padding:0.5rem; margin-bottom:0.5rem;"
+        />
+        <button class="btn" onclick="copyRefLink()">Copy Link</button>
+      </div>
+
+      <!-- Card: Số dư TON -->
+      <div class="card">
+        <h3>Số dư TON</h3>
+        <p id="tonBalance">TON Balance: <strong>0</strong></p>
+        <p id="refEarn">TON nhận từ referral: <strong>0</strong></p>
+        <button class="btn" onclick="claimRef()">Rút referral</button>
+      </div>
+    </section>
+
+    <!-- Danh sách trứng chưa mở -->
+    <section style="margin-top:2rem;">
+      <h2>Trứng của bạn</h2>
+      <div class="list-container" id="eggList">
+        <!-- Ví dụ 3 trứng -->
+        <div class="egg-card">
+          <!-- Chèn ảnh minh họa trứng -->
+          <img src="https://via.placeholder.com/80?text=Egg" alt="Egg Image"/>
+          <h4>Egg #1</h4>
+          <p>Trạng thái: Chưa mở</p>
+          <button class="btn" onclick="openEgg(1)">Mở trứng</button>
+        </div>
+        <div class="egg-card">
+          <img src="https://via.placeholder.com/80?text=Egg" alt="Egg Image"/>
+          <h4>Egg #2</h4>
+          <p>Trạng thái: Chưa mở</p>
+          <button class="btn" onclick="openEgg(2)">Mở trứng</button>
+        </div>
+        <div class="egg-card">
+          <img src="https://via.placeholder.com/80?text=Egg" alt="Egg Image"/>
+          <h4>Egg #3</h4>
+          <p>Trạng thái: Chưa mở</p>
+          <button class="btn" onclick="openEgg(3)">Mở trứng</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Danh sách Hero (khi mở trứng) -->
+    <section style="margin-top:2rem;">
+      <h2>Hero của bạn</h2>
+      <div class="list-container" id="heroList">
+        <!-- Ví dụ hero đã mở -->
+        <div class="hero-card">
+          <!-- Chèn ảnh minh họa hero -->
+          <img src="https://via.placeholder.com/80?text=Dragon" alt="Hero Image"/>
+          <h4>Dragon #8</h4>
+          <p>Độ hiếm: Rare</p>
+          <p>Attack: 120</p>
+          <p>Skill: Fire Breath</p>
+        </div>
+        <div class="hero-card">
+          <img src="https://via.placeholder.com/80?text=Dragon" alt="Hero Image"/>
+          <h4>Dragon #9</h4>
+          <p>Độ hiếm: Legendary</p>
+          <p>Attack: 200</p>
+          <p>Skill: Thunder Strike</p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>© 2025 - Dragon Egg Presale Mini App</p>
+  </footer>
+
+  <!-- JavaScript demo -->
   <script>
-    const heroes = [
-      { name: "Level 1: Ice Phoenix Basic", img: "https://source.unsplash.com/150x150/?phoenix,ice", progress: 20 },
-      { name: "Level 2: Frosty Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,frost", progress: 40 },
-      { name: "Level 3: Glowing Ice Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,glow", progress: 60 },
-      { name: "Level 4: Powerful Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,fire,ice", progress: 80 },
-      { name: "Level 5: Legendary Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,legend", progress: 100 },
-    ];
+    // Giả lập số dư TON
+    let userTonBalance = 50;
+    let userRefTon = 0;
 
-    let currentHero = 0;
+    // Cập nhật hiển thị TON
+    document.getElementById('tonBalance').innerHTML = 'TON Balance: ' + userTonBalance;
+    document.getElementById('refEarn').innerHTML = 'TON nhận từ referral: ' + userRefTon;
 
-    function unlockHero() {
-      const progressBar = document.getElementById("progress");
-      const heroImage = document.getElementById("hero-image");
-      const successMessage = document.getElementById("success-message");
-      const boxSound = document.getElementById("box-sound");
+    // Hàm copy link referral
+    function copyRefLink() {
+      const refLink = document.getElementById('refLink');
+      refLink.select();
+      refLink.setSelectionRange(0, 99999); // Cho mobile
+      document.execCommand('copy');
+      alert('Đã copy link referral!');
+    }
 
-      if (currentHero < heroes.length - 1) {
-        currentHero++;
-        const hero = heroes[currentHero];
-
-        document.getElementById("hero-name").innerText = hero.name;
-        heroImage.src = hero.img;
-
-        // Play box opening sound
-        boxSound.play();
-
-        // GSAP animation for Hero
-        gsap.fromTo(heroImage, 
-          { scale: 0, opacity: 0 }, 
-          { scale: 1, opacity: 1, duration: 1, ease: "elastic.out(1, 0.3)" }
-        );
-        gsap.to(heroImage, { filter: "drop-shadow(0 0 30px #7fdbff)", duration: 2 });
-
-        progressBar.style.width = hero.progress + "%";
+    // Hàm mua trứng (demo)
+    function buyEggs() {
+      const qty = Number(document.getElementById('eggQuantity').value);
+      const cost = qty * 5; // 5 TON / 1 trứng
+      if (userTonBalance >= cost) {
+        userTonBalance -= cost;
+        document.getElementById('tonBalance').innerHTML = 'TON Balance: ' + userTonBalance;
+        alert(`Bạn đã mua ${qty} trứng với giá ${cost} TON!`);
+        // TODO: Thêm logic cập nhật danh sách trứng, gọi API / blockchain
       } else {
-        alert("You have unlocked all heroes!");
+        alert('Không đủ TON để mua trứng!');
       }
+    }
+
+    // Hàm mở trứng (demo)
+    function openEgg(eggId) {
+      alert(`Mở trứng #${eggId}! (Demo)`);
+      // TODO: Gọi smart contract random hero, hiển thị hero
+    }
+
+    // Hàm rút TON referral (demo)
+    function claimRef() {
+      if (userRefTon > 0) {
+        alert(`Bạn vừa rút ${userRefTon} TON referral!`);
+        userTonBalance += userRefTon;
+        userRefTon = 0;
+        document.getElementById('tonBalance').innerHTML = 'TON Balance: ' + userTonBalance;
+        document.getElementById('refEarn').innerHTML = 'TON nhận từ referral: ' + userRefTon;
+      } else {
+        alert('Hiện chưa có TON referral để rút!');
+      }
+    }
+
+    // Khởi tạo Telegram WebApp (nếu cần)
+    if (window.Telegram.WebApp) {
+      const tg = window.Telegram.WebApp;
+      tg.expand(); 
+      // Gọi các hàm, ví dụ: tg.MainButton.setText("Thanh toán");
     }
   </script>
 </body>
