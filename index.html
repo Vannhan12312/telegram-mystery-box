@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dragon Egg Presale (Mini App)</title>
+  <title>Dragon Egg Presale - Telegram Mini App (Updated)</title>
+
+  <!-- Telegram WebApp JavaScript -->
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
   <style>
-    /* ================================
-       RESET & GLOBAL BOLD
-    =================================*/
     * {
-      margin: 0; 
+      margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: "Arial", sans-serif;
-      font-weight: bold;
+      font-family: "Roboto", sans-serif;
     }
     body {
       background: #0f0f0f;
@@ -21,65 +21,50 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      overflow-x: hidden;
+      position: relative;
     }
 
-    /* ================================
-       HEADER (có thể ẩn nếu muốn)
-    =================================*/
-    header {
+    header, footer {
       text-align: center;
-      padding: 0.5rem;
+      padding: 1rem;
       background: #1e1e1e;
     }
-    header h1 {
-      font-size: 1.2rem;
+
+    footer p {
+      font-size: 0.85rem;
+      opacity: 0.8;
     }
 
-    /* ================================
-       MAIN CONTAINER
-    =================================*/
     main {
       flex: 1;
       padding: 1rem;
-      position: relative;
-      z-index: 1;
-      max-width: 900px;
+      max-width: 1200px;
       width: 100%;
       margin: 0 auto;
+      position: relative;
+      z-index: 1;
     }
 
-    /* ================================
-       BOTTOM NAV
-    =================================*/
-    .bottom-nav {
+    .tabs {
       display: flex;
-      justify-content: space-around;
-      align-items: center;
-      background: #1e1e1e;
-      padding: 0.5rem 0;
+      gap: 1rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 0.5rem;
     }
-    .nav-btn {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      text-decoration: none;
-      color: #fff;
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
-      font-size: 0.8rem;
+      font-weight: bold;
+      transition: 0.3s;
     }
-    .nav-btn.active {
-      color: #00c6ff;
-    }
-    .nav-btn img {
-      width: 24px; 
-      height: 24px; 
-      margin-bottom: 0.2rem;
+    .tab-btn.active {
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
     }
 
-    /* ================================
-       TAB CONTENT
-    =================================*/
     .tab-content {
       display: none;
     }
@@ -87,16 +72,59 @@
       display: block;
     }
 
-    /* ================================
-       CARD & BUTTON
-    =================================*/
-    .card {
-      background: rgba(255,255,255,0.07);
+    .hero-list-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .hero-card {
+      width: 160px;
+      background: rgba(255,255,255,0.08);
       border: 1px solid rgba(255,255,255,0.2);
       border-radius: 8px;
-      padding: 1rem;
-      margin-bottom: 1rem;
+      padding: 0.75rem;
+      text-align: center;
+      position: relative;
+      cursor: pointer;
     }
+
+    .hero-card img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      margin-bottom: 0.5rem;
+      border-radius: 50%;
+      border: 2px solid #00c6ff;
+    }
+
+    .hero-card:hover {
+      transform: scale(1.03);
+      transition: 0.2s;
+    }
+
+    .hero-rarity {
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Màu tên theo độ hiếm */
+    .rarity-common {
+      color: #ccc; 
+    }
+    .rarity-uncommon {
+      color: #4CAF50; 
+    }
+    .rarity-rare {
+      color: #2196F3;
+    }
+    .rarity-epic {
+      color: #9C27B0;
+    }
+    .rarity-legendary {
+      color: #FFD700;
+    }
+
     .btn {
       display: inline-block;
       padding: 0.5rem 1rem;
@@ -106,448 +134,390 @@
       color: #fff;
       cursor: pointer;
       transition: 0.3s;
-      font-size: 0.8rem;
+      font-weight: bold;
     }
+
     .btn:hover {
       background: linear-gradient(45deg, #0072ff, #00c6ff);
     }
-    label {
-      font-size: 0.8rem;
-    }
-    input[type="number"] {
-      width: 60px;
-      font-size: 0.8rem;
-      text-align: center;
+
+    .egg-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin-top: 1rem;
     }
 
-    /* ================================
-       HERO GRID (3 COLUMNS)
-    =================================*/
-    .hero-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 0.7rem;
-    }
-    .hero-card {
-      background: rgba(255,255,255,0.1);
-      border: 1px solid rgba(255,255,255,0.2);
-      border-radius: 8px;
-      padding: 0.5rem;
-      text-align: center;
-      font-size: 0.7rem;
-      position: relative;
-    }
-    .hero-card img {
-      width: 50px;
-      height: 50px;
-      border-radius: 50%;
+    .egg-image {
+      width: 120px;
+      height: 120px;
       border: 2px solid #00c6ff;
-      margin-bottom: 0.3rem;
-    }
-    .hero-card:hover {
-      transform: scale(1.03);
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      text-align: center;
     }
 
-    /* Màu chữ theo rarity */
-    .rarity-common { color: #ffffff; }
-    .rarity-uncommon { color: #00ff00; }
-    .rarity-rare { color: #0066ff; }
-    .rarity-epic { color: #ffff00; }
-    .rarity-legendary { color: #ff0000; }
-
-    /* ================================
-       MODAL (để hiển thị hero vừa mở)
-    =================================*/
-    .modal-bg {
+    /* Modal */
+    .modal {
       display: none;
-      position: fixed; 
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: rgba(0,0,0,0.8);
+      position: fixed;
+      z-index: 9999;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      background-color: rgba(0,0,0,0.7);
       justify-content: center;
       align-items: center;
-      z-index: 9999;
     }
-    .modal-bg.active {
-      display: flex;
-    }
-    .modal-card {
+    .modal-content {
       background: #1e1e1e;
-      border: 1px solid rgba(255,255,255,0.2);
+      margin: 20px;
+      padding: 1.5rem;
       border-radius: 8px;
-      padding: 1rem;
-      max-width: 300px;
-      text-align: center;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
     }
-    .modal-card img {
-      width: 60px;
-      height: 60px;
+    .modal-close {
+      position: absolute;
+      top: 10px; 
+      right: 10px;
+      cursor: pointer;
+      background: transparent;
+      border: none;
+      font-size: 1.2rem;
+      color: #fff;
+      font-weight: bold;
+    }
+    .modal-content img {
+      display: block;
+      margin: 0 auto 1rem auto;
+      width: 100px;
+      height: 100px;
       border-radius: 50%;
       border: 2px solid #00c6ff;
-      margin-bottom: 0.3rem;
     }
-    .modal-buttons {
-      margin-top: 0.5rem;
+
+    /* Wallet */
+    .wallet-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .wallet-item {
       display: flex;
       justify-content: space-between;
+      background: rgba(255,255,255,0.08);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      align-items: center;
+    }
+
+    .wallet-label {
+      font-weight: bold;
+    }
+
+    .countdown {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .progress-bar {
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      height: 10px;
+      width: 100%;
+      position: relative;
+    }
+
+    .progress-fill {
+      background: linear-gradient(45deg, #00ff88, #00c6ff);
+      height: 100%;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+    
+    .presale-title {
+      display: flex;
+      align-items: center;
       gap: 0.5rem;
     }
 
-    /* ================================
-       FOOTER
-    =================================*/
-    footer {
-      text-align: center;
-      background: #1e1e1e;
-      padding: 0.5rem;
-      font-size: 0.7rem;
+    .gift-box {
+      font-size: 1.5rem;
+      color: gold;
     }
   </style>
 </head>
 <body>
-  <!-- HEADER (có thể ẩn nếu muốn) -->
+  <div class="bg-hero"></div>
+
   <header>
     <h1>Dragon Egg Presale</h1>
+    <h2 class="presale-title">
+      <span>Presale (3000 Eggs)</span> 
+      <span class="gift-box">🎁🎁</span>
+    </h2>
   </header>
 
   <main>
-    <!-- TAB: CONNECT -->
-    <section id="tabConnect" class="tab-content active">
-      <div class="card">
-        <p>Connect TON Wallet (Demo)</p>
-        <button class="btn" onclick="connectWallet()">Connect</button>
-      </div>
-    </section>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="openTab(event, 'tabPresale')">Mua Trứng</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabHero')">Hero</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabWallet')">Wallet</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabReferral')">Referral</button>
+    </div>
 
-    <!-- TAB: PRESALE -->
-    <section id="tabPresale" class="tab-content">
+    <!-- Mua Trứng -->
+    <section id="tabPresale" class="tab-content active">
       <div class="card">
-        <p>Presale (3000 Eggs)</p>
-        <!-- Trạng thái (demo) -->
-        <p id="eggsLeftInfo">Eggs Left: 3000</p>
-        <div style="margin-top:0.5rem;">
-          <label for="qty">Quantity:</label>
-          <input type="number" id="qty" value="1" min="1">
-          <button class="btn" onclick="buyEggs()">Buy</button>
+        <h3>Presale 3000 trứng</h3>
+        <div class="countdown">
+          Presale còn <span id="countdownTimer">--:--:--</span>
+        </div>
+
+        <div class="egg-section">
+          <div class="egg-image">
+            TRỨNG
+          </div>
+          <label for="eggQuantity">Số lượng mua:</label>
+          <input type="number" id="eggQuantity" min="1" value="1" style="width:60px;margin-left:0.5rem;" />
+          <button class="btn" onclick="buyEggs()">Mua</button>
+          <button class="btn" onclick="openEgg()">Mở Trứng</button>
         </div>
       </div>
     </section>
 
-    <!-- TAB: HERO -->
+    <!-- Hero -->
     <section id="tabHero" class="tab-content">
       <div class="card">
-        <p>Your Heroes</p>
-        <div class="hero-grid" id="heroGrid">
-          <!-- Hero hiển thị 3 cột; hero chưa mua thì ko hiện -->
+        <h2>Hero của bạn</h2>
+        <div class="hero-list-container" id="heroListContainer">
+          <!-- List heroes will be generated here -->
         </div>
       </div>
     </section>
 
-    <!-- TAB: REFERRAL -->
+    <!-- Wallet -->
+    <section id="tabWallet" class="tab-content">
+      <div class="card wallet-card">
+        <h2>Wallet</h2>
+        <div class="wallet-item">
+          <span class="wallet-label">Số dư TON:</span>
+          <span id="tonBalance">100</span>
+        </div>
+        <div class="wallet-item">
+          <span class="wallet-label">Trứng đang có:</span>
+          <span id="walletEggCount">0</span>
+        </div>
+        <div class="wallet-item">
+          <span class="wallet-label">Số Hero:</span>
+          <span id="walletHeroCount">0</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- Referral -->
     <section id="tabReferral" class="tab-content">
       <div class="card">
-        <p>Share Your Link</p>
-        <input type="text" id="refLink" style="width:100%; margin-bottom:0.5rem;" 
-               value="https://t.me/DragonEggBot?start=ReferralID" readonly />
-        <button class="btn" onclick="copyRefLink()">Copy</button>
-      </div>
-      <div class="card">
-        <p>Referral Reward: <span id="refReward">0</span> TON</p>
-        <button class="btn" onclick="claimRef()">Claim</button>
+        <h2>Referral</h2>
+        <p>Chia sẻ link để nhận 10% TON khi có người mua trứng qua link của bạn.</p>
+        <input type="text" id="refLink" value="https://t.me/DragonEggBot?start=refABC" readonly />
+        <button class="btn" onclick="copyRefLink()">Copy Link</button>
+        <button class="btn" onclick="shareRefLink()">Share Link</button>
       </div>
     </section>
   </main>
 
-  <!-- BOTTOM NAV -->
-  <nav class="bottom-nav">
-    <div class="nav-btn active" id="navConnect" onclick="switchTab('tabConnect', this)">
-      <!-- Thay icon thật nếu muốn -->
-      <img src="https://via.placeholder.com/24/FFFFFF?text=C" alt="Connect Icon"/>
-      <span>Connect</span>
-    </div>
-    <div class="nav-btn" id="navPresale" onclick="switchTab('tabPresale', this)">
-      <img src="https://via.placeholder.com/24/FFFFFF?text=P" alt="Presale Icon"/>
-      <span>Presale</span>
-    </div>
-    <div class="nav-btn" id="navHero" onclick="switchTab('tabHero', this)">
-      <img src="https://via.placeholder.com/24/FFFFFF?text=H" alt="Hero Icon"/>
-      <span>Hero</span>
-    </div>
-    <div class="nav-btn" id="navReferral" onclick="switchTab('tabReferral', this)">
-      <img src="https://via.placeholder.com/24/FFFFFF?text=R" alt="Referral Icon"/>
-      <span>Referral</span>
-    </div>
-  </nav>
-
-  <!-- FOOTER (có thể ẩn nếu muốn) -->
-  <footer>
-    <p>© 2025 - Dragon Egg Presale (Mini App)</p>
-  </footer>
-
-  <!-- MODAL ĐỂ HIỂN THỊ HERO MỚI MỞ -->
-  <div class="modal-bg" id="modalBg">
-    <div class="modal-card" id="modalCard">
-      <!-- Sẽ hiện thông tin hero -->
-      <img src="https://via.placeholder.com/60?text=Hero" alt="Hero"/>
-      <div id="modalHeroInfo" style="margin-top:0.5rem;"></div>
-      <div class="modal-buttons">
-        <button class="btn" onclick="nextHero()">Next</button>
+  <!-- Modal -->
+  <div class="modal" id="heroModal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeHeroModal()">X</button>
+      <div id="heroModalContent">
+        <!-- Hero details will be dynamically inserted here -->
       </div>
     </div>
   </div>
 
+  <!-- JS DEMO -->
   <script>
-    /* =====================================
-       BIẾN DEMO
-    ====================================== */
+    let totalEggs = 3000;
     let eggsLeft = 3000;
+    let userEggs = [];
+    let userHeroes = [];
     let userReferralTon = 0;
+    let userTonBalance = 100;
 
-    // Danh sách Hero
-    let userHeroes = []; 
-    // Lưu danh sách hero mới mở (nếu user mua nhiều)
-    let openedHeroesQueue = [];
-    let heroIdCount = 0;
+    // Demo heroes
+    userHeroes.push({
+      heroId: 1,
+      rarity: "Common",
+      level: 1,
+      stats: { "🗡": 60, "🛡": 50, "❤️": 200, "⚡": 15, "✨": 20 }
+    });
 
-    /* =====================================
-       TAB SWITCH
-    ====================================== */
-    function switchTab(tabId, navBtnElem) {
-      // 1) Ẩn tất cả .tab-content
-      const tabs = document.getElementsByClassName("tab-content");
-      for (let i=0; i<tabs.length; i++){
-        tabs[i].classList.remove("active");
+    // Tăng chỉ số theo độ hiếm
+    function increaseHeroStats(hero) {
+      const rarityIncrease = {
+        "Common": 10,
+        "Uncommon": 20,
+        "Rare": 40,
+        "Epic": 80,
+        "Legendary": 160
+      };
+      for (let key in hero.stats) {
+        hero.stats[key] += rarityIncrease[hero.rarity] || 0;
       }
-      // 2) Bỏ active ở các .nav-btn
-      const navBtns = document.getElementsByClassName("nav-btn");
-      for (let i=0; i<navBtns.length; i++){
-        navBtns[i].classList.remove("active");
+    }
+
+    function openTab(evt, tabId) {
+      const contents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < contents.length; i++) {
+        contents[i].classList.remove("active");
       }
-      // 3) Hiện tab được chọn, set active cho nav
+      const tabBtns = document.getElementsByClassName("tab-btn");
+      for (let i = 0; i < tabBtns.length; i++) {
+        tabBtns[i].classList.remove("active");
+      }
       document.getElementById(tabId).classList.add("active");
-      navBtnElem.classList.add("active");
+      evt.currentTarget.classList.add("active");
     }
 
-    /* =====================================
-       CONNECT WALLET (DEMO)
-    ====================================== */
-    function connectWallet(){
-      alert("Connect TON Wallet - Demo!");
-    }
-
-    /* =====================================
-       MUA TRỨNG => MỞ TỪNG HERO
-    ====================================== */
-    function buyEggs(){
-      let qty = parseInt(document.getElementById("qty").value) || 1;
-      if (qty < 1) qty = 1;
-      if (eggsLeft <= 0){
-        alert("No eggs left!");
+    function buyEggs() {
+      const qty = Number(document.getElementById('eggQuantity').value);
+      if (eggsLeft <= 0) {
+        alert("Trứng đã bán hết!");
         return;
       }
-      if (qty > eggsLeft){
-        alert(`Only ${eggsLeft} eggs left!`);
+      if (qty < 1) {
+        alert("Số lượng mua phải >= 1!");
         return;
       }
-      // Giảm số trứng
+      if (qty > eggsLeft) {
+        alert(Chỉ còn ${eggsLeft} trứng!);
+        return;
+      }
       eggsLeft -= qty;
-      document.getElementById("eggsLeftInfo").textContent = "Eggs Left: " + eggsLeft;
-
-      // Tạo hero mới & cho vào openedHeroesQueue
-      for (let i=0; i<qty; i++){
-        const newHero = createRandomHero();
-        openedHeroesQueue.push(newHero);
+      for (let i = 0; i < qty; i++) {
+        userEggs.push({ eggId: userEggs.length + 1 });
       }
-      alert(`You bought ${qty} egg(s)! Let's see what you got...`);
-      showNextOpenedHero();
+      alert(Bạn đã mua ${qty} trứng!);
+      updateEggStatus();
+      updateUserEggCount();
     }
 
-    // Tạo hero random
-    function createRandomHero(){
-      const rarities = ["Common","Uncommon","Rare","Epic","Legendary"];
-      // Tỷ lệ (demo)
-      let n = Math.random()*100;
-      let r = "";
-      if (n<40) r="Common";
-      else if (n<70) r="Uncommon";
-      else if (n<90) r="Rare";
-      else if (n<98) r="Epic";
-      else r="Legendary";
+    function openEgg() {
+      if (userEggs.length < 1) {
+        alert("Bạn không có trứng để mở!");
+        return;
+      }
+      const egg = userEggs.shift(); // Lấy 1 trứng ra
+      // Tạo hero mới random
+      const newHero = createRandomHero();
+      // Kiểm tra trùng độ hiếm
+      const sameRarityHero = userHeroes.find(h => h.rarity === newHero.rarity);
+      if (sameRarityHero) {
+        // Nâng cấp hero cũ
+        sameRarityHero.level++;
+        increaseHeroStats(sameRarityHero);
+        showHeroModal(sameRarityHero);
+      } else {
+        // Thêm hero mới
+        newHero.heroId = userHeroes.length + 1;
+        userHeroes.push(newHero);
+        showHeroModal(newHero);
+      }
+      updateUserEggCount();
+      updateHeroList();
+    }
 
-      heroIdCount++;
-      let stats = {
-        "🗡": Math.floor(Math.random()*50)+50,
-        "🛡": Math.floor(Math.random()*50)+50,
-        "❤️": Math.floor(Math.random()*200)+200,
-        "⚡": Math.floor(Math.random()*30)+10,
-        "✨": Math.floor(Math.random()*40)+20
+    function createRandomHero() {
+      const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+      const randomNum = Math.random() * 100;
+      let rarity = "Common";
+      if (randomNum < 40) rarity = "Common";
+      else if (randomNum < 70) rarity = "Uncommon";
+      else if (randomNum < 90) rarity = "Rare";
+      else if (randomNum < 98) rarity = "Epic";
+      else rarity = "Legendary";
+
+      const stats = {
+        "🗡": Math.floor(Math.random() * 50) + 50,
+        "🛡": Math.floor(Math.random() * 50) + 50,
+        "❤️": Math.floor(Math.random() * 200) + 200,
+        "⚡": Math.floor(Math.random() * 30) + 10,
+        "✨": Math.floor(Math.random() * 40) + 20,
       };
       return {
-        heroId: heroIdCount,
-        rarity: r,
+        heroId: 0,
+        rarity: rarity,
         level: 1,
         stats: stats
       };
     }
 
-    /* 
-      Hiển thị hero tiếp theo trong hàng đợi openedHeroesQueue
-      dưới dạng modal
-    */
-    function showNextOpenedHero(){
-      if (openedHeroesQueue.length === 0) {
-        // Không còn hero cần show => cập nhật hero list
-        renderHeroList();
-        return;
+    function showHeroModal(hero) {
+      const modal = document.getElementById('heroModal');
+      const content = document.getElementById('heroModalContent');
+      let rarityClass = getRarityClass(hero.rarity);
+
+      let html = 
+        <img src="https://via.placeholder.com/100?text=Hero" alt="Hero Image"/>
+        <h3 class="${rarityClass}">Hero #${hero.heroId}</h3>
+        <p class="${rarityClass}">Rarity: ${hero.rarity} (Cấp: ${hero.level})</p>
+        <p>;
+      for (let k in hero.stats) {
+        html += ${k}${hero.stats[k]} ;
       }
-      // Lấy hero kế
-      const hero = openedHeroesQueue[0];
-      // Hiển thị modal
-      document.getElementById("modalBg").classList.add("active");
-      renderModalHero(hero);
+      html += </p>;
+
+      content.innerHTML = 
+        <button class="modal-close" onclick="closeHeroModal()">X</button>
+        ${html}
+      ;
+      modal.style.display = "flex";
     }
 
-    function renderModalHero(hero){
-      const colorClass = getRarityClass(hero.rarity);
-      // Stats
-      let statsStr = "";
-      for (let k in hero.stats){
-        statsStr += `${k}${hero.stats[k]}  `;
-      }
-      const infoDiv = document.getElementById("modalHeroInfo");
-      infoDiv.innerHTML = `
-        <div class="${colorClass}" style="font-size:0.8rem;">
-          Hero #${hero.heroId}
-        </div>
-        <div class="${colorClass}" style="font-size:0.7rem;">
-          Rarity: ${hero.rarity}, Lvl: ${hero.level}
-        </div>
-        <div style="margin-top:0.3rem; font-size:0.7rem;">
-          ${statsStr}
-        </div>
-      `;
+    function closeHeroModal() {
+      const modal = document.getElementById('heroModal');
+      modal.style.display = "none";
     }
 
-    function nextHero(){
-      // Đóng modal hero đầu tiên => add hero vào userHeroes => autoUpgrade => Show hero tiếp
-      const hero = openedHeroesQueue.shift();
-      userHeroes.push(hero);
-      autoUpgradeHero(hero.rarity);
-      // Ẩn modal
-      document.getElementById("modalBg").classList.remove("active");
-
-      // Nếu còn hero trong queue => hiển thị hero tiếp
-      if (openedHeroesQueue.length > 0){
-        showNextOpenedHero();
-      } else {
-        // Hết => render
-        renderHeroList();
-      }
-    }
-
-    /* =====================================
-       AUTO UPGRADE (2 hero cùng rarity & level)
-    ====================================== */
-    function autoUpgradeHero(rarity){
-      // Lấy tất cả hero cùng rarity
-      const same = userHeroes.filter(h => h.rarity === rarity);
-      if (same.length < 2) return; 
-
-      // Sắp xếp theo level
-      same.sort((a,b)=> a.level - b.level);
-
-      // Kiểm tra cặp đầu
-      let h1 = same[0];
-      let h2 = same[1];
-      if (h1.level === h2.level){
-        // Merge => level up h1
-        h1.level += 1;
-        // +70% stats
-        for (let key in h1.stats){
-          h1.stats[key] = Math.floor(h1.stats[key]*1.7);
-        }
-        // Xoá h2
-        userHeroes = userHeroes.filter(x => x.heroId !== h2.heroId);
-
-        // Lặp lại (có thể merge tiếp)
-        autoUpgradeHero(rarity);
-      }
-    }
-
-    /* =====================================
-       RENDER HERO LIST
-    ====================================== */
-    function renderHeroList(){
-      const grid = document.getElementById("heroGrid");
-      grid.innerHTML = "";
-
-      // Sort hero => Common->Uncommon->Rare->Epic->Legendary
-      const order = ["Common","Uncommon","Rare","Epic","Legendary"];
-      let sorted = [...userHeroes].sort((a,b)=>{
-        return order.indexOf(a.rarity) - order.indexOf(b.rarity);
-      });
-
-      sorted.forEach(hero => {
-        const d = document.createElement("div");
-        d.className = "hero-card";
-        const colorClass = getRarityClass(hero.rarity);
-
-        // Stats
-        let statsStr = "";
-        for (let k in hero.stats){
-          statsStr += `${k}${hero.stats[k]} `;
-        }
-
-        d.innerHTML = `
-          <img src="https://via.placeholder.com/50?text=Hero"/>
-          <div class="${colorClass}" style="font-size:0.8rem;">
-            Hero #${hero.heroId}
-          </div>
-          <div class="${colorClass}" style="font-size:0.7rem;">
-            ${hero.rarity}, Lvl: ${hero.level}
-          </div>
-          <div style="font-size:0.7rem; margin-top:0.3rem;">
-            ${statsStr}
-          </div>
-        `;
-        grid.appendChild(d);
-      });
-    }
-
-    /* =====================================
-       GET RARITY CLASS => ĐỔI MÀU CHỮ
-    ====================================== */
-    function getRarityClass(r){
-      switch(r){
+    function getRarityClass(rarity) {
+      switch(rarity) {
         case "Common": return "rarity-common";
         case "Uncommon": return "rarity-uncommon";
         case "Rare": return "rarity-rare";
         case "Epic": return "rarity-epic";
         case "Legendary": return "rarity-legendary";
-        default: return "rarity-common";
+        default: return "";
       }
     }
 
-    /* =====================================
-       REFERRAL FUNCTIONS (DEMO)
-    ====================================== */
-    function copyRefLink(){
-      const ref = document.getElementById("refLink");
-      ref.select();
-      ref.setSelectionRange(0,99999);
-      document.execCommand("copy");
-      alert("Link copied!");
-    }
+    function updateHeroList() {
+      const container = document.getElementById('heroListContainer');
+      container.innerHTML = "";
 
-    function claimRef(){
-      if (userReferralTon>0){
-        alert(`You claimed ${userReferralTon} TON!`);
-        userReferralTon=0;
-        document.getElementById("refReward").textContent=0;
-      } else {
-        alert("No referral reward yet!");
-      }
-    }
-  </script>
-</body>
-</html>
+      const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+      let sorted = [...userHeroes].sort((a, b) => {
+        return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
+      });
+
+      sorted.forEach(hero => {
+        let rarityClass = getRarityClass(hero.rarity);
+        let div = document.createElement("div");
+        div.className = "hero-card";
+        div.onclick = () => showHeroDetailModal(hero.heroId);
+        div.innerHTML = 
+          <img src="https://via.placeholder.com/70?text=Hero" alt="Hero Image"/>
+          <h4 class="${rarityClass}
