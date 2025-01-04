@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dragon Egg Presale - Telegram Mini App (Tab Version)</title>
+  <title>Dragon Egg Presale - Telegram Mini App (Tab Version) + 5 Heroes</title>
 
   <!-- Telegram WebApp JavaScript (bắt buộc khi làm Mini App chính thức) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
@@ -62,7 +62,8 @@
     */
     .bg-hero {
       position: fixed;
-      top: 0; left: 0;
+      top: 0; 
+      left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
@@ -251,7 +252,7 @@
 
   <header>
     <h1>Dragon Egg Presale</h1>
-    <h2>Telegram Mini App - Tab Demo</h2>
+    <h2>Telegram Mini App - Tab Demo (5 Heroes)</h2>
   </header>
 
   <!-- MAIN -->
@@ -305,8 +306,6 @@
         <p>Click "Mở" để mở trứng ngay!</p>
         <div class="list-container" id="eggList">
           <!-- Danh sách trứng chưa mở (DEMO) -->
-          <!-- eggId = 1,2,... -> Mô phỏng -->
-          <!-- Ảnh trứng demo: placeholder -->
         </div>
       </div>
     </section>
@@ -325,7 +324,7 @@
           <h3>Hero được sắp xếp theo độ hiếm (5 cấp)</h3>
           <p>
             Mỗi Hero có 5 chỉ số, ví dụ: 
-            <br/>🗡 Tấn công, 🛡 Phòng thủ, ❤️ Máu, ⚡ Tốc độ, ✨ Ma thuật (tùy bạn).
+            <br/>🗡 Tấn công, 🛡 Phòng thủ, ❤️ Máu, ⚡ Tốc độ, ✨ Ma thuật...
           </p>
           <div class="list-container" id="heroListContainer">
             <!-- Danh sách hero (DEMO) -->
@@ -344,7 +343,7 @@
           </p>
           <!-- Danh sách Hero trùng độ hiếm (DEMO) -->
           <div class="list-container" id="upgradeContainer">
-            <!-- Gợi ý hiển thị cặp hero trùng hiếm, button "Xác nhận nâng cấp" -->
+            <!-- Gợi ý: Hiển thị cặp hero trùng hiếm, button "Xác nhận nâng cấp" -->
           </div>
         </div>
       </div>
@@ -386,40 +385,77 @@
     */
     let totalEggs = 3000;           // Tổng trứng presale
     let eggsLeft = 3000;            // Trứng còn lại
-    let userEggs = [];              // Danh sách trứng của user [ {id, opened: false}, ... ]
-    let userHeroes = [];            // Danh sách hero [ {id, rarity, stats: {...}, level=1}, ... ]
+    let userEggs = [];              // Danh sách trứng của user [ {eggId, opened: false}, ... ]
     let userReferralTon = 0;        // TON từ referral
 
-    // Tạo 3 trứng demo
+    // Mặc định tạo sẵn 5 Hero (mỗi loại hiếm một cái)
+    let userHeroes = [
+      {
+        heroId: 1,
+        rarity: "Common",
+        level: 1,
+        stats: { 
+          "🗡": 50, 
+          "🛡": 30, 
+          "❤️": 200, 
+          "⚡": 15, 
+          "✨": 20
+        }
+      },
+      {
+        heroId: 2,
+        rarity: "Uncommon",
+        level: 1,
+        stats: { 
+          "🗡": 70, 
+          "🛡": 50, 
+          "❤️": 250, 
+          "⚡": 18, 
+          "✨": 35
+        }
+      },
+      {
+        heroId: 3,
+        rarity: "Rare",
+        level: 1,
+        stats: { 
+          "🗡": 120, 
+          "🛡": 80, 
+          "❤️": 300, 
+          "⚡": 20, 
+          "✨": 50
+        }
+      },
+      {
+        heroId: 4,
+        rarity: "Epic",
+        level: 1,
+        stats: { 
+          "🗡": 160, 
+          "🛡": 100, 
+          "❤️": 400, 
+          "⚡": 25, 
+          "✨": 70
+        }
+      },
+      {
+        heroId: 5,
+        rarity: "Legendary",
+        level: 1,
+        stats: { 
+          "🗡": 200, 
+          "🛡": 120, 
+          "❤️": 500, 
+          "⚡": 35, 
+          "✨": 80
+        }
+      }
+    ];
+
+    // Tạo 3 trứng demo (chưa mở)
     for (let i = 1; i <= 3; i++) {
       userEggs.push({ eggId: i, opened: false });
     }
-
-    // Tạo 2 hero demo
-    userHeroes.push({
-      heroId: 1,
-      rarity: "Rare",
-      level: 1,
-      stats: { 
-        "🗡": 120, 
-        "🛡": 80, 
-        "❤️": 300, 
-        "⚡": 20, 
-        "✨": 50
-      }
-    });
-    userHeroes.push({
-      heroId: 2,
-      rarity: "Legendary",
-      level: 1,
-      stats: { 
-        "🗡": 200, 
-        "🛡": 120, 
-        "❤️": 500, 
-        "⚡": 35, 
-        "✨": 80
-      }
-    });
 
     /*
       ============================================================
@@ -449,8 +485,8 @@
       const heroListEl = document.getElementById('heroListContainer');
       heroListEl.innerHTML = "";
 
-      // Sắp xếp hero theo độ hiếm (cần define logic xếp hạng hiếm)
-      // Demo: Thứ tự "Common, Uncommon, Rare, Epic, Legendary"
+      // Sắp xếp hero theo độ hiếm
+      // Thứ tự hiển thị: Common -> Uncommon -> Rare -> Epic -> Legendary
       const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
       const sortedHeroes = userHeroes.sort((a, b) => {
         return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
@@ -493,7 +529,7 @@
       }
       // Demo: không trừ TON, không kiểm tra balance...
       // Giả lập userEggs.push
-      const startingId =  userEggs.length + 1;
+      const startingId = userEggs.length + 1;
       for (let i = 0; i < qty; i++) {
         userEggs.push({ eggId: startingId + i, opened: false });
       }
@@ -529,7 +565,7 @@
     function createRandomHero() {
       // 5 cấp độ hiếm: Common, Uncommon, Rare, Epic, Legendary
       const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
-      // Tỷ lệ demo: 40%, 30%, 20%, 8%, 2% (chỉ minh họa)
+      // Tỷ lệ demo: 40%, 30%, 20%, 8%, 2% 
       const randomNum = Math.random() * 100;
       let rarity = "";
       if (randomNum < 40) rarity = "Common";
@@ -549,7 +585,7 @@
       return {
         heroId: 0,
         rarity: rarity,
-        level: 1, 
+        level: 1,
         stats: stats
       };
     }
