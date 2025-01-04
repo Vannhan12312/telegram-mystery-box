@@ -1,63 +1,156 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Frozen Phoenix Mini App</title>
-  <!-- (Các thẻ <link>, <style> tùy ý) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rost & Flame</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+  <style>
+    /* General styles */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(180deg, #001f3f, #004e92);
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    .title {
+      font-size: 3rem;
+      font-weight: bold;
+      margin-bottom: 20px;
+      text-transform: uppercase;
+      text-shadow: 0 0 20px #00c6ff, 0 0 40px #0072ff;
+    }
+
+    .hero {
+      margin: 20px 0;
+      padding: 20px;
+      background: rgba(30, 58, 138, 0.8);
+      border-radius: 20px;
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+      position: relative;
+    }
+
+    .hero img {
+      width: 150px;
+      margin: 0 auto;
+      display: block;
+      filter: drop-shadow(0 0 20px #7fdbff);
+    }
+
+    .hero h2 {
+      font-size: 1.5rem;
+      margin: 10px 0;
+      text-shadow: 0 0 5px #7fdbff;
+    }
+
+    .unlock-btn {
+      margin-top: 20px;
+      padding: 15px 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #fff;
+      background: linear-gradient(90deg, #ff512f, #f09819);
+      border: none;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .unlock-btn:hover {
+      transform: scale(1.1);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .progress-bar {
+      margin-top: 20px;
+      height: 20px;
+      background: #c2e9fb;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress-bar div {
+      height: 100%;
+      width: 0%;
+      background: linear-gradient(90deg, #00c6ff, #0072ff);
+      border-radius: 10px;
+      transition: width 0.5s ease;
+    }
+
+    .success {
+      margin-top: 10px;
+      color: #00ffcc;
+      text-shadow: 0 0 10px #00ffcc;
+    }
+  </style>
 </head>
 <body>
-  <h1>Frozen Phoenix Mini App</h1>
-  
-  <!-- Nút Connect Wallet -->
-  <button id="connectBtn">Connect Wallet</button>
-  <!-- Nút Open Box (ẩn ban đầu) -->
-  <button id="openBtn" style="display: none;">Open Box</button>
+  <div class="container">
+    <h1 class="title" id="game-title">Rost & Flame</h1>
+    <div class="hero">
+      <img id="hero-image" src="https://source.unsplash.com/150x150/?phoenix,ice" alt="Hero">
+      <h2 id="hero-name">Level 1: Ice Phoenix Basic</h2>
+      <div class="progress-bar">
+        <div id="progress"></div>
+      </div>
+      <button class="unlock-btn" id="unlock-btn" onclick="unlockHero()">Unlock</button>
+    </div>
+    <audio id="box-sound" src="https://www.myinstants.com/media/sounds/magic-box-opening.mp3" preload="auto"></audio>
+  </div>
 
-  <!-- Khu vực hiển thị thông báo hay phần thưởng -->
-  <div id="rewardBox" style="display:none;"></div>
-
-  <!-- 1) Nạp SDK: Phải đặt trước code khởi tạo -->
-  <script src="tonconnect-sdk.min.js"></script>
-  
-  <!-- 2) Sử dụng SDK trong code -->
   <script>
-    // Kiểm tra xem TonConnectSDK có tồn tại không
-    console.log("TonConnectSDK:", window.TonConnectSDK);
+    const heroes = [
+      { name: "Level 1: Ice Phoenix Basic", img: "https://source.unsplash.com/150x150/?phoenix,ice", progress: 20 },
+      { name: "Level 2: Frosty Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,frost", progress: 40 },
+      { name: "Level 3: Glowing Ice Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,glow", progress: 60 },
+      { name: "Level 4: Powerful Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,fire,ice", progress: 80 },
+      { name: "Level 5: Legendary Phoenix", img: "https://source.unsplash.com/150x150/?phoenix,legend", progress: 100 },
+    ];
 
-    // Thay vì: const connector = new TonConnect();
-    // Hãy dùng: const connector = new TonConnectSDK();
-    // (Vì bạn đã xác nhận 'TonConnectSDK' là biến global do SDK cung cấp)
-    const connector = new TonConnectSDK();
+    let currentHero = 0;
 
-    // Ví dụ: sự kiện click "Connect Wallet"
-    document.getElementById("connectBtn").addEventListener("click", async () => {
-      try {
-        console.log("Connect Wallet clicked!");
-        // Giả sử SDK có hàm connectWallet()
-        await connector.connectWallet();
-        alert("Wallet connected!");
-        document.getElementById("connectBtn").style.display = "none";
-        document.getElementById("openBtn").style.display = "inline-block";
-      } catch (err) {
-        console.error("Failed to connect wallet:", err);
+    function unlockHero() {
+      const progressBar = document.getElementById("progress");
+      const heroImage = document.getElementById("hero-image");
+      const successMessage = document.getElementById("success-message");
+      const boxSound = document.getElementById("box-sound");
+
+      if (currentHero < heroes.length - 1) {
+        currentHero++;
+        const hero = heroes[currentHero];
+
+        document.getElementById("hero-name").innerText = hero.name;
+        heroImage.src = hero.img;
+
+        // Play box opening sound
+        boxSound.play();
+
+        // GSAP animation for Hero
+        gsap.fromTo(heroImage, 
+          { scale: 0, opacity: 0 }, 
+          { scale: 1, opacity: 1, duration: 1, ease: "elastic.out(1, 0.3)" }
+        );
+        gsap.to(heroImage, { filter: "drop-shadow(0 0 30px #7fdbff)", duration: 2 });
+
+        progressBar.style.width = hero.progress + "%";
+      } else {
+        alert("You have unlocked all heroes!");
       }
-    });
-
-    // Ví dụ: sự kiện click "Open Box"
-    document.getElementById("openBtn").addEventListener("click", async () => {
-      try {
-        // Gửi transaction, v.v. (tuỳ logic của bạn)
-        await connector.sendTransaction({ to: "SOME_ADDRESS", value: "1000000000" });
-        alert("Payment successful!");
-        document.getElementById("rewardBox").style.display = "block";
-        document.getElementById("rewardBox").textContent = "You got a Frost Phoenix!";
-      } catch (err) {
-        console.error("Payment failed:", err);
-      }
-    });
-
-    // Chỗ này từng bị lỗi "..." nếu code cắt dở. Kiểm tra cẩn thận cú pháp.
-    // Ví dụ: { ...spreadSyntax } phải đầy đủ, hoặc xóa "..." nếu không cần.
+    }
   </script>
 </body>
 </html>
