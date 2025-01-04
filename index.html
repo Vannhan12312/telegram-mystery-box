@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dragon Egg Presale (Mini App)</title>
+  <title>Dragon Egg Presale - Telegram Mini App (Advanced)</title>
 
-  <!-- Telegram WebApp JavaScript (nếu cần) -->
+  <!-- Telegram WebApp JavaScript (bắt buộc khi làm Mini App) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
   <style>
@@ -15,409 +15,742 @@
       ====================
     */
     * {
-      margin: 0; 
-      padding: 0; 
+      margin: 0;
+      padding: 0;
       box-sizing: border-box;
       font-family: "Roboto", sans-serif;
     }
     body {
-      background: #000; /* Nền tối giống ảnh chụp */
+      background: #0f0f0f;
       color: #fff;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
       position: relative;
     }
+    h1, h2, h3, h4, p, label, span, div {
+      font-weight: bold; /* Tất cả text in đậm */
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
+    header, footer {
+      text-align: center;
+      padding: 1rem;
+      background: #1e1e1e;
+    }
+    footer p {
+      font-size: 0.85rem;
+      opacity: 0.8;
+    }
+
     main {
       flex: 1;
+      padding: 1rem;
+      max-width: 1200px;
       width: 100%;
-      max-width: 600px;
       margin: 0 auto;
-      padding: 0.5rem 1rem;
-    }
-    h1, h2, h3, h4, p, span, label {
-      font-weight: normal;
+      position: relative;
+      z-index: 1;
     }
 
     /* 
       ====================
-      PRESALE INFO CARD 
+      HIỆU ỨNG NỀN 
       ====================
     */
-    .presale-card {
-      background: #111;
-      border-radius: 8px;
-      padding: 1rem;
+    .bg-hero {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      background: radial-gradient(circle, rgba(0,255,234,0.2) 0%, rgba(0,0,0,0) 60%);
+      animation: pulse 5s infinite alternate;
+      z-index: 0;
+    }
+    @keyframes pulse {
+      from { opacity: 0.3; }
+      to { opacity: 0.6; }
+    }
+
+    /* 
+      ====================
+      THANH TAB CHÍNH 
+      ====================
+    */
+    .tabs {
+      display: flex;
+      gap: 1rem;
       margin-bottom: 1rem;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 0.5rem;
     }
-    .presale-title {
-      text-align: center;
-      margin-bottom: 1rem;
-      font-size: 1.2rem;
-    }
-    .presale-details {
-      font-size: 0.9rem;
-      margin-bottom: 0.5rem;
-    }
-    .quantity-input {
-      width: 60px;
-      margin-left: 0.5rem;
-      padding: 0.2rem;
-      text-align: center;
-      border-radius: 4px;
-      border: 1px solid #333;
-      color: #fff;
-      background: #222;
-    }
-    .buy-btn {
-      background: #0080ff;
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.08);
       border: none;
       border-radius: 4px;
-      color: #fff;
-      padding: 0.3rem 0.8rem;
-      margin-left: 0.5rem;
       cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
     }
-    .buy-btn:hover {
-      background: #00a0ff;
+    .tab-btn.active {
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+    }
+    .tab-content {
+      display: none; 
+    }
+    .tab-content.active {
+      display: block;
     }
 
     /* 
       ====================
-      HERO MODAL 
+      BUTTON & CARD 
       ====================
     */
-    .hero-modal {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      width: 280px;
-      padding: 1rem;
-      background: #111;
+    .btn {
+      display: inline-block;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+      border: none;
+      border-radius: 5px;
+      color: #fff;
+      cursor: pointer;
+      transition: 0.3s;
+      font-weight: bold;
+    }
+    .btn:hover {
+      background: linear-gradient(45deg, #0072ff, #00c6ff);
+    }
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 8px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.7);
-      transform: translate(-50%, -50%);
-      display: none;
-      z-index: 9999;
+      padding: 1rem;
+      margin-bottom: 1rem;
     }
-    .hero-modal.show {
-      display: block;
-    }
-    .hero-modal h3 {
+
+    /* 
+      ====================
+      THANH ĐẾM NGƯỢC & THANH SỐ TRỨNG 
+      ====================
+    */
+    .countdown, .egg-progress {
+      margin-bottom: 1rem;
       text-align: center;
-      margin-bottom: 0.5rem;
       font-size: 1rem;
     }
-    .hero-modal .stats {
-      text-align: center;
-      margin-bottom: 1rem;
-      font-size: 0.9rem;
-    }
-    .hero-modal .open-btn {
-      display: block;
-      margin: 0 auto;
-      background: #0080ff;
-      border: none;
+    .progress-bar {
+      background: rgba(255,255,255,0.2);
       border-radius: 4px;
-      padding: 0.4rem 0.8rem;
-      cursor: pointer;
-      color: #fff;
-      font-size: 0.95rem;
+      height: 10px;
+      width: 100%;
+      position: relative;
     }
-    .hero-modal .open-btn:hover {
-      background: #00a0ff;
+    .progress-fill {
+      background: linear-gradient(45deg, #00ff88, #00c6ff);
+      height: 100%;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.5s;
     }
 
     /* 
       ====================
-      BOTTOM NAV 
+      HERO & EGG 
       ====================
-      (theo ảnh: 4 icon: "Wallet", "Presale 🎁🎁", "Hero", "Referral")
     */
-    .bottom-nav {
+    .egg-section {
       display: flex;
-      justify-content: space-around;
-      background: #111;
-      padding: 0.5rem 0;
-      box-shadow: 0 -2px 8px rgba(0,0,0,0.5);
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      margin-top: 1rem;
     }
-    .nav-item {
-      flex: 1;
+    .egg-image {
+      width: 120px;
+      height: 120px;
+      border: 2px solid #00c6ff;
+      border-radius: 50%;
+      margin-bottom: 1rem;
+      background: rgba(255,255,255,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
       text-align: center;
-      color: #ccc;
-      font-size: 0.8rem;
-    }
-    .nav-item img {
-      width: 24px;
-      height: 24px;
-      display: block;
-      margin: 0 auto 0.2rem auto;
-    }
-    .nav-item.active,
-    .nav-item:hover {
-      color: #fff;
     }
 
-    /* 
-      ====================
-      HERO LIST 
-      ====================
-    */
-    .hero-list {
+    .hero-list-container {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.5rem;
+      gap: 1rem;
     }
-    .hero-item {
-      background: #111;
-      border-radius: 6px;
-      padding: 0.5rem;
+    .hero-card {
+      width: 160px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 0.75rem;
       text-align: center;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      position: relative;
       cursor: pointer;
-      flex: 1 1 30%;
-      min-width: 100px;
     }
-    .hero-item img {
-      width: 40px;
-      height: 40px;
-      margin-bottom: 0.3rem;
+    .hero-card img {
+      width: 70px;
+      height: 70px;
+      object-fit: cover;
+      margin-bottom: 0.5rem;
+      border-radius: 50%;
+      border: 2px solid #00c6ff;
     }
-    .hero-item:hover {
-      background: #222;
+    .hero-card:hover {
+      transform: scale(1.03);
+      transition: 0.2s;
     }
-    .hero-rarity { 
-      font-size: 0.8rem; 
-      margin-top: 0.2rem; 
+    .hero-rarity {
+      font-size: 0.95rem;
+      margin-bottom: 0.25rem;
+    }
+
+    /* Màu tên theo độ hiếm */
+    .rarity-common {
+      color: #ccc; 
+    }
+    .rarity-uncommon {
+      color: #4CAF50; 
+    }
+    .rarity-rare {
+      color: #2196F3;
+    }
+    .rarity-epic {
+      color: #9C27B0;
+    }
+    .rarity-legendary {
+      color: #FFD700;
     }
 
     /* 
       ====================
-      RARITY COLORS 
+      MODAL 
       ====================
     */
-    .common { color: #bbb; }
-    .uncommon { color: #4CAF50; }
-    .rare { color: #2196F3; }
-    .epic { color: #9C27B0; }
-    .legendary { color: #FFD700; }
-
-    /* 
-      ====================
-      SHARE BUTTON 
-      ====================
-    */
-    .share-btn {
-      background: #0080ff;
+    .modal {
+      display: none; 
+      position: fixed;
+      z-index: 9999;
+      left: 0; 
+      top: 0;
+      width: 100%; 
+      height: 100%;
+      overflow: auto; 
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center; 
+      align-items: center;
+    }
+    .modal-content {
+      background: #1e1e1e;
+      margin: 20px;
+      padding: 1.5rem;
+      border-radius: 8px;
+      max-width: 400px;
+      width: 90%;
+      position: relative;
+    }
+    .modal-close {
+      position: absolute;
+      top: 10px; 
+      right: 10px;
+      cursor: pointer;
+      background: transparent;
       border: none;
-      border-radius: 4px;
+      font-size: 1.2rem;
       color: #fff;
-      padding: 0.3rem 0.8rem;
-      cursor: pointer;
-      margin-left: 0.5rem;
+      font-weight: bold;
     }
-    .share-btn:hover {
-      background: #00a0ff;
+    .modal-content img {
+      display: block;
+      margin: 0 auto 1rem auto;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      border: 2px solid #00c6ff;
+    }
+    .modal-content h3, .modal-content p {
+      text-align: center;
+      margin-bottom: 0.75rem;
+    }
+
+    /*
+      ====================
+      WALLET
+      ====================
+    */
+    .wallet-card {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+    .wallet-item {
+      display: flex;
+      justify-content: space-between;
+      background: rgba(255,255,255,0.08);
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      align-items: center;
+    }
+    .wallet-label {
+      font-weight: bold;
+    }
+
+    /*
+      ====================
+      RESPONSIVE
+      ====================
+    */
+    @media (max-width: 768px) {
+      .tabs {
+        flex-direction: column;
+      }
     }
   </style>
 </head>
 <body>
-  <!-- MAIN -->
+  <!-- NỀN HOLOGRAM -->
+  <div class="bg-hero"></div>
+
+  <header>
+    <h1>Dragon Egg Presale</h1>
+    <h2>Telegram Mini App - Advanced</h2>
+  </header>
+
   <main>
-    <div class="presale-card">
-      <div class="presale-title">Dragon Egg Presale</div>
-      <div class="presale-details">
-        Presale (3000 Eggs)  
-        <br/>
-        Eggs Left: <span id="eggsLeft">3000</span>
+    <!-- CHÈN NHẠC (NẾU CẦN) -->
+    <!-- <audio src="path-to-your-music.mp3" autoplay loop></audio> -->
+
+    <!-- THANH TAB CHÍNH -->
+    <div class="tabs">
+      <!-- Đã sửa "Connect" thành "Wallet" -->
+      <button class="tab-btn active" onclick="openTab(event, 'tabPresale')">Mua Trứng</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabHero')">Hero</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabWallet')">Wallet</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabReferral')">Referral</button>
+    </div>
+
+    <!-- TAB: MUA TRỨNG -->
+    <section id="tabPresale" class="tab-content active">
+      <div class="card">
+        <h2>Presale 3000 trứng</h2>
+        <div class="countdown">
+          Presale còn <span id="countdownTimer">--:--:--</span>
+        </div>
+        <div class="egg-progress">
+          <p>Còn <span id="eggsLeft">3000</span> trứng</p>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
       </div>
-      <label for="quantity">Quantity:</label>
-      <input 
-        type="number" 
-        id="quantity" 
-        class="quantity-input" 
-        min="1" 
-        value="10"
-      />
-      <button class="buy-btn" onclick="buyEggs()">Buy</button>
-    </div>
 
-    <!-- Hero Modal (Khi mở trứng xong) -->
-    <div class="hero-modal" id="heroModal">
-      <h3 id="heroTitle">Hero #16</h3>
-      <div id="heroInfo" class="stats">
-        Rarity: Common, Lvl: 1
-        <br/>
-        <span>⚔ 89 🛡 86 ❤️ 393 ⚡ 18 ✨ 45</span>
+      <div class="card">
+        <h3>Mua Trứng</h3>
+        <p>Số trứng bạn đang có: <span id="userEggCount">0</span></p>
+
+        <label for="eggQuantity">Số lượng mua:</label>
+        <input 
+          type="number" 
+          id="eggQuantity" 
+          min="1" 
+          value="1" 
+          style="width: 60px; margin-left: 0.5rem;"
+        />
+        <button class="btn" style="margin-left: 1rem;" onclick="buyEggs()">Mua</button>
+
+        <div class="egg-section">
+          <div class="egg-image">
+            <!-- Bạn có thể chèn ảnh quả trứng ở đây -->
+            TRỨNG
+          </div>
+          <!-- Nút "Mở Trứng" để mở 1 trứng -->
+          <button class="btn" onclick="openOneEgg()">Mở Trứng</button>
+        </div>
       </div>
-      <!-- Nút Open ở giữa -->
-      <button class="open-btn" onclick="closeHeroModal()">Open</button>
-    </div>
+    </section>
 
-    <!-- Danh sách hero -->
-    <div class="presale-card" id="heroListCard" style="display:none;">
-      <h3>Your Heroes</h3>
-      <div class="hero-list" id="heroList">
-        <!-- Tạo Hero item ở đây -->
+    <!-- TAB: HERO -->
+    <section id="tabHero" class="tab-content">
+      <div class="card">
+        <h2>Hero của bạn</h2>
+        <p>Chạm vào Hero để xem chỉ số chi tiết</p>
+        <div class="hero-list-container" id="heroListContainer">
+          <!-- Danh sách hero -->
+        </div>
       </div>
-    </div>
+    </section>
 
-    <!-- Referral -->
-    <div class="presale-card" id="refCard" style="display:none;">
-      <h3>Referral</h3>
-      <p>Share your link to get 10% bonus</p>
-      <input 
-        type="text" 
-        id="refLink"
-        value="https://t.me/DragonEggBot?start=refABC"
-        readonly
-        style="width:100%;margin-bottom:0.5rem;"
-      />
-      <button class="buy-btn" onclick="copyRefLink()">Copy</button>
-      <!-- Đổi tên nút sang "Chia sẻ" -->
-      <button class="share-btn" onclick="shareRefLink()">Chia sẻ</button>
-    </div>
+    <!-- TAB: WALLET -->
+    <section id="tabWallet" class="tab-content">
+      <div class="card wallet-card">
+        <h2>Wallet</h2>
+        <div class="wallet-item">
+          <span class="wallet-label">Số dư TON:</span>
+          <span id="tonBalance">100</span>
+        </div>
+        <div class="wallet-item">
+          <span class="wallet-label">Trứng đang có:</span>
+          <span id="walletEggCount">0</span>
+        </div>
+        <div class="wallet-item">
+          <span class="wallet-label">Số Hero:</span>
+          <span id="walletHeroCount">0</span>
+        </div>
+      </div>
+    </section>
 
-    <!-- Wallet -->
-    <div class="presale-card" id="walletCard" style="display:none;">
-      <h3>Wallet</h3>
-      <p>Tổng số Hero: <span id="heroCount">0</span></p>
-      <p>Eggs Left (của bạn): <span id="userEggCount">0</span></p>
-      <p>TON Balance: <span id="userTonBalance">100</span></p>
-    </div>
+    <!-- TAB: REFERRAL -->
+    <section id="tabReferral" class="tab-content">
+      <div class="card">
+        <h2>Referral</h2>
+        <p>Chia sẻ link để nhận 10% TON khi có người mua trứng qua link của bạn.</p>
+        <p><strong>Link giới thiệu:</strong></p>
+        <input 
+          type="text" 
+          id="refLink" 
+          value="https://t.me/DragonEggBot?start=refABC" 
+          readonly 
+          style="width:100%; padding:0.5rem; margin-bottom:0.5rem;"
+        />
+        <div style="display:flex; gap:1rem;">
+          <button class="btn" onclick="copyRefLink()">Copy Link</button>
+          <!-- Đổi tên nút sang "Chia sẻ" -->
+          <button class="btn" onclick="shareRefLink()">Chia sẻ</button>
+        </div>
+      </div>
+      <div class="card">
+        <h3>TON Referral</h3>
+        <p>Nhận từ referral: <span id="refEarn">0</span> TON</p>
+        <button class="btn" onclick="claimRef()">Rút Referral</button>
+      </div>
+    </section>
   </main>
 
-  <!-- Bottom Nav -->
-  <div class="bottom-nav">
-    <!-- Đổi "Connect" thành "Wallet" -->
-    <div class="nav-item" id="navWallet" onclick="showWalletTab()">
-      <img src="https://via.placeholder.com/24?text=W" alt="Wallet Icon"/>
-      Wallet
-    </div>
-    <!-- Sau chữ "Presale" thêm 🎁🎁 -->
-    <div class="nav-item active" id="navPresale" onclick="showPresaleTab()">
-      <img src="https://via.placeholder.com/24?text=P" alt="Presale Icon"/>
-      Presale 🎁🎁
-    </div>
-    <div class="nav-item" id="navHero" onclick="showHeroTab()">
-      <img src="https://via.placeholder.com/24?text=H" alt="Hero Icon"/>
-      Hero
-    </div>
-    <div class="nav-item" id="navReferral" onclick="showReferralTab()">
-      <img src="https://via.placeholder.com/24?text=R" alt="Referral Icon"/>
-      Referral
+  <footer>
+    <p>© 2025 - Dragon Egg Presale Mini App</p>
+  </footer>
+
+  <!-- MODAL HIỂN THỊ HERO KHI MỞ TRỨNG -->
+  <div class="modal" id="heroModal">
+    <div class="modal-content" id="heroModalContent">
+      <!-- Nút đóng (góc trên) -->
+      <button class="modal-close" onclick="closeHeroModal()">X</button>
+      <!-- Nội dung Hero sẽ được chèn động bằng JS -->
     </div>
   </div>
 
-  <!-- JS DEMO -->
-  <script>
-    let eggsLeft = 3000;         // Trứng còn lại
-    let userEggs = 0;           // Số trứng người dùng đang có
-    let userTonBalance = 100;   // Demo TON
-    let heroList = [];          // Danh sách hero
+  <!-- MODAL XEM CHI TIẾT HERO TRONG DANH SÁCH -->
+  <div class="modal" id="heroDetailModal">
+    <div class="modal-content" id="heroDetailModalContent">
+      <button class="modal-close" onclick="closeHeroDetailModal()">X</button>
+      <!-- Nội dung chi tiết Hero -->
+    </div>
+  </div>
 
-    // Mua trứng
-    function buyEggs() {
-      const qty = parseInt(document.getElementById('quantity').value, 10);
-      if (qty > 0 && qty <= eggsLeft) {
-        eggsLeft -= qty;
-        userEggs += qty;
-        document.getElementById('eggsLeft').innerText = eggsLeft;
-        alert(`You bought ${qty} eggs!`);
-      } else {
-        alert('Invalid quantity or no eggs left!');
+  <!-- JS DEMO LOGIC -->
+  <script>
+    /* 
+      ==========================================================
+      BIẾN DEMO, DỮ LIỆU GIẢ
+      ==========================================================
+    */
+    let totalEggs = 3000;       // Tổng trứng presale
+    let eggsLeft = 3000;        // Trứng còn lại
+    let userEggs = [];          // Danh sách trứng chưa mở
+    let userHeroes = [];        // Danh sách hero
+    let userReferralTon = 0;    // TON từ referral
+    let userTonBalance = 100;   // Số dư TON demo
+
+    // Demo: 5 hero sẵn
+    userHeroes.push({
+      heroId: 1,
+      rarity: "Common",
+      level: 1,
+      stats: { "🗡": 60, "🛡": 50, "❤️": 200, "⚡": 15, "✨": 20 }
+    });
+    userHeroes.push({
+      heroId: 2,
+      rarity: "Uncommon",
+      level: 1,
+      stats: { "🗡": 80, "🛡": 60, "❤️": 250, "⚡": 18, "✨": 30 }
+    });
+    userHeroes.push({
+      heroId: 3,
+      rarity: "Rare",
+      level: 1,
+      stats: { "🗡": 120, "🛡": 90, "❤️": 320, "⚡": 22, "✨": 40 }
+    });
+    userHeroes.push({
+      heroId: 4,
+      rarity: "Epic",
+      level: 1,
+      stats: { "🗡": 150, "🛡": 110, "❤️": 400, "⚡": 26, "✨": 55 }
+    });
+    userHeroes.push({
+      heroId: 5,
+      rarity: "Legendary",
+      level: 1,
+      stats: { "🗡": 200, "🛡": 140, "❤️": 500, "⚡": 35, "✨": 80 }
+    });
+
+    /* 
+      ==========================================================
+      HÀM TAB
+      ==========================================================
+    */
+    function openTab(evt, tabId) {
+      const contents = document.getElementsByClassName("tab-content");
+      for (let i = 0; i < contents.length; i++) {
+        contents[i].classList.remove("active");
       }
-      document.getElementById('userEggCount').innerText = userEggs;
+      const tabBtns = document.getElementsByClassName("tab-btn");
+      for (let i = 0; i < tabBtns.length; i++) {
+        tabBtns[i].classList.remove("active");
+      }
+      document.getElementById(tabId).classList.add("active");
+      evt.currentTarget.classList.add("active");
+      // Cập nhật hiển thị Wallet, v.v. mỗi lần chuyển tab
+      updateWalletInfo();
     }
 
-    // Khi mở trứng -> random Hero
-    // Thay vì hiển thị 1 list "Next" => Popup
-    // Stats scale: Common ×1, Uncommon ×2, Rare ×4, Epic ×8, Legendary ×16
-    function openEgg() {
-      if (userEggs <= 0) {
-        alert('No egg to open!');
+    /* 
+      ==========================================================
+      HÀM MUA TRỨNG
+      ==========================================================
+    */
+    function buyEggs() {
+      const qty = Number(document.getElementById('eggQuantity').value);
+      if (eggsLeft <= 0) {
+        alert("Trứng đã bán hết!");
         return;
       }
-      userEggs -= 1;
-      document.getElementById('userEggCount').innerText = userEggs;
+      if (qty < 1) {
+        alert("Số lượng mua phải >= 1!");
+        return;
+      }
+      if (qty > eggsLeft) {
+        alert(`Chỉ còn ${eggsLeft} trứng!`);
+        return;
+      }
+      // Giả lập (không trừ TON)
+      eggsLeft -= qty;
+      for (let i = 0; i < qty; i++) {
+        userEggs.push({ eggId: userEggs.length + 1 });
+      }
+      alert(`Bạn đã mua ${qty} trứng!`);
+      updateEggStatus();
+      updateUserEggCount();
+    }
 
-      // Random rarity
-      const r = Math.random() * 100;
-      let rarity = 'Common';
-      let factor = 1;
-      if (r < 40) {
-        rarity = 'Common'; factor = 1;
-      } else if (r < 70) {
-        rarity = 'Uncommon'; factor = 2;
-      } else if (r < 90) {
-        rarity = 'Rare'; factor = 4;
-      } else if (r < 98) {
-        rarity = 'Epic'; factor = 8;
+    /* 
+      ==========================================================
+      HÀM MỞ 1 TRỨNG
+      ==========================================================
+      - Kiểm tra userEggs, nếu có, mở trứng đầu tiên.
+      - Random hero. Nếu trùng độ hiếm => Nâng cấp hero cũ (+70%)
+      - Nếu không trùng => hero mới
+      - Tăng chỉ số hero hiếm: Common×10, Uncommon×20, Rare×40, Epic×80, Legendary×160
+    */
+    function openOneEgg() {
+      if (userEggs.length < 1) {
+        alert("Bạn không có trứng để mở!");
+        return;
+      }
+      userEggs.shift(); // Bỏ 1 trứng
+      updateUserEggCount();
+
+      // Tạo hero random
+      const newHero = createRandomHero();
+
+      // Nếu đã có hero cùng độ hiếm -> nâng cấp hero cũ
+      const sameRarityHero = userHeroes.find(h => h.rarity === newHero.rarity);
+      if (sameRarityHero) {
+        sameRarityHero.level++;
+        // Mỗi cấp => +70% stats
+        for (let key in sameRarityHero.stats) {
+          sameRarityHero.stats[key] = Math.floor(sameRarityHero.stats[key] * 1.7);
+        }
+        // Show modal
+        showHeroModal({
+          heroId: sameRarityHero.heroId,
+          rarity: sameRarityHero.rarity,
+          level: sameRarityHero.level,
+          stats: sameRarityHero.stats,
+          upgraded: true
+        });
       } else {
-        rarity = 'Legendary'; factor = 16;
+        // Hero mới
+        newHero.heroId = userHeroes.length + 1;
+        userHeroes.push(newHero);
+        showHeroModal(newHero);
       }
 
-      // Random base
-      let atk = Math.floor(Math.random() * 20 + 10) * factor;
-      let def = Math.floor(Math.random() * 20 + 10) * factor;
-      let hp  = Math.floor(Math.random() * 80 + 50) * factor;
-      let spd = Math.floor(Math.random() * 10 + 5) * factor;
-      let mgc = Math.floor(Math.random() * 15 + 5) * factor;
-
-      const heroId = heroList.length + 1;
-      const hero = {
-        id: heroId,
-        rarity,
-        level: 1,
-        atk, def, hp, spd, mgc
-      };
-      heroList.push(hero);
-      showHeroModal(hero);
       updateHeroList();
     }
 
-    // Hiện modal Hero
-    function showHeroModal(h) {
-      document.getElementById('heroTitle').innerText = `Hero #${h.id}`;
-      document.getElementById('heroInfo').innerHTML = `
-        Rarity: ${h.rarity}, Lvl: ${h.level}
-        <br/>
-        ⚔ ${h.atk} 🛡 ${h.def} ❤️ ${h.hp} ⚡ ${h.spd} ✨ ${h.mgc}
-      `;
-      document.getElementById('heroModal').classList.add('show');
-    }
-    // Đóng modal Hero
-    function closeHeroModal() {
-      document.getElementById('heroModal').classList.remove('show');
+    // Tạo hero random + áp dụng chỉ số hiếm × (10,20,40,80,160)
+    function createRandomHero() {
+      const randomNum = Math.random() * 100;
+      let rarity = "Common";
+      let factor = 10; // Common
+      if (randomNum < 40) {
+        rarity = "Common";    factor = 10;
+      } else if (randomNum < 70) {
+        rarity = "Uncommon";  factor = 20;
+      } else if (randomNum < 90) {
+        rarity = "Rare";      factor = 40;
+      } else if (randomNum < 98) {
+        rarity = "Epic";      factor = 80;
+      } else {
+        rarity = "Legendary"; factor = 160;
+      }
+
+      // Base random (1~5) * factor
+      // Tùy bạn điều chỉnh con số base
+      let stats = {
+        "🗡": (Math.floor(Math.random() * 5) + 1) * factor,
+        "🛡": (Math.floor(Math.random() * 5) + 1) * factor,
+        "❤️": (Math.floor(Math.random() * 5) + 1) * factor,
+        "⚡": (Math.floor(Math.random() * 5) + 1) * factor,
+        "✨": (Math.floor(Math.random() * 5) + 1) * factor
+      };
+      return {
+        heroId: 0,
+        rarity,
+        level: 1,
+        stats,
+        upgraded: false
+      };
     }
 
-    // Cập nhật danh sách Hero (Tab Hero)
+    /*
+      ==========================================================
+      HIỂN THỊ HERO MODAL (THAY “Next” BẰNG “Open” Ở CUỐI)
+      ==========================================================
+    */
+    function showHeroModal(hero) {
+      const modal = document.getElementById('heroModal');
+      const content = document.getElementById('heroModalContent');
+      let rarityClass = getRarityClass(hero.rarity);
+
+      let html = `
+        <img src="https://via.placeholder.com/100?text=Dragon" alt="Hero Image"/>
+      `;
+      if (hero.upgraded) {
+        html += `<h3 class="${rarityClass}">Hero Cũ Đã Nâng Cấp!</h3>`;
+      } else {
+        html += `<h3 class="${rarityClass}">Hero Mới!</h3>`;
+      }
+      html += `
+        <p class="${rarityClass}">Rarity: ${hero.rarity}, Cấp: ${hero.level}</p>
+        <p>
+      `;
+      for (let k in hero.stats) {
+        html += `${k}${hero.stats[k]} `;
+      }
+      html += `</p>
+        <!-- Nút “Open” canh giữa -->
+        <button class="btn" style="margin: 0 auto; display: block;" onclick="closeHeroModal()">Open</button>
+      `;
+
+      content.innerHTML = `
+        <button class="modal-close" onclick="closeHeroModal()">X</button>
+        ${html}
+      `;
+      modal.style.display = "flex";
+    }
+
+    function closeHeroModal() {
+      document.getElementById('heroModal').style.display = "none";
+    }
+
+    /* 
+      ==========================================================
+      DANH SÁCH HERO (TAB HERO)
+      ==========================================================
+    */
     function updateHeroList() {
-      const heroListEl = document.getElementById('heroList');
-      heroListEl.innerHTML = "";
-      heroList.forEach((h) => {
-        // Rarity class
-        let rarClass = h.rarity.toLowerCase();
-        let div = document.createElement('div');
-        div.className = 'hero-item';
+      const container = document.getElementById('heroListContainer');
+      container.innerHTML = "";
+
+      // Sắp xếp theo độ hiếm
+      const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+      let sorted = [...userHeroes].sort((a,b) => {
+        return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
+      });
+
+      sorted.forEach(hero => {
+        let rarityClass = getRarityClass(hero.rarity);
+        let div = document.createElement("div");
+        div.className = "hero-card";
+        div.onclick = () => showHeroDetailModal(hero.heroId);
         div.innerHTML = `
-          <img src="https://via.placeholder.com/40?text=H" alt="Hero"/>
-          <div>Hero #${h.id}</div>
-          <div class="hero-rarity ${rarClass}">${h.rarity}</div>
+          <img src="https://via.placeholder.com/70?text=Dragon" alt="Hero Image"/>
+          <h4 class="${rarityClass}">Dragon #${hero.heroId}</h4>
+          <div class="hero-rarity">${hero.rarity} (Cấp ${hero.level})</div>
         `;
-        div.onclick = () => showHeroModal(h); // Bấm vào để xem info
-        heroListEl.appendChild(div);
+        container.appendChild(div);
       });
     }
 
-    // Referral
+    // Xem chi tiết hero trong modal
+    function showHeroDetailModal(heroId) {
+      const hero = userHeroes.find(h => h.heroId === heroId);
+      if (!hero) return;
+      const modal = document.getElementById('heroDetailModal');
+      const content = document.getElementById('heroDetailModalContent');
+      let rarityClass = getRarityClass(hero.rarity);
+
+      let html = `
+        <img src="https://via.placeholder.com/100?text=Dragon" alt="Hero Detail"/>
+        <h3 class="${rarityClass}">Dragon #${hero.heroId}</h3>
+        <p class="${rarityClass}">Rarity: ${hero.rarity}, Cấp: ${hero.level}</p>
+        <p>
+      `;
+      for (let k in hero.stats) {
+        html += `${k}${hero.stats[k]} `;
+      }
+      html += `</p>`;
+      content.innerHTML = `
+        <button class="modal-close" onclick="closeHeroDetailModal()">X</button>
+        ${html}
+      `;
+      modal.style.display = "flex";
+    }
+    function closeHeroDetailModal() {
+      document.getElementById('heroDetailModal').style.display = "none";
+    }
+
+    /* 
+      ==========================================================
+      WALLET & REFERRAL
+      ==========================================================
+    */
+    function updateWalletInfo() {
+      document.getElementById('tonBalance').innerText = userTonBalance;
+      document.getElementById('walletEggCount').innerText = userEggs.length;
+      document.getElementById('walletHeroCount').innerText = userHeroes.length;
+    }
+
     function copyRefLink() {
-      const ref = document.getElementById('refLink');
-      ref.select();
-      ref.setSelectionRange(0,99999);
+      const refLink = document.getElementById('refLink');
+      refLink.select();
+      refLink.setSelectionRange(0, 99999);
       document.execCommand('copy');
-      alert("Link copied!");
+      alert("Đã copy link referral!");
     }
     // Nút "Chia sẻ"
     function shareRefLink() {
@@ -425,68 +758,89 @@
       if (navigator.share) {
         navigator.share({
           title: 'Dragon Egg Presale',
-          text: 'Join me in the presale!',
+          text: 'Nhấn vào link để tham gia Presale!',
           url: url
-        });
+        }).catch(err => console.log("Share cancelled", err));
       } else {
-        alert("Trình duyệt không hỗ trợ Share API!");
+        alert("Trình duyệt không hỗ trợ Share API, vui lòng Copy link thủ công!");
+      }
+    }
+    function claimRef() {
+      if (userReferralTon > 0) {
+        alert(`Bạn vừa rút ${userReferralTon} TON referral! (Demo)`);
+        userTonBalance += userReferralTon;
+        userReferralTon = 0;
+        document.getElementById('refEarn').innerText = userReferralTon;
+        updateWalletInfo();
+      } else {
+        alert("Hiện chưa có TON referral!");
       }
     }
 
-    // Hiển thị / Ẩn các phần
-    function showWalletTab() {
-      activeNav('navWallet');
-      // Ẩn presale, hero, ref
-      document.querySelector('.presale-card').style.display = "none";
-      document.getElementById('heroListCard').style.display = "none";
-      document.getElementById('refCard').style.display = "none";
-      document.getElementById('walletCard').style.display = "block";
-
-      // Cập nhật info
-      document.getElementById('heroCount').innerText = heroList.length;
-      document.getElementById('userEggCount').innerText = userEggs;
-      document.getElementById('userTonBalance').innerText = userTonBalance;
+    /* 
+      ==========================================================
+      HÀM PHỤ TRỢ
+      ==========================================================
+    */
+    function getRarityClass(rarity) {
+      switch(rarity) {
+        case "Common": return "rarity-common";
+        case "Uncommon": return "rarity-uncommon";
+        case "Rare": return "rarity-rare";
+        case "Epic": return "rarity-epic";
+        case "Legendary": return "rarity-legendary";
+        default: return "";
+      }
     }
-    function showPresaleTab() {
-      activeNav('navPresale');
-      document.querySelector('.presale-card').style.display = "block";
-      document.getElementById('heroListCard').style.display = "none";
-      document.getElementById('refCard').style.display = "none";
-      document.getElementById('walletCard').style.display = "none";
+    function updateEggStatus() {
+      document.getElementById('eggsLeft').innerText = eggsLeft;
+      const percent = ((totalEggs - eggsLeft) / totalEggs) * 100;
+      document.getElementById('progressFill').style.width = percent + "%";
     }
-    function showHeroTab() {
-      activeNav('navHero');
-      document.querySelector('.presale-card').style.display = "none";
-      document.getElementById('heroListCard').style.display = "block";
-      document.getElementById('refCard').style.display = "none";
-      document.getElementById('walletCard').style.display = "none";
-    }
-    function showReferralTab() {
-      activeNav('navReferral');
-      document.querySelector('.presale-card').style.display = "none";
-      document.getElementById('heroListCard').style.display = "none";
-      document.getElementById('refCard').style.display = "block";
-      document.getElementById('walletCard').style.display = "none";
+    function updateUserEggCount() {
+      document.getElementById('userEggCount').innerText = userEggs.length;
+      updateWalletInfo();
     }
 
-    function activeNav(id) {
-      document.getElementById('navWallet').classList.remove('active');
-      document.getElementById('navPresale').classList.remove('active');
-      document.getElementById('navHero').classList.remove('active');
-      document.getElementById('navReferral').classList.remove('active');
-      document.getElementById(id).classList.add('active');
+    /* 
+      ==========================================================
+      ĐẾM NGƯỢC PRESALE (DEMO)
+      ==========================================================
+    */
+    let presaleEndTime = new Date().getTime() + 2 * 60 * 1000; // 2 phút
+    function updateCountdown() {
+      let now = new Date().getTime();
+      let distance = presaleEndTime - now;
+      if (distance < 0) {
+        document.getElementById('countdownTimer').innerText = "Đã kết thúc!";
+        return;
+      }
+      let minutes = Math.floor(distance / (1000 * 60));
+      let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      document.getElementById('countdownTimer').innerText =
+        `${String(minutes).padStart(2,'0')}:${String(seconds).padStart(2,'0')}`;
     }
 
-    // Khởi tạo
-    window.onload = () => {
+    /* 
+      ==========================================================
+      ON LOAD
+      ==========================================================
+    */
+    window.onload = function() {
       // Telegram WebApp
-      if (window.Telegram && window.Telegram.WebApp) {
-        window.Telegram.WebApp.expand();
+      if (window.Telegram.WebApp) {
+        let tg = window.Telegram.WebApp;
+        tg.expand();
       }
-      // Ẩn hero list, referral, wallet => chỉ hiện Presale ban đầu
-      document.getElementById('heroListCard').style.display = "none";
-      document.getElementById('refCard').style.display = "none";
-      document.getElementById('walletCard').style.display = "none";
+      // Render ban đầu
+      updateEggStatus();
+      updateUserEggCount();
+      updateHeroList();
+      updateWalletInfo();
+
+      // Đếm ngược
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
     };
   </script>
 </body>
