@@ -3,22 +3,21 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Dragon Egg Presale - Telegram Mini App</title>
+  <title>Dragon Egg Presale - Telegram Mini App (Tab Version)</title>
 
-  <!-- Telegram WebApp JavaScript (bắt buộc khi làm Mini App) -->
+  <!-- Telegram WebApp JavaScript (bắt buộc khi làm Mini App chính thức) -->
   <script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-  <!-- 
-    Gợi ý: Bạn có thể sử dụng thêm thư viện CSS như Bootstrap, Tailwind, 
-    hoặc framework UI khác để tăng tốc độ phát triển giao diện.
-  -->
-
   <style>
-    /* Reset và định dạng cơ bản */
+    /* 
+      ====================
+      RESET & CƠ BẢN 
+      ====================
+    */
     * {
-      margin: 0; 
-      padding: 0; 
-      box-sizing: border-box; 
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
       font-family: "Roboto", sans-serif;
     }
     body {
@@ -27,311 +26,647 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: flex-start;
     }
+    h1, h2, h3, h4 {
+      margin-bottom: 0.5rem;
+    }
+    a {
+      text-decoration: none;
+      color: inherit;
+    }
+
     header, footer {
       text-align: center;
       padding: 1rem;
       background: #1e1e1e;
     }
-    h1, h2, h3 {
-      margin-bottom: 0.5rem;
+    footer p {
+      font-size: 0.85rem;
+      opacity: 0.8;
     }
 
-    /* Hiệu ứng nền hologram/futuristic (chỉ mang tính minh họa) */
+    main {
+      flex: 1;
+      padding: 1rem;
+      max-width: 1200px;
+      width: 100%;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* 
+      ====================
+      HIỆU ỨNG NỀN 
+      ====================
+    */
     .bg-hero {
       position: fixed;
       top: 0; left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
-      background: radial-gradient(circle, rgba(0,255,234,0.15) 0%, rgba(0,0,0,0) 70%);
+      background: radial-gradient(circle, rgba(0,255,234,0.2) 0%, rgba(0,0,0,0) 60%);
       animation: pulse 5s infinite alternate;
+      z-index: 0;
     }
     @keyframes pulse {
       from { opacity: 0.3; }
       to { opacity: 0.6; }
     }
 
-    /* Nội dung chính */
-    main {
-      margin: 0 auto;
-      max-width: 1200px;
-      width: 100%;
-      flex: 1;
-      padding: 1.5rem;
-      position: relative;
-      z-index: 10; /* để nội dung nổi lên trên lớp nền */
-    }
-
-    .container {
+    /* 
+      ====================
+      THANH TAB CHÍNH 
+      ====================
+    */
+    .tabs {
       display: flex;
-      flex-wrap: wrap;
       gap: 1rem;
-      justify-content: space-between;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 0.5rem;
+    }
+    .tab-btn {
+      padding: 0.5rem 1rem;
+      background: rgba(255,255,255,0.08);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: 0.3s;
+    }
+    .tab-btn.active {
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
+    }
+    .tab-content {
+      display: none; /* Ẩn tất cả, chỉ hiển thị tab đang chọn */
+    }
+    .tab-content.active {
+      display: block;
     }
 
-    /* Khối card tổng quan: "Buy Eggs", "Referral", "My TON Balance" */
-    .card {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 8px;
-      padding: 1rem;
-      flex: 1 1 300px;
-      min-width: 250px;
-      position: relative;
-      overflow: hidden;
+    /* 
+      ====================
+      THANH TAB CON 
+      (Dùng trong mục Hero)
+      ====================
+    */
+    .sub-tabs {
+      display: flex;
+      gap: 1rem;
+      margin: 1rem 0;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 0.5rem;
     }
-    .card h3 {
-      margin-bottom: 0.75rem;
+    .sub-tab-btn {
+      padding: 0.4rem 0.8rem;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .sub-tab-btn.active {
+      background: linear-gradient(45deg, #ffffff33, #ffffff22);
       font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
     }
-    .card p {
-      line-height: 1.5;
+    .sub-tab-content {
+      display: none;
+    }
+    .sub-tab-content.active {
+      display: block;
     }
 
-    /* Button phong cách futuristic */
+    /* 
+      ====================
+      BUTTON & CARD 
+      ====================
+    */
     .btn {
       display: inline-block;
-      padding: 0.75rem 1.25rem;
+      padding: 0.5rem 1rem;
+      background: linear-gradient(45deg, #00c6ff, #0072ff);
       border: none;
       border-radius: 5px;
-      font-size: 1rem;
-      cursor: pointer;
-      background: linear-gradient(45deg, #00c6ff, #0072ff);
       color: #fff;
+      cursor: pointer;
       transition: 0.3s;
-      margin-top: 1rem;
-      text-decoration: none;
       font-weight: 500;
     }
     .btn:hover {
       background: linear-gradient(45deg, #0072ff, #00c6ff);
     }
+    .card {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 1rem;
+    }
 
-    /* Danh sách trứng và hero */
+    /* 
+      ====================
+      THANH ĐẾM NGƯỢC & THANH SỐ TRỨNG 
+      ====================
+    */
+    .countdown, .egg-progress {
+      margin-bottom: 1rem;
+      text-align: center;
+      font-size: 1rem;
+    }
+    .progress-bar {
+      background: rgba(255,255,255,0.2);
+      border-radius: 4px;
+      height: 10px;
+      width: 100%;
+      position: relative;
+    }
+    .progress-fill {
+      background: linear-gradient(45deg, #00ff88, #00c6ff);
+      height: 100%;
+      width: 0%;
+      border-radius: 4px;
+      transition: width 0.5s;
+    }
+
+    /* 
+      ====================
+      DANH SÁCH TRỨNG & HERO 
+      ====================
+    */
     .list-container {
       display: flex;
       flex-wrap: wrap;
       gap: 1rem;
     }
     .egg-card, .hero-card {
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      width: 160px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
       border-radius: 8px;
-      padding: 1rem;
-      width: 180px;
+      padding: 0.75rem;
       text-align: center;
       position: relative;
     }
     .egg-card img, .hero-card img {
-      width: 80px;
-      height: 80px;
+      width: 70px;
+      height: 70px;
       object-fit: cover;
       margin-bottom: 0.5rem;
       border-radius: 50%;
       border: 2px solid #00c6ff;
     }
+    .egg-card:hover, .hero-card:hover {
+      transform: scale(1.03);
+      transition: 0.2s;
+    }
     .egg-card h4, .hero-card h4 {
       margin-bottom: 0.25rem;
-      font-size: 1.1rem;
+      font-size: 1rem;
     }
     .egg-card p, .hero-card p {
       font-size: 0.9rem;
       margin-bottom: 0.25rem;
     }
-    /* Hiệu ứng hover card */
-    .egg-card:hover, .hero-card:hover {
-      transform: scale(1.02);
-      transition: transform 0.2s;
-    }
 
-    /* Footer */
-    footer p {
-      font-size: 0.875rem;
-      opacity: 0.8;
-    }
-
-    /* Responsive */
+    /* 
+      ====================
+      RESPONSIVE 
+      ====================
+    */
     @media (max-width: 768px) {
-      .container {
+      .tabs {
+        flex-direction: column;
+      }
+      .sub-tabs {
         flex-direction: column;
       }
     }
   </style>
 </head>
 <body>
-  <!-- Nền hologram -->
+  <!-- NỀN HOLOGRAM -->
   <div class="bg-hero"></div>
 
   <header>
     <h1>Dragon Egg Presale</h1>
-    <h2>Telegram Mini App - Futuristic Design</h2>
+    <h2>Telegram Mini App - Tab Demo</h2>
   </header>
 
+  <!-- MAIN -->
   <main>
-    <!-- Chèn nhạc ở đây (nếu cần) -->
+    <!-- CHÈN NHẠC (NẾU CẦN) -->
     <!-- <audio src="path-to-your-music.mp3" autoplay loop></audio> -->
 
-    <section class="container">
-      <!-- Card: Mua trứng -->
+    <!-- THANH TAB CHÍNH -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="openTab(event, 'tabPresale')">Mua Trứng</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabHero')">Hero</button>
+      <button class="tab-btn" onclick="openTab(event, 'tabReferral')">Referral</button>
+    </div>
+
+    <!-- NỘI DUNG TAB: MUA TRỨNG -->
+    <section id="tabPresale" class="tab-content active">
       <div class="card">
-        <h3>Mua Trứng</h3>
-        <p>Số lượng tối đa: <strong>3000</strong> trứng</p>
-        <p>Giá 1 trứng: <strong>5 TON</strong></p>
-        <label for="eggQuantity">Chọn số lượng trứng:</label>
-        <input 
-          type="number" 
-          id="eggQuantity" 
-          name="eggQuantity" 
-          min="1" 
-          max="3000" 
-          value="1"
-          style="width:60px; margin-left:0.5rem;"
-        />
-        <br />
-        <button class="btn" onclick="buyEggs()">Mua ngay</button>
+        <h2>Presale 3000 trứng</h2>
+        <!-- Thanh đếm ngược (demo) -->
+        <div class="countdown">
+          Presale còn <span id="countdownTimer">--:--:--</span>
+        </div>
+
+        <!-- Thanh hiển thị số trứng còn lại và progress bar (demo) -->
+        <div class="egg-progress">
+          <p>Còn <span id="eggsLeft">3000</span> trứng</p>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+
+        <!-- Mua trứng -->
+        <div style="margin-top:1rem;">
+          <label for="eggQuantity">Số lượng mua: </label>
+          <input
+            type="number"
+            id="eggQuantity"
+            name="eggQuantity"
+            min="1"
+            value="1"
+            style="width:60px; margin-left:0.5rem;"
+          />
+          <button class="btn" style="margin-left:1rem;" onclick="buyEggs()">
+            Mua
+          </button>
+        </div>
       </div>
 
-      <!-- Card: Referral -->
       <div class="card">
-        <h3>Referral</h3>
-        <p>Chia sẻ link để nhận 10% TON khi có người mua trứng.</p>
+        <h3>Trứng của bạn</h3>
+        <p>Click "Mở" để mở trứng ngay!</p>
+        <div class="list-container" id="eggList">
+          <!-- Danh sách trứng chưa mở (DEMO) -->
+          <!-- eggId = 1,2,... -> Mô phỏng -->
+          <!-- Ảnh trứng demo: placeholder -->
+        </div>
+      </div>
+    </section>
+
+    <!-- NỘI DUNG TAB: HERO (Có TAB CON) -->
+    <section id="tabHero" class="tab-content">
+      <!-- TAB CON CHO HERO -->
+      <div class="sub-tabs">
+        <button class="sub-tab-btn active" onclick="openSubTab(event, 'heroList')">Danh sách Hero</button>
+        <button class="sub-tab-btn" onclick="openSubTab(event, 'heroUpgrade')">Nâng cấp</button>
+      </div>
+
+      <!-- SUB-TAB: Danh sách Hero -->
+      <div id="heroList" class="sub-tab-content active">
+        <div class="card">
+          <h3>Hero được sắp xếp theo độ hiếm (5 cấp)</h3>
+          <p>
+            Mỗi Hero có 5 chỉ số, ví dụ: 
+            <br/>🗡 Tấn công, 🛡 Phòng thủ, ❤️ Máu, ⚡ Tốc độ, ✨ Ma thuật (tùy bạn).
+          </p>
+          <div class="list-container" id="heroListContainer">
+            <!-- Danh sách hero (DEMO) -->
+          </div>
+        </div>
+      </div>
+
+      <!-- SUB-TAB: Nâng cấp Hero (khi trùng độ hiếm) -->
+      <div id="heroUpgrade" class="sub-tab-content">
+        <div class="card">
+          <h3>Nâng cấp Hero</h3>
+          <p>
+            **Khi bạn sở hữu 2 Hero cùng độ hiếm, chúng sẽ tự động nâng cấp:  
+            <br/>1 + 1 = 2, +1 = 3, … Mỗi cấp tăng +70% chỉ số.  
+            <br/>(Demo logic, cần backend để xử lý thực tế).
+          </p>
+          <!-- Danh sách Hero trùng độ hiếm (DEMO) -->
+          <div class="list-container" id="upgradeContainer">
+            <!-- Gợi ý hiển thị cặp hero trùng hiếm, button "Xác nhận nâng cấp" -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- NỘI DUNG TAB: REFERRAL -->
+    <section id="tabReferral" class="tab-content">
+      <div class="card">
+        <h2>Referral</h2>
+        <p>Chia sẻ link để nhận 10% TON khi có người mua trứng qua link của bạn.</p>
         <p><strong>Link giới thiệu:</strong></p>
         <input 
           type="text" 
           id="refLink" 
-          value="https://t.me/dragonEggBot?start=ref123" 
+          value="https://t.me/DragonEggBot?start=refABC" 
           readonly 
           style="width:100%; padding:0.5rem; margin-bottom:0.5rem;"
         />
         <button class="btn" onclick="copyRefLink()">Copy Link</button>
       </div>
-
-      <!-- Card: Số dư TON -->
       <div class="card">
-        <h3>Số dư TON</h3>
-        <p id="tonBalance">TON Balance: <strong>0</strong></p>
+        <h3>TON Referral</h3>
         <p id="refEarn">TON nhận từ referral: <strong>0</strong></p>
         <button class="btn" onclick="claimRef()">Rút referral</button>
-      </div>
-    </section>
-
-    <!-- Danh sách trứng chưa mở -->
-    <section style="margin-top:2rem;">
-      <h2>Trứng của bạn</h2>
-      <div class="list-container" id="eggList">
-        <!-- Ví dụ 3 trứng -->
-        <div class="egg-card">
-          <!-- Chèn ảnh minh họa trứng -->
-          <img src="https://via.placeholder.com/80?text=Egg" alt="Egg Image"/>
-          <h4>Egg #1</h4>
-          <p>Trạng thái: Chưa mở</p>
-          <button class="btn" onclick="openEgg(1)">Mở trứng</button>
-        </div>
-        <div class="egg-card">
-          <img src="https://via.placeholder.com/80?text=Egg" alt="Egg Image"/>
-          <h4>Egg #2</h4>
-          <p>Trạng thái: Chưa mở</p>
-          <button class="btn" onclick="openEgg(2)">Mở trứng</button>
-        </div>
-        <div class="egg-card">
-          <img src="https://via.placeholder.com/80?text=Egg" alt="Egg Image"/>
-          <h4>Egg #3</h4>
-          <p>Trạng thái: Chưa mở</p>
-          <button class="btn" onclick="openEgg(3)">Mở trứng</button>
-        </div>
-      </div>
-    </section>
-
-    <!-- Danh sách Hero (khi mở trứng) -->
-    <section style="margin-top:2rem;">
-      <h2>Hero của bạn</h2>
-      <div class="list-container" id="heroList">
-        <!-- Ví dụ hero đã mở -->
-        <div class="hero-card">
-          <!-- Chèn ảnh minh họa hero -->
-          <img src="https://via.placeholder.com/80?text=Dragon" alt="Hero Image"/>
-          <h4>Dragon #8</h4>
-          <p>Độ hiếm: Rare</p>
-          <p>Attack: 120</p>
-          <p>Skill: Fire Breath</p>
-        </div>
-        <div class="hero-card">
-          <img src="https://via.placeholder.com/80?text=Dragon" alt="Hero Image"/>
-          <h4>Dragon #9</h4>
-          <p>Độ hiếm: Legendary</p>
-          <p>Attack: 200</p>
-          <p>Skill: Thunder Strike</p>
-        </div>
       </div>
     </section>
   </main>
 
   <footer>
-    <p>© 2025 - Dragon Egg Presale Mini App</p>
+    <p>© 2025 - Dragon Egg Presale Mini App (Tab Version)</p>
   </footer>
 
-  <!-- JavaScript demo -->
+  <!-- JS DEMO -->
   <script>
-    // Giả lập số dư TON
-    let userTonBalance = 50;
-    let userRefTon = 0;
+    /*
+      ============================================================
+      BIẾN DEMO & HÀM TẠO DỮ LIỆU GIẢ: SỐ TRỨNG, HERO, V.V.
+      ============================================================
+    */
+    let totalEggs = 3000;           // Tổng trứng presale
+    let eggsLeft = 3000;            // Trứng còn lại
+    let userEggs = [];              // Danh sách trứng của user [ {id, opened: false}, ... ]
+    let userHeroes = [];            // Danh sách hero [ {id, rarity, stats: {...}, level=1}, ... ]
+    let userReferralTon = 0;        // TON từ referral
 
-    // Cập nhật hiển thị TON
-    document.getElementById('tonBalance').innerHTML = 'TON Balance: ' + userTonBalance;
-    document.getElementById('refEarn').innerHTML = 'TON nhận từ referral: ' + userRefTon;
+    // Tạo 3 trứng demo
+    for (let i = 1; i <= 3; i++) {
+      userEggs.push({ eggId: i, opened: false });
+    }
 
-    // Hàm copy link referral
+    // Tạo 2 hero demo
+    userHeroes.push({
+      heroId: 1,
+      rarity: "Rare",
+      level: 1,
+      stats: { 
+        "🗡": 120, 
+        "🛡": 80, 
+        "❤️": 300, 
+        "⚡": 20, 
+        "✨": 50
+      }
+    });
+    userHeroes.push({
+      heroId: 2,
+      rarity: "Legendary",
+      level: 1,
+      stats: { 
+        "🗡": 200, 
+        "🛡": 120, 
+        "❤️": 500, 
+        "⚡": 35, 
+        "✨": 80
+      }
+    });
+
+    /*
+      ============================================================
+      HÀM HIỂN THỊ DANH SÁCH TRỨNG & HERO
+      ============================================================
+    */
+    function renderEggList() {
+      const eggListEl = document.getElementById('eggList');
+      eggListEl.innerHTML = "";
+      userEggs.forEach((egg) => {
+        if (!egg.opened) {
+          const div = document.createElement("div");
+          div.className = "egg-card";
+          // Ảnh trứng placeholder
+          div.innerHTML = `
+            <img src="https://via.placeholder.com/70?text=Egg" alt="Egg Image"/>
+            <h4>Egg #${egg.eggId}</h4>
+            <p>Trạng thái: Chưa mở</p>
+            <button class="btn" onclick="openEgg(${egg.eggId})">Mở</button>
+          `;
+          eggListEl.appendChild(div);
+        }
+      });
+    }
+
+    function renderHeroList() {
+      const heroListEl = document.getElementById('heroListContainer');
+      heroListEl.innerHTML = "";
+
+      // Sắp xếp hero theo độ hiếm (cần define logic xếp hạng hiếm)
+      // Demo: Thứ tự "Common, Uncommon, Rare, Epic, Legendary"
+      const rarityOrder = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+      const sortedHeroes = userHeroes.sort((a, b) => {
+        return rarityOrder.indexOf(a.rarity) - rarityOrder.indexOf(b.rarity);
+      });
+
+      sortedHeroes.forEach((hero) => {
+        const div = document.createElement("div");
+        div.className = "hero-card";
+        // Ảnh hero placeholder
+        div.innerHTML = `
+          <img src="https://via.placeholder.com/70?text=Dragon" alt="Hero Image"/>
+          <h4>Dragon #${hero.heroId}</h4>
+          <p>Độ hiếm: ${hero.rarity} (Cấp: ${hero.level})</p>
+          <p>
+            ${Object.keys(hero.stats).map((k) => `${k}${hero.stats[k]}`).join(" | ")}
+          </p>
+        `;
+        heroListEl.appendChild(div);
+      });
+    }
+
+    /*
+      ============================================================
+      HÀM MUA TRỨNG, MỞ TRỨNG
+      ============================================================
+    */
+    function buyEggs() {
+      const qty = Number(document.getElementById('eggQuantity').value);
+      if (eggsLeft <= 0) {
+        alert("Trứng đã bán hết!");
+        return;
+      }
+      if (qty < 1) {
+        alert("Số lượng mua phải >= 1!");
+        return;
+      }
+      if (qty > eggsLeft) {
+        alert(`Chỉ còn ${eggsLeft} trứng!`);
+        return;
+      }
+      // Demo: không trừ TON, không kiểm tra balance...
+      // Giả lập userEggs.push
+      const startingId =  userEggs.length + 1;
+      for (let i = 0; i < qty; i++) {
+        userEggs.push({ eggId: startingId + i, opened: false });
+      }
+      eggsLeft -= qty;
+      alert(`Bạn đã mua ${qty} trứng!`);
+      updateEggStatus();
+      renderEggList();
+    }
+
+    function openEgg(eggId) {
+      // Tìm egg
+      const egg = userEggs.find(e => e.eggId === eggId);
+      if (!egg) return;
+      if (egg.opened) {
+        alert("Trứng này đã mở rồi!");
+        return;
+      }
+      // Giả lập random hero
+      const hero = createRandomHero();
+      // Gán heroId tạm = userHeroes.length + 1
+      hero.heroId = userHeroes.length + 1;
+      userHeroes.push(hero);
+
+      // Đánh dấu trứng đã mở
+      egg.opened = true;
+      alert(`Mở Egg #${eggId} => Nhận Hero #${hero.heroId} [${hero.rarity}]!`);
+
+      // Cập nhật hiển thị
+      renderEggList();
+      renderHeroList();
+    }
+
+    function createRandomHero() {
+      // 5 cấp độ hiếm: Common, Uncommon, Rare, Epic, Legendary
+      const rarities = ["Common", "Uncommon", "Rare", "Epic", "Legendary"];
+      // Tỷ lệ demo: 40%, 30%, 20%, 8%, 2% (chỉ minh họa)
+      const randomNum = Math.random() * 100;
+      let rarity = "";
+      if (randomNum < 40) rarity = "Common";
+      else if (randomNum < 70) rarity = "Uncommon";
+      else if (randomNum < 90) rarity = "Rare";
+      else if (randomNum < 98) rarity = "Epic";
+      else rarity = "Legendary";
+
+      // Random chỉ số (demo)
+      const stats = {
+        "🗡": Math.floor(Math.random() * 50) + 50,
+        "🛡": Math.floor(Math.random() * 50) + 50,
+        "❤️": Math.floor(Math.random() * 200) + 200,
+        "⚡": Math.floor(Math.random() * 30) + 10,
+        "✨": Math.floor(Math.random() * 40) + 20,
+      };
+      return {
+        heroId: 0,
+        rarity: rarity,
+        level: 1, 
+        stats: stats
+      };
+    }
+
+    /*
+      ============================================================
+      HÀM REFERRAL
+      ============================================================
+    */
     function copyRefLink() {
       const refLink = document.getElementById('refLink');
       refLink.select();
-      refLink.setSelectionRange(0, 99999); // Cho mobile
+      refLink.setSelectionRange(0, 99999); 
       document.execCommand('copy');
-      alert('Đã copy link referral!');
+      alert("Đã copy link referral!");
     }
-
-    // Hàm mua trứng (demo)
-    function buyEggs() {
-      const qty = Number(document.getElementById('eggQuantity').value);
-      const cost = qty * 5; // 5 TON / 1 trứng
-      if (userTonBalance >= cost) {
-        userTonBalance -= cost;
-        document.getElementById('tonBalance').innerHTML = 'TON Balance: ' + userTonBalance;
-        alert(`Bạn đã mua ${qty} trứng với giá ${cost} TON!`);
-        // TODO: Thêm logic cập nhật danh sách trứng, gọi API / blockchain
-      } else {
-        alert('Không đủ TON để mua trứng!');
-      }
-    }
-
-    // Hàm mở trứng (demo)
-    function openEgg(eggId) {
-      alert(`Mở trứng #${eggId}! (Demo)`);
-      // TODO: Gọi smart contract random hero, hiển thị hero
-    }
-
-    // Hàm rút TON referral (demo)
     function claimRef() {
-      if (userRefTon > 0) {
-        alert(`Bạn vừa rút ${userRefTon} TON referral!`);
-        userTonBalance += userRefTon;
-        userRefTon = 0;
-        document.getElementById('tonBalance').innerHTML = 'TON Balance: ' + userTonBalance;
-        document.getElementById('refEarn').innerHTML = 'TON nhận từ referral: ' + userRefTon;
+      if (userReferralTon > 0) {
+        alert(`Bạn vừa rút ${userReferralTon} TON referral! (Demo)`);
+        userReferralTon = 0;
+        document.getElementById('refEarn').innerHTML = `TON nhận từ referral: <strong>${userReferralTon}</strong>`;
       } else {
-        alert('Hiện chưa có TON referral để rút!');
+        alert("Chưa có TON referral để rút!");
       }
     }
 
-    // Khởi tạo Telegram WebApp (nếu cần)
-    if (window.Telegram.WebApp) {
-      const tg = window.Telegram.WebApp;
-      tg.expand(); 
-      // Gọi các hàm, ví dụ: tg.MainButton.setText("Thanh toán");
+    /*
+      ============================================================
+      HÀM TAB CHÍNH & TAB CON
+      ============================================================
+    */
+    function openTab(evt, tabId) {
+      // Ẩn tất cả tab-content
+      const tabs = document.getElementsByClassName('tab-content');
+      for (let i = 0; i < tabs.length; i++) {
+        tabs[i].classList.remove('active');
+      }
+      // Xóa class active của tất cả nút tab
+      const tabBtns = document.getElementsByClassName('tab-btn');
+      for (let i = 0; i < tabBtns.length; i++) {
+        tabBtns[i].classList.remove('active');
+      }
+      // Hiện tab được chọn
+      document.getElementById(tabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
     }
+
+    function openSubTab(evt, subTabId) {
+      // Ẩn tất cả sub-tab-content
+      const subTabs = document.getElementsByClassName('sub-tab-content');
+      for (let i = 0; i < subTabs.length; i++) {
+        subTabs[i].classList.remove('active');
+      }
+      // Xóa class active tất cả sub-tab-btn
+      const subTabBtns = document.getElementsByClassName('sub-tab-btn');
+      for (let i = 0; i < subTabBtns.length; i++) {
+        subTabBtns[i].classList.remove('active');
+      }
+      // Hiện sub-tab được chọn
+      document.getElementById(subTabId).classList.add('active');
+      evt.currentTarget.classList.add('active');
+    }
+
+    /*
+      ============================================================
+      HÀM ĐẾM NGƯỢC PRESALE (DEMO)
+      ============================================================
+      Giả định presale còn 2 phút. Bạn có thể set datetime
+      thật (VD: new Date("2025-12-31T23:59:59Z")).
+    */
+    let presaleEndTime = new Date().getTime() + 2 * 60 * 1000; // 2 phút từ bây giờ
+    function updateCountdown() {
+      let now = new Date().getTime();
+      let distance = presaleEndTime - now;
+      if (distance < 0) {
+        document.getElementById('countdownTimer').innerText = "Đã kết thúc!";
+        return;
+      }
+      let minutes = Math.floor(distance / (1000 * 60));
+      let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+      document.getElementById('countdownTimer').innerText =
+        `${minutes.toString().padStart(2,'0')}:${seconds.toString().padStart(2,'0')}`;
+    }
+
+    /*
+      ============================================================
+      HÀM CẬP NHẬT THANH PROGRESS & SỐ TRỨNG CÒN LẠI
+      ============================================================
+    */
+    function updateEggStatus() {
+      // update text
+      document.getElementById('eggsLeft').innerText = eggsLeft;
+      // update progress
+      const percent = ((totalEggs - eggsLeft) / totalEggs) * 100;
+      document.getElementById('progressFill').style.width = percent + "%";
+    }
+
+    /*
+      ============================================================
+      ON LOAD
+      ============================================================
+    */
+    window.onload = function() {
+      // Telegram WebApp (nếu cần)
+      if (window.Telegram.WebApp) {
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+      }
+      // Render ban đầu
+      renderEggList();
+      renderHeroList();
+      updateEggStatus();
+
+      // Gọi hàm đếm ngược
+      updateCountdown();
+      setInterval(updateCountdown, 1000);
+    };
   </script>
 </body>
 </html>
